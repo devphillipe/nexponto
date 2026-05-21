@@ -14,16 +14,235 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      employees: {
+        Row: {
+          active: boolean
+          cpf: string | null
+          created_at: string
+          daily_hours: number | null
+          department: string | null
+          email: string
+          full_name: string
+          hire_date: string | null
+          id: string
+          phone: string | null
+          position: string | null
+          tenant_id: string
+          user_id: string
+        }
+        Insert: {
+          active?: boolean
+          cpf?: string | null
+          created_at?: string
+          daily_hours?: number | null
+          department?: string | null
+          email: string
+          full_name: string
+          hire_date?: string | null
+          id?: string
+          phone?: string | null
+          position?: string | null
+          tenant_id: string
+          user_id: string
+        }
+        Update: {
+          active?: boolean
+          cpf?: string | null
+          created_at?: string
+          daily_hours?: number | null
+          department?: string | null
+          email?: string
+          full_name?: string
+          hire_date?: string | null
+          id?: string
+          phone?: string | null
+          position?: string | null
+          tenant_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employees_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          tenant_id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          full_name: string
+          id: string
+          tenant_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tenants: {
+        Row: {
+          created_at: string
+          default_daily_hours: number
+          document: string | null
+          email: string | null
+          id: string
+          name: string
+          phone: string | null
+        }
+        Insert: {
+          created_at?: string
+          default_daily_hours?: number
+          document?: string | null
+          email?: string | null
+          id?: string
+          name: string
+          phone?: string | null
+        }
+        Update: {
+          created_at?: string
+          default_daily_hours?: number
+          document?: string | null
+          email?: string | null
+          id?: string
+          name?: string
+          phone?: string | null
+        }
+        Relationships: []
+      }
+      time_entries: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          employee_id: string
+          entry_at: string
+          entry_date: string
+          entry_type: Database["public"]["Enums"]["entry_type"]
+          id: string
+          ip: string | null
+          notes: string | null
+          source: Database["public"]["Enums"]["entry_source"]
+          tenant_id: string
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          employee_id: string
+          entry_at?: string
+          entry_date?: string
+          entry_type: Database["public"]["Enums"]["entry_type"]
+          id?: string
+          ip?: string | null
+          notes?: string | null
+          source?: Database["public"]["Enums"]["entry_source"]
+          tenant_id: string
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          employee_id?: string
+          entry_at?: string
+          entry_date?: string
+          entry_type?: Database["public"]["Enums"]["entry_type"]
+          id?: string
+          ip?: string | null
+          notes?: string | null
+          source?: Database["public"]["Enums"]["entry_source"]
+          tenant_id?: string
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "time_entries_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "time_entries_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          tenant_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          tenant_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          tenant_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_roles_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      current_tenant_id: { Args: never; Returns: string }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_tenant_admin: { Args: { _tenant_id: string }; Returns: boolean }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "employee"
+      entry_source: "automatico" | "manual_admin"
+      entry_type: "entrada" | "saida_almoco" | "retorno_almoco" | "saida"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +369,10 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "employee"],
+      entry_source: ["automatico", "manual_admin"],
+      entry_type: ["entrada", "saida_almoco", "retorno_almoco", "saida"],
+    },
   },
 } as const
