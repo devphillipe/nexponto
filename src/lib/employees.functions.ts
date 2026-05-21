@@ -1,0 +1,109 @@
+import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { supabaseAdmin } from "@/integrations/supabase/client.server";
+
+const CreateEmployeeSchema = z.object({
+  full_name: z.string().min(2).max(120),
+  email: z.string().email().max(180),
+  password: z.string().min(8).max(72),
+  cpf: z.string().max(20).optional().nullable(),
+  phone: z.string().max(30).optional().nullable(),
+  position: z.string().max(80).optional().nullable(),
+  department: z.string().max(80).optional().nullable(),
+  hire_date: z.string().optional().nullable(),
+  daily_hours: z.number().min(1).max(24).optional().nullable(),
+});
+
+export const createEmployee = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => CreateEmployeeSchema.parse(data))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+
+    // Get admin's tenant + verify admin role using the authed client (RLS).
+    const { data: profile, error: profErr } = await supabase
+      .from("profiles")
+      .select("tenant_id")
+      .eq("id", userId)
+      .maybeSingle();
+    if (profErr || !profile) throw new Error("Perfil não encontrado.");
+
+    const { data: roles, error: roleErr } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId)
+      .eq("tenant_id", profile.tenant_id);
+    if (roleErr) throw new Error(roleErr.message);
+    if (!roles?.some((r) => r.role === "admin")) {
+      throw new Error("Apenas administradores podem cadastrar funcionários.");
+    }
+
+    const tenantId = profile.tenant_id;
+
+    // Create auth user with provisional password (email auto-confirmed in config).
+    const { data: created, error: createErr } =
+      await supabaseAdmin.auth.admin.createUser({
+        email: data.email,
+        password: data.password,
+        email_confirm: true,
+        user_metadata: { signup_type: "employee", full_name: data.full_name },
+      });
+    if (createErr || !created.user) {
+      throw new Error(createErr?.message ?? "Falha ao criar usuário.");
+    }
+    const newUserId = created.user.id;
+
+    try {
+      const { error: pErr } = await supabaseAdmin.from("profiles").insert({
+        id: newUserId,
+        tenant_id: tenantId,
+        full_name: data.full_name,
+        email: data.email,
+      });
+      if (pErr) throw pErr;
+
+      const { error: rErr } = await supabaseAdmin.from("user_roles").insert({
+        user_id: newUserId,
+        tenant_id: tenantId,
+        role: "employee",
+      });
+      if (rErr) throw rErr;
+
+      const { error: eErr } = await supabaseAdmin.from("employees").insert({
+        tenant_id: tenantId,
+        user_id: newUserId,
+        full_name: data.full_name,
+        email: data.email,
+        cpf: data.cpf,
+        phone: data.phone,
+        position: data.position,
+        department: data.department,
+        hire_date: data.hire_date || null,
+        daily_hours: data.daily_hours ?? null,
+        active: true,
+      });
+      if (eErr) throw eErr;
+    } catch (e) {
+      // Roll back the auth user if downstream inserts failed.
+      await supabaseAdmin.auth.admin.deleteUser(newUserId).catch(() => {});
+      throw e instanceof Error ? e : new Error("Falha ao cadastrar funcionário.");
+    }
+
+    return { ok: true, user_id: newUserId };
+  });
+
+export const toggleEmployeeActive = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) =>
+    z.object({ employee_id: z.string().uuid(), active: z.boolean() }).parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const { error } = await supabase
+      .from("employees")
+      .update({ active: data.active })
+      .eq("id", data.employee_id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });

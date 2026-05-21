@@ -10,33 +10,68 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as FuncionarioLoginRouteImport } from './routes/funcionario.login'
+import { Route as AdminLoginRouteImport } from './routes/admin.login'
+import { Route as AdminCadastroRouteImport } from './routes/admin.cadastro'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FuncionarioLoginRoute = FuncionarioLoginRouteImport.update({
+  id: '/funcionario/login',
+  path: '/funcionario/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/admin/login',
+  path: '/admin/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminCadastroRoute = AdminCadastroRouteImport.update({
+  id: '/admin/cadastro',
+  path: '/admin/cadastro',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin/cadastro': typeof AdminCadastroRoute
+  '/admin/login': typeof AdminLoginRoute
+  '/funcionario/login': typeof FuncionarioLoginRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin/cadastro': typeof AdminCadastroRoute
+  '/admin/login': typeof AdminLoginRoute
+  '/funcionario/login': typeof FuncionarioLoginRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin/cadastro': typeof AdminCadastroRoute
+  '/admin/login': typeof AdminLoginRoute
+  '/funcionario/login': typeof FuncionarioLoginRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/admin/cadastro' | '/admin/login' | '/funcionario/login'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/admin/cadastro' | '/admin/login' | '/funcionario/login'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin/cadastro'
+    | '/admin/login'
+    | '/funcionario/login'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminCadastroRoute: typeof AdminCadastroRoute
+  AdminLoginRoute: typeof AdminLoginRoute
+  FuncionarioLoginRoute: typeof FuncionarioLoginRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,12 +83,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/funcionario/login': {
+      id: '/funcionario/login'
+      path: '/funcionario/login'
+      fullPath: '/funcionario/login'
+      preLoaderRoute: typeof FuncionarioLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/login': {
+      id: '/admin/login'
+      path: '/admin/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/cadastro': {
+      id: '/admin/cadastro'
+      path: '/admin/cadastro'
+      fullPath: '/admin/cadastro'
+      preLoaderRoute: typeof AdminCadastroRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminCadastroRoute: AdminCadastroRoute,
+  AdminLoginRoute: AdminLoginRoute,
+  FuncionarioLoginRoute: FuncionarioLoginRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
