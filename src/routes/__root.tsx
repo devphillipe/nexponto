@@ -71,17 +71,25 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Ponto Digital — Controle de ponto multitenant" },
+      { title: "NexPonto — Controle de ponto multitenant" },
       {
         name: "description",
         content:
           "Sistema de ponto digital com painel administrativo e portal do funcionário, isolamento total por escritório.",
       },
-      { property: "og:title", content: "Ponto Digital" },
+      { property: "og:title", content: "NexPonto — Controle de ponto multitenant" },
       {
         property: "og:description",
         content: "Painel do escritório + portal do funcionário em um só lugar.",
       },
+      { name: "twitter:title", content: "NexPonto — Controle de ponto multitenant" },
+      { name: "description", content: "Ponto Digital is a time tracking application for managing employee attendance and work hours." },
+      { property: "og:description", content: "Ponto Digital is a time tracking application for managing employee attendance and work hours." },
+      { name: "twitter:description", content: "Ponto Digital is a time tracking application for managing employee attendance and work hours." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/94a48ac5-0ee0-4fed-9617-69c211480ed0/id-preview-6212d833--1ddd49b7-dd66-45ec-835e-37eb4f3dce9c.lovable.app-1779330822556.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/94a48ac5-0ee0-4fed-9617-69c211480ed0/id-preview-6212d833--1ddd49b7-dd66-45ec-835e-37eb4f3dce9c.lovable.app-1779330822556.png" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:type", content: "website" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
