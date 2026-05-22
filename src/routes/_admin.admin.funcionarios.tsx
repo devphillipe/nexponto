@@ -16,10 +16,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Plus, Mail } from "lucide-react";
+import { Plus, Mail, User, Briefcase, Calendar, ShieldCheck, Search } from "lucide-react";
 
 export const Route = createFileRoute("/_admin/admin/funcionarios")({
-  head: () => ({ meta: [{ title: "Funcionários — Admin" }] }),
+  head: () => ({ meta: [{ title: "Funcionários — NexPonto Admin" }] }),
   component: EmployeesPage,
 });
 
@@ -27,6 +27,7 @@ function EmployeesPage() {
   const qc = useQueryClient();
   const toggleFn = useServerFn(toggleEmployeeActive);
   const [open, setOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const { data: employees, isLoading } = useQuery({
     queryKey: ["employees"],
@@ -43,73 +44,118 @@ function EmployeesPage() {
   async function handleToggle(id: string, active: boolean) {
     try {
       await toggleFn({ data: { employee_id: id, active } });
-      toast.success(active ? "Funcionário ativado" : "Funcionário desativado");
+      toast.success(active ? "Colaborador reativado" : "Colaborador desativado");
       qc.invalidateQueries({ queryKey: ["employees"] });
     } catch (e) {
       toast.error((e as Error).message);
     }
   }
 
+  const filtered = employees?.filter(e => 
+    e.full_name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    e.email.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between gap-4">
+    <div className="space-y-8 animate-in fade-in duration-500">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <h1 className="font-display text-3xl font-semibold">Funcionários</h1>
-          <p className="text-sm text-muted-foreground">
-            Cadastre e gerencie os colaboradores do escritório.
-          </p>
+          <h1 className="font-display text-4xl font-bold tracking-tight">Equipe</h1>
+          <p className="text-muted-foreground mt-2">Gerencie todos os colaboradores do seu escritório.</p>
         </div>
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" /> Novo funcionário
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-lg">
-            <DialogHeader>
-              <DialogTitle>Cadastrar funcionário</DialogTitle>
-            </DialogHeader>
-            <NewEmployeeForm onDone={() => { setOpen(false); qc.invalidateQueries({ queryKey: ["employees"] }); }} />
-          </DialogContent>
-        </Dialog>
+        <div className="flex gap-3">
+          <div className="relative hidden sm:block">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input 
+              placeholder="Buscar por nome ou e-mail..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 h-11 w-64 bg-muted/20 border-border/40 rounded-xl"
+            />
+          </div>
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button className="premium-button h-11 px-6 rounded-xl font-bold">
+                <Plus className="mr-2 h-5 w-5" /> Novo Colaborador
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl p-0 overflow-hidden bg-background border-primary/20 rounded-[2rem]">
+              <div className="bg-primary/5 p-8 border-b border-primary/10">
+                <DialogHeader>
+                  <DialogTitle className="text-2xl font-display font-bold">Cadastrar Colaborador</DialogTitle>
+                  <p className="text-muted-foreground text-sm mt-1">Preencha os dados abaixo para gerar as credenciais de acesso.</p>
+                </DialogHeader>
+              </div>
+              <div className="p-8">
+                <NewEmployeeForm onDone={() => { setOpen(false); qc.invalidateQueries({ queryKey: ["employees"] }); }} />
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
-      <div className="glass-card overflow-hidden rounded-xl">
+      <div className="glass-card overflow-hidden rounded-[2rem] border border-border/40">
         {isLoading ? (
-          <div className="p-8 text-center text-sm text-muted-foreground">Carregando...</div>
-        ) : !employees?.length ? (
-          <div className="p-12 text-center">
-            <p className="text-sm text-muted-foreground">Nenhum funcionário cadastrado ainda.</p>
+          <div className="p-16 text-center text-sm text-muted-foreground animate-pulse">Carregando equipe...</div>
+        ) : !filtered?.length ? (
+          <div className="p-20 text-center space-y-4">
+             <div className="h-20 w-20 bg-muted/30 rounded-[1.5rem] grid place-items-center mx-auto mb-2">
+                <User className="h-10 w-10 text-muted-foreground" />
+             </div>
+             <p className="text-muted-foreground font-medium">
+               {searchTerm ? "Nenhum colaborador encontrado para esta busca." : "Sua equipe está vazia. Comece cadastrando alguém!"}
+             </p>
           </div>
         ) : (
           <table className="w-full text-sm">
-            <thead className="border-b border-border bg-card/50 text-left text-xs uppercase text-muted-foreground">
+            <thead className="border-b border-border/40 bg-muted/20 text-left text-[11px] uppercase font-bold tracking-widest text-muted-foreground">
               <tr>
-                <th className="px-4 py-3">Nome</th>
-                <th className="px-4 py-3">Cargo</th>
-                <th className="px-4 py-3">E-mail</th>
-                <th className="px-4 py-3">Jornada</th>
-                <th className="px-4 py-3 text-right">Ativo</th>
+                <th className="px-8 py-4">Nome & Contato</th>
+                <th className="px-6 py-4">Departamento / Cargo</th>
+                <th className="px-6 py-4">Jornada Diária</th>
+                <th className="px-6 py-4 text-right">Status de Acesso</th>
               </tr>
             </thead>
-            <tbody>
-              {employees.map((e) => (
-                <tr key={e.id} className="border-b border-border/50 last:border-0">
-                  <td className="px-4 py-3 font-medium">{e.full_name}</td>
-                  <td className="px-4 py-3 text-muted-foreground">{e.position || "—"}</td>
-                  <td className="px-4 py-3 text-muted-foreground">
-                    <span className="inline-flex items-center gap-1.5">
-                      <Mail className="h-3 w-3" /> {e.email}
-                    </span>
+            <tbody className="divide-y divide-border/20">
+              {filtered.map((e) => (
+                <tr key={e.id} className="hover:bg-muted/10 transition-colors group">
+                  <td className="px-8 py-5">
+                    <div className="flex items-center gap-4">
+                       <div className="h-10 w-10 rounded-xl bg-primary/10 border border-primary/10 grid place-items-center font-bold text-primary group-hover:scale-110 transition-transform">
+                          {e.full_name.charAt(0)}
+                       </div>
+                       <div>
+                          <div className="font-bold text-sm leading-tight">{e.full_name}</div>
+                          <div className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1.5 font-medium">
+                             <Mail className="h-3 w-3" /> {e.email}
+                          </div>
+                       </div>
+                    </div>
                   </td>
-                  <td className="px-4 py-3 text-muted-foreground">
-                    {e.daily_hours ? `${e.daily_hours}h` : "Padrão"}
+                  <td className="px-6 py-5">
+                    <div className="space-y-0.5">
+                       <div className="font-semibold text-xs flex items-center gap-1.5">
+                          <Briefcase className="h-3 w-3 text-muted-foreground" /> {e.position || "Sem Cargo"}
+                       </div>
+                       <div className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">{e.department || "Geral"}</div>
+                    </div>
                   </td>
-                  <td className="px-4 py-3 text-right">
-                    <Switch
-                      checked={e.active}
-                      onCheckedChange={(v) => handleToggle(e.id, v)}
-                    />
+                  <td className="px-6 py-5">
+                     <span className="px-3 py-1 bg-muted/50 rounded-lg text-xs font-bold border border-border/20">
+                        {e.daily_hours ? `${e.daily_hours} horas` : "Padrão (8h)"}
+                     </span>
+                  </td>
+                  <td className="px-8 py-5 text-right">
+                    <div className="flex items-center justify-end gap-3">
+                       <span className={`text-[10px] font-bold uppercase tracking-widest ${e.active ? "text-success" : "text-muted-foreground"}`}>
+                          {e.active ? "Ativo" : "Inativo"}
+                       </span>
+                       <Switch
+                         checked={e.active}
+                         onCheckedChange={(v) => handleToggle(e.id, v)}
+                         className="data-[state=checked]:bg-success"
+                       />
+                    </div>
                   </td>
                 </tr>
               ))}

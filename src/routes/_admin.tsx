@@ -1,8 +1,9 @@
 import { createFileRoute, Link, Outlet, redirect, useNavigate, useLocation } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useProfile } from "@/lib/auth";
-import { LayoutDashboard, Users, Clock, LogOut, Building2 } from "lucide-react";
+import { LayoutDashboard, Users, Clock, LogOut, Building2, Bell, Search, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 export const Route = createFileRoute("/_admin")({
   beforeLoad: async () => {
@@ -38,47 +39,101 @@ function AdminLayout() {
   }
 
   return (
-    <div className="flex min-h-screen">
-      <aside className="hidden w-64 shrink-0 flex-col border-r border-sidebar-border bg-sidebar p-4 md:flex">
-        <div className="mb-8 flex items-center gap-2 px-2">
-          <div className="grid h-9 w-9 place-items-center rounded-lg bg-[var(--gradient-primary)] shadow-[var(--shadow-glow)]">
-            <Building2 className="h-5 w-5 text-primary-foreground" />
+    <div className="flex min-h-screen bg-background/50">
+      <aside className="hidden w-72 shrink-0 flex-col border-r border-sidebar-border bg-sidebar/50 backdrop-blur-xl p-6 md:flex sticky top-0 h-screen">
+        <div className="mb-10 flex items-center gap-3 px-2">
+          <div className="grid h-10 w-10 place-items-center rounded-xl bg-[var(--gradient-primary)] shadow-[var(--shadow-glow)]">
+            <Building2 className="h-6 w-6 text-primary-foreground" />
           </div>
           <div className="min-w-0">
-            <div className="truncate font-display text-sm font-semibold">
-              {profile?.tenant_name || "Escritório"}
+            <div className="truncate font-display text-lg font-bold tracking-tight">
+              NexPonto
             </div>
-            <div className="truncate text-[10px] uppercase tracking-wider text-primary/70">
-              Administrador
+            <div className="truncate text-[10px] uppercase font-bold tracking-[0.2em] text-primary">
+              Admin Console
             </div>
           </div>
         </div>
-        <nav className="flex flex-1 flex-col gap-1">
+
+        <div className="mb-8 p-4 glass-card rounded-2xl">
+           <div className="flex items-center gap-3">
+             <div className="h-10 w-10 rounded-full bg-primary/20 border border-primary/20 grid place-items-center text-primary font-bold">
+               {profile?.tenant_name?.charAt(0) || "E"}
+             </div>
+             <div className="min-w-0">
+               <div className="truncate text-sm font-semibold">{profile?.tenant_name || "Escritório"}</div>
+               <div className="truncate text-[10px] text-muted-foreground uppercase font-medium">Conta Ativa</div>
+             </div>
+           </div>
+        </div>
+
+        <nav className="flex flex-1 flex-col gap-2">
+          <div className="px-2 mb-2 text-[10px] uppercase font-bold tracking-widest text-muted-foreground/50">
+            Principal
+          </div>
           {nav.map((item) => {
             const active = loc.pathname.startsWith(item.to);
             return (
               <Link
                 key={item.to}
                 to={item.to}
-                className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${
+                className={`group flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all ${
                   active
-                    ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                    : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
+                    ? "bg-primary/10 text-primary border border-primary/20"
+                    : "text-muted-foreground hover:bg-sidebar-accent/50 hover:text-foreground"
                 }`}
               >
-                <item.icon className="h-4 w-4" />
+                <item.icon className={`h-4.5 w-4.5 transition-colors ${active ? "text-primary" : "group-hover:text-primary"}`} />
                 {item.label}
               </Link>
             );
           })}
         </nav>
-        <Button variant="ghost" onClick={logout} className="justify-start gap-2">
-          <LogOut className="h-4 w-4" /> Sair
-        </Button>
+
+        <div className="mt-auto space-y-4 pt-6 border-t border-border/40">
+           <button className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-muted-foreground hover:bg-sidebar-accent/50 hover:text-foreground transition-all">
+             <Settings className="h-4.5 w-4.5" /> Configurações
+           </button>
+           <button 
+             onClick={logout}
+             className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-destructive/80 hover:bg-destructive/10 hover:text-destructive transition-all"
+           >
+             <LogOut className="h-4.5 w-4.5" /> Sair do Sistema
+           </button>
+        </div>
       </aside>
-      <main className="flex-1 overflow-x-hidden p-6 md:p-10">
-        <Outlet />
-      </main>
+
+      <div className="flex-1 flex flex-col min-w-0">
+        <header className="h-20 border-b border-border/40 flex items-center justify-between px-6 md:px-10 bg-background/20 backdrop-blur-md sticky top-0 z-30">
+           <div className="relative w-full max-w-md hidden md:block">
+             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+             <Input 
+               placeholder="Pesquisar..." 
+               className="pl-10 bg-muted/30 border-none rounded-xl h-10 focus-visible:ring-primary/30"
+             />
+           </div>
+           <div className="flex items-center gap-4 ml-auto">
+             <button className="relative p-2 rounded-xl hover:bg-muted/50 transition-colors">
+               <Bell className="h-5 w-5 text-muted-foreground" />
+               <span className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full border-2 border-background"></span>
+             </button>
+             <div className="h-8 w-[1px] bg-border/50 mx-2"></div>
+             <div className="flex items-center gap-3">
+                <div className="text-right hidden sm:block">
+                  <div className="text-sm font-semibold leading-tight">{profile?.full_name?.split(" ")[0]}</div>
+                  <div className="text-[10px] text-muted-foreground uppercase font-medium">Administrador</div>
+                </div>
+                <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/10 grid place-items-center font-bold text-primary">
+                  {profile?.full_name?.charAt(0) || "A"}
+                </div>
+             </div>
+           </div>
+        </header>
+        
+        <main className="flex-1 p-6 md:p-10 max-w-[1600px] mx-auto w-full">
+          <Outlet />
+        </main>
+      </div>
     </div>
   );
 }

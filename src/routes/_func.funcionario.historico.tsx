@@ -2,17 +2,25 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useProfile } from "@/lib/auth";
+import { Calendar, Clock, ChevronRight, History } from "lucide-react";
 
 export const Route = createFileRoute("/_func/funcionario/historico")({
-  head: () => ({ meta: [{ title: "Histórico" }] }),
+  head: () => ({ meta: [{ title: "Meu Histórico — NexPonto" }] }),
   component: HistoryPage,
 });
 
 const TYPE_LABEL: Record<string, string> = {
   entrada: "Entrada",
-  saida_almoco: "Saída almoço",
-  retorno_almoco: "Retorno almoço",
-  saida: "Saída",
+  saida_almoco: "Saída Almoço",
+  retorno_almoco: "Retorno Almoço",
+  saida: "Saída Final",
+};
+
+const TYPE_COLOR: Record<string, string> = {
+  entrada: "text-success",
+  saida_almoco: "text-warning",
+  retorno_almoco: "text-primary",
+  saida: "text-destructive",
 };
 
 function HistoryPage() {
@@ -39,58 +47,75 @@ function HistoryPage() {
     },
   });
 
-  // group by date
   const grouped: Record<string, typeof entries> = {};
   (entries ?? []).forEach((e) => {
     (grouped[e.entry_date] ||= [] as any).push(e);
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div>
-        <h1 className="font-display text-2xl font-semibold">Histórico</h1>
-        <p className="text-sm text-muted-foreground">Seus últimos 100 registros.</p>
+        <h1 className="font-display text-3xl font-bold tracking-tight">Histórico</h1>
+        <p className="text-muted-foreground mt-1">Seus últimos registros de ponto sincronizados.</p>
       </div>
 
       {isLoading ? (
-        <div className="glass-card rounded-xl p-8 text-center text-sm text-muted-foreground">
-          Carregando...
+        <div className="glass-card rounded-[2rem] p-20 text-center text-sm text-muted-foreground animate-pulse">
+          Carregando histórico...
         </div>
       ) : !entries?.length ? (
-        <div className="glass-card rounded-xl p-8 text-center text-sm text-muted-foreground">
-          Nenhum registro ainda.
+        <div className="glass-card rounded-[2rem] p-20 text-center space-y-4">
+           <div className="h-16 w-16 bg-muted/30 rounded-full grid place-items-center mx-auto">
+              <History className="h-8 w-8 text-muted-foreground" />
+           </div>
+           <p className="text-muted-foreground">Você ainda não possui registros.</p>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-6">
           {Object.entries(grouped).map(([date, items]) => (
-            <div key={date} className="glass-card rounded-xl p-5">
-              <div className="mb-3 text-sm font-semibold capitalize">
-                {new Date(date + "T00:00:00").toLocaleDateString("pt-BR", {
-                  weekday: "long",
-                  day: "2-digit",
-                  month: "long",
-                  year: "numeric",
-                })}
+            <div key={date} className="glass-card rounded-[2rem] p-6 border border-border/40 overflow-hidden relative">
+              <div className="absolute top-0 left-0 w-1.5 h-full bg-primary/20"></div>
+              <div className="mb-4 flex items-center justify-between px-2">
+                <div className="flex items-center gap-3">
+                   <div className="p-2 rounded-xl bg-primary/10">
+                      <Calendar className="h-4 w-4 text-primary" />
+                   </div>
+                   <span className="font-bold text-sm capitalize">
+                    {new Date(date + "T00:00:00").toLocaleDateString("pt-BR", {
+                      weekday: "long",
+                      day: "2-digit",
+                      month: "long",
+                    })}
+                   </span>
+                </div>
+                <span className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground">
+                   {items?.length} registros
+                </span>
               </div>
-              <div className="space-y-1.5">
+              
+              <div className="space-y-2">
                 {items!.map((e) => (
                   <div
                     key={e.id}
-                    className="flex items-center justify-between rounded-md bg-card/40 px-3 py-2 text-sm"
+                    className="group flex items-center justify-between rounded-[1.25rem] bg-muted/10 hover:bg-muted/20 border border-transparent hover:border-border/40 px-5 py-4 transition-all"
                   >
-                    <span>{TYPE_LABEL[e.entry_type]}</span>
-                    <div className="flex items-center gap-3">
-                      {e.source === "manual_admin" && (
-                        <span className="rounded-full bg-warning/15 px-2 py-0.5 text-xs text-warning">
-                          Ajustado por admin
+                    <div className="flex items-center gap-4">
+                       <div className={`h-2 w-2 rounded-full ${TYPE_COLOR[e.entry_type] || "bg-muted"}`}></div>
+                       <span className="font-bold text-sm">{TYPE_LABEL[e.entry_type]}</span>
+                       {e.source === "manual_admin" && (
+                        <span className="rounded-full bg-warning/10 border border-warning/20 px-2.5 py-0.5 text-[10px] font-bold text-warning uppercase tracking-tighter">
+                          Ajustado
                         </span>
                       )}
-                      <span className="font-mono">
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <span className="font-mono font-bold text-base text-primary/80">
                         {new Date(e.entry_at).toLocaleTimeString("pt-BR", {
                           hour: "2-digit",
                           minute: "2-digit",
                         })}
                       </span>
+                      <ChevronRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                     </div>
                   </div>
                 ))}
