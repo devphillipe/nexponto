@@ -48,7 +48,9 @@ function AdminLayout() {
             <div className="truncate font-display text-sm font-semibold">
               {profile?.tenant_name || "Escritório"}
             </div>
-            <div className="truncate text-xs text-muted-foreground">{profile?.full_name}</div>
+            <div className="truncate text-[10px] uppercase tracking-wider text-primary/70">
+              Administrador
+            </div>
           </div>
         </div>
         <nav className="flex flex-1 flex-col gap-1">
