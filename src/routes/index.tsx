@@ -116,11 +116,9 @@ function Landing() {
       </section>
 
       <footer className="mt-auto py-10 flex flex-col md:flex-row items-center justify-between border-t border-border/40 gap-4">
-        <div className="flex items-center gap-2 opacity-80">
-          <div className="h-6 w-6 rounded-lg bg-primary/20 grid place-items-center">
-            <Clock className="h-3.5 w-3.5 text-primary" />
-          </div>
-          <span className="font-display font-bold text-sm tracking-tight">NexPonto</span>
+        <div className="flex items-center gap-2 opacity-80 text-primary">
+          <LogoMark size={20} />
+          <span className="font-display font-bold text-sm tracking-tight text-foreground">NexPonto</span>
         </div>
         <div className="text-[13px] text-muted-foreground">
           © {new Date().getFullYear()} NexPonto — Todos os direitos reservados.
