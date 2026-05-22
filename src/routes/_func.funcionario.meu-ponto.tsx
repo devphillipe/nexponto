@@ -39,6 +39,7 @@ function MyClockPage() {
 
   const { data: employee } = useQuery({
     queryKey: ["my-employee"],
+    staleTime: 1000 * 60 * 60, // 1 hour (employee info rarely changes)
     enabled: !!profile,
     queryFn: async () => {
       const { data, error } = await supabase
@@ -53,6 +54,7 @@ function MyClockPage() {
 
   const { data: todayEntries } = useQuery({
     queryKey: ["my-today", employee?.id],
+    staleTime: 1000 * 30, // 30 seconds
     enabled: !!employee,
     queryFn: async () => {
       const { data, error } = await supabase
