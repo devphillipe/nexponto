@@ -5,19 +5,19 @@
   --font-sans: "Inter", system-ui, sans-serif;
   --font-display: "Space Grotesk", system-ui, sans-serif;
 
-  --color-primary: #8b5cf6;
-  --color-primary-foreground: #ffffff;
-  --color-accent: #d946ef;
+  --color-primary: #06b6d4;
+  --color-primary-foreground: #0a0f14;
+  --color-accent: #22d3ee;
   --color-success: #10b981;
   --color-warning: #f59e0b;
   --color-destructive: #ef4444;
-  --color-background: #09090b;
-  --color-foreground: #fafafa;
-  --color-muted: #18181b;
-  --color-muted-foreground: #a1a1aa;
-  --color-border: #27272a;
-  --color-input: #27272a;
-  --color-ring: #8b5cf6;
+  --color-background: #0b0d10;
+  --color-foreground: #f5f7fa;
+  --color-muted: #15181d;
+  --color-muted-foreground: #8b95a3;
+  --color-border: #1f242b;
+  --color-input: #1f242b;
+  --color-ring: #06b6d4;
 
   --radius-xl: 1rem;
   --radius-2xl: 1.5rem;
