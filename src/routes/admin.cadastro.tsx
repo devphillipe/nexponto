@@ -18,8 +18,6 @@ function AdminSignup() {
     tenant_name: "",
     tenant_document: "",
     tenant_phone: "",
-    tenant_email: "",
-    full_name: "",
     email: "",
     password: "",
     confirm: "",
@@ -48,11 +46,11 @@ function AdminSignup() {
         emailRedirectTo: `${window.location.origin}/admin/dashboard`,
         data: {
           signup_type: "admin",
-          full_name: form.full_name,
+          full_name: form.tenant_name,
           tenant_name: form.tenant_name,
           tenant_document: form.tenant_document,
           tenant_phone: form.tenant_phone,
-          tenant_email: form.tenant_email || form.email,
+          tenant_email: form.email,
         },
       },
     });
@@ -83,60 +81,81 @@ function AdminSignup() {
             </div>
             <div>
               <h1 className="font-display text-xl font-semibold">Cadastre seu escritório</h1>
-              <p className="text-xs text-muted-foreground">Você será o administrador</p>
+              <p className="text-xs text-muted-foreground">Conta administrativa do escritório</p>
             </div>
           </div>
           <form onSubmit={onSubmit} className="space-y-4">
-            <div className="rounded-lg border border-border bg-card/40 p-4">
-              <h2 className="mb-3 text-sm font-semibold text-muted-foreground">Dados da empresa</h2>
-              <div className="space-y-3">
+            <div className="space-y-4 rounded-lg border border-border bg-card/40 p-5">
+              <div className="space-y-1.5">
+                <Label htmlFor="tn">Nome do escritório *</Label>
+                <Input 
+                  id="tn" 
+                  placeholder="Ex: Contabilidade Silva"
+                  required 
+                  value={form.tenant_name} 
+                  onChange={(e) => up("tenant_name", e.target.value)} 
+                />
+              </div>
+              
+              <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <Label htmlFor="tn">Nome do escritório *</Label>
-                  <Input id="tn" required value={form.tenant_name} onChange={(e) => up("tenant_name", e.target.value)} />
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1.5">
-                    <Label htmlFor="td">CPF/CNPJ</Label>
-                    <Input id="td" value={form.tenant_document} onChange={(e) => up("tenant_document", e.target.value)} />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="tp">Telefone</Label>
-                    <Input id="tp" value={form.tenant_phone} onChange={(e) => up("tenant_phone", e.target.value)} />
-                  </div>
+                  <Label htmlFor="td">CPF/CNPJ</Label>
+                  <Input 
+                    id="td" 
+                    placeholder="00.000.000/0000-00"
+                    value={form.tenant_document} 
+                    onChange={(e) => up("tenant_document", e.target.value)} 
+                  />
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="te">E-mail do escritório</Label>
-                  <Input id="te" type="email" value={form.tenant_email} onChange={(e) => up("tenant_email", e.target.value)} />
+                  <Label htmlFor="tp">Telefone</Label>
+                  <Input 
+                    id="tp" 
+                    placeholder="(00) 00000-0000"
+                    value={form.tenant_phone} 
+                    onChange={(e) => up("tenant_phone", e.target.value)} 
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="ae">E-mail (login) *</Label>
+                <Input 
+                  id="ae" 
+                  type="email" 
+                  placeholder="admin@escritorio.com"
+                  required 
+                  value={form.email} 
+                  onChange={(e) => up("email", e.target.value)} 
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="pw">Senha *</Label>
+                  <Input 
+                    id="pw" 
+                    type="password" 
+                    required 
+                    value={form.password} 
+                    onChange={(e) => up("password", e.target.value)} 
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="pc">Confirmar *</Label>
+                  <Input 
+                    id="pc" 
+                    type="password" 
+                    required 
+                    value={form.confirm} 
+                    onChange={(e) => up("confirm", e.target.value)} 
+                  />
                 </div>
               </div>
             </div>
 
-            <div className="rounded-lg border border-border bg-card/40 p-4">
-              <h2 className="mb-3 text-sm font-semibold text-muted-foreground">Administrador</h2>
-              <div className="space-y-3">
-                <div className="space-y-1.5">
-                  <Label htmlFor="fn">Nome completo *</Label>
-                  <Input id="fn" required value={form.full_name} onChange={(e) => up("full_name", e.target.value)} />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="ae">E-mail (login) *</Label>
-                  <Input id="ae" type="email" required value={form.email} onChange={(e) => up("email", e.target.value)} />
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1.5">
-                    <Label htmlFor="pw">Senha *</Label>
-                    <Input id="pw" type="password" required value={form.password} onChange={(e) => up("password", e.target.value)} />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="pc">Confirmar *</Label>
-                    <Input id="pc" type="password" required value={form.confirm} onChange={(e) => up("confirm", e.target.value)} />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <Button type="submit" disabled={loading} className="w-full">
-              {loading ? "Criando..." : "Criar escritório"}
+            <Button type="submit" disabled={loading} className="w-full py-6 text-base shadow-[var(--shadow-glow)]">
+              {loading ? "Criando..." : "Criar conta do escritório"}
             </Button>
           </form>
         </div>

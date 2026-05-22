@@ -45,8 +45,8 @@ function Dashboard() {
   return (
     <div className="space-y-8">
       <div>
-        <p className="text-sm text-muted-foreground">Bem-vindo de volta,</p>
-        <h1 className="font-display text-3xl font-semibold">{profile?.full_name}</h1>
+        <p className="text-sm text-muted-foreground">Painel do escritório,</p>
+        <h1 className="font-display text-3xl font-semibold">{profile?.tenant_name}</h1>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

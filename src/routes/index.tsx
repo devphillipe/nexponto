@@ -22,7 +22,7 @@ function Landing() {
             to="/admin/login"
             className="rounded-md px-3 py-2 text-muted-foreground transition-colors hover:bg-accent/40 hover:text-foreground"
           >
-            Acesso admin
+            Acesso escritório
           </Link>
           <Link
             to="/funcionario/login"
