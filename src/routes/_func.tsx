@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useProfile } from "@/lib/auth";
 import { Clock, History, LogOut, User, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { memo } from "react";
 
 export const Route = createFileRoute("/_func")({
   beforeLoad: async () => {
@@ -18,7 +19,7 @@ export const Route = createFileRoute("/_func")({
       throw redirect({ to: "/funcionario/login" });
     }
   },
-  component: FuncLayout,
+  component: memo(FuncLayout),
 });
 
 const nav = [
