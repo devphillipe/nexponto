@@ -5,21 +5,21 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useProfile } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, Clock, LogIn, Coffee, Sunrise, LogOut } from "lucide-react";
+import { CheckCircle2, Clock, LogIn, Coffee, Sunrise, LogOut, MapPin, Smartphone } from "lucide-react";
 
 export const Route = createFileRoute("/_func/funcionario/meu-ponto")({
-  head: () => ({ meta: [{ title: "Meu Ponto" }] }),
+  head: () => ({ meta: [{ title: "Registrar Ponto — NexPonto" }] }),
   component: MyClockPage,
 });
 
 const SEQUENCE = ["entrada", "saida_almoco", "retorno_almoco", "saida"] as const;
 type EntryType = (typeof SEQUENCE)[number];
 
-const META: Record<EntryType, { label: string; icon: typeof LogIn; tone: string }> = {
-  entrada: { label: "Entrada", icon: LogIn, tone: "text-success" },
-  saida_almoco: { label: "Saída para almoço", icon: Coffee, tone: "text-warning" },
-  retorno_almoco: { label: "Retorno do almoço", icon: Sunrise, tone: "text-primary" },
-  saida: { label: "Saída final", icon: LogOut, tone: "text-destructive" },
+const META: Record<EntryType, { label: string; icon: typeof LogIn; tone: string; bg: string }> = {
+  entrada: { label: "Entrada", icon: LogIn, tone: "text-success", bg: "bg-success/10" },
+  saida_almoco: { label: "Saída Almoço", icon: Coffee, tone: "text-warning", bg: "bg-warning/10" },
+  retorno_almoco: { label: "Retorno Almoço", icon: Sunrise, tone: "text-primary", bg: "bg-primary/10" },
+  saida: { label: "Saída Final", icon: LogOut, tone: "text-destructive", bg: "bg-destructive/10" },
 };
 
 function todayStr() {
@@ -84,7 +84,7 @@ function MyClockPage() {
       toast.error(error.message);
       return;
     }
-    toast.success(`${META[nextType].label} registrada!`);
+    toast.success(`${META[nextType].label} registrada com sucesso!`);
     qc.invalidateQueries({ queryKey: ["my-today"] });
   }
 
@@ -100,88 +100,147 @@ function MyClockPage() {
   });
 
   return (
-    <div className="space-y-6">
-      <div>
-        <p className="text-sm text-muted-foreground capitalize">{dateStr}</p>
-        <h1 className="font-display text-2xl font-semibold">
-          Olá, {profile?.full_name?.split(" ")[0]} 👋
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="text-center md:text-left">
+        <h1 className="font-display text-4xl font-bold tracking-tight">
+          Olá, {profile?.full_name?.split(" ")[0]}!
         </h1>
+        <p className="text-muted-foreground mt-1 text-lg capitalize">{dateStr}</p>
       </div>
 
-      <div className="glass-card rounded-2xl p-8 text-center">
-        <div className="font-mono text-5xl font-semibold tracking-tight">
-          {now.toLocaleTimeString("pt-BR")}
+      <div className="glass-card rounded-[2.5rem] p-10 text-center relative overflow-hidden group">
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-50"></div>
+        
+        <div className="mb-8 space-y-2">
+           <div className="font-mono text-7xl font-bold tracking-tighter text-primary animate-pulse-slow">
+             {now.toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' })}<span className="text-4xl opacity-50">:{now.toLocaleTimeString("pt-BR", { second: '2-digit' })}</span>
+           </div>
+           <div className="flex items-center justify-center gap-2 text-xs font-bold text-muted-foreground uppercase tracking-widest">
+              <MapPin className="h-3 w-3" /> Localização: Escritório Central
+           </div>
         </div>
+
         {employee?.active === false ? (
-          <p className="mt-6 text-sm text-destructive">
-            Sua conta está inativa. Contate o administrador.
-          </p>
-        ) : nextType ? (
-          <>
-            <p className="mt-4 text-sm text-muted-foreground">Próximo registro:</p>
-            <p className={`mt-1 text-lg font-semibold ${META[nextType].tone}`}>
-              {META[nextType].label}
+          <div className="p-6 rounded-3xl bg-destructive/10 border border-destructive/20">
+            <p className="text-sm font-bold text-destructive">
+              CONTA INATIVA. Contate o administrador do sistema.
             </p>
+          </div>
+        ) : nextType ? (
+          <div className="max-w-md mx-auto space-y-8">
+            <div className="p-6 rounded-3xl bg-muted/30 border border-border/40 relative">
+               <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-background border border-border text-[10px] uppercase font-bold tracking-widest text-muted-foreground">
+                 Próximo Registro
+               </span>
+               <div className={`text-2xl font-bold flex items-center justify-center gap-3 ${META[nextType].tone}`}>
+                  {(() => {
+                    const Icon = META[nextType].icon;
+                    return <Icon className="h-7 w-7" />;
+                  })()}
+                  {META[nextType].label}
+               </div>
+            </div>
+
             <Button
               size="lg"
               onClick={punch}
               disabled={punching}
-              className="mt-6 h-14 w-full max-w-xs text-base shadow-[var(--shadow-glow)]"
+              className="premium-button h-20 w-full rounded-3xl text-xl font-bold gap-3"
             >
-              <Clock className="mr-2 h-5 w-5" />
-              {punching ? "Registrando..." : "Registrar Ponto"}
+              <Smartphone className="h-6 w-6" />
+              {punching ? "Registrando..." : "Registrar Agora"}
             </Button>
-          </>
+            
+            <p className="text-xs text-muted-foreground">
+              Certifique-se de que está no seu local de trabalho.
+            </p>
+          </div>
         ) : (
-          <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-success/15 px-4 py-2 text-sm text-success">
-            <CheckCircle2 className="h-4 w-4" /> Ponto completo do dia
+          <div className="py-10 space-y-4">
+            <div className="h-24 w-24 rounded-full bg-success/10 border-4 border-success/20 flex items-center justify-center mx-auto mb-4 animate-bounce">
+               <CheckCircle2 className="h-12 w-12 text-success" />
+            </div>
+            <h2 className="text-2xl font-bold">Jornada Concluída!</h2>
+            <p className="text-muted-foreground max-w-xs mx-auto">
+              Você já realizou todos os registros obrigatórios para o dia de hoje.
+            </p>
           </div>
         )}
       </div>
 
-      <div className="glass-card rounded-2xl p-6">
-        <h2 className="mb-4 font-display text-base font-semibold">Hoje</h2>
-        <div className="space-y-2">
-          {SEQUENCE.map((t) => {
-            const entry = todayEntries?.find((e) => e.entry_type === t);
-            const Icon = META[t].icon;
-            return (
-              <div
-                key={t}
-                className="flex items-center justify-between rounded-lg border border-border/50 bg-card/30 px-4 py-3"
-              >
-                <div className="flex items-center gap-3">
-                  <Icon className={`h-4 w-4 ${entry ? META[t].tone : "text-muted-foreground"}`} />
-                  <span className={entry ? "" : "text-muted-foreground"}>{META[t].label}</span>
+      <div className="grid gap-6 md:grid-cols-2">
+        <div className="glass-card rounded-[2rem] p-8">
+          <h2 className="mb-6 font-display text-xl font-bold flex items-center gap-2">
+            <Clock className="h-5 w-5 text-primary" /> Histórico de Hoje
+          </h2>
+          <div className="space-y-3">
+            {SEQUENCE.map((t) => {
+              const entry = todayEntries?.find((e) => e.entry_type === t);
+              const Icon = META[t].icon;
+              return (
+                <div
+                  key={t}
+                  className={`flex items-center justify-between rounded-2xl px-5 py-4 transition-all ${
+                    entry 
+                      ? `${META[t].bg} border border-border/10` 
+                      : "bg-muted/10 border border-border/5 text-muted-foreground"
+                  }`}
+                >
+                  <div className="flex items-center gap-4">
+                    <div className={`p-2 rounded-xl ${entry ? "bg-background/40" : "bg-muted/10"}`}>
+                      <Icon className={`h-5 w-5 ${entry ? META[t].tone : "opacity-30"}`} />
+                    </div>
+                    <span className={`font-bold text-sm ${entry ? "" : "opacity-50"}`}>{META[t].label}</span>
+                  </div>
+                  <span className="font-mono font-bold">
+                    {entry
+                      ? new Date(entry.entry_at).toLocaleTimeString("pt-BR", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })
+                      : "--:--"}
+                  </span>
                 </div>
-                <span className="font-mono text-sm">
-                  {entry
-                    ? new Date(entry.entry_at).toLocaleTimeString("pt-BR", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })
-                    : "—"}
-                </span>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
-        <div className="mt-5 grid grid-cols-2 gap-3 border-t border-border/50 pt-4 text-sm">
-          <div>
-            <div className="text-xs text-muted-foreground">Total trabalhado</div>
-            <div className="font-mono text-base font-semibold">{formatDur(totalWorkedMs)}</div>
+
+        <div className="glass-card rounded-[2rem] p-8 flex flex-col">
+          <h2 className="mb-6 font-display text-xl font-bold">Resumo da Jornada</h2>
+          
+          <div className="space-y-8 flex-1">
+             <div className="flex items-center justify-between p-6 rounded-3xl bg-muted/20 border border-border/20">
+                <div>
+                   <div className="text-xs uppercase font-bold tracking-widest text-muted-foreground mb-1">Total Trabalhado</div>
+                   <div className="font-mono text-3xl font-bold">{formatDur(totalWorkedMs)}</div>
+                </div>
+                <div className="h-12 w-12 rounded-2xl bg-primary/10 grid place-items-center text-primary">
+                   <Clock className="h-6 w-6" />
+                </div>
+             </div>
+
+             <div className="flex items-center justify-between p-6 rounded-3xl bg-muted/20 border border-border/20">
+                <div>
+                   <div className="text-xs uppercase font-bold tracking-widest text-muted-foreground mb-1">Saldo do Dia</div>
+                   <div
+                    className={`font-mono text-3xl font-bold ${
+                      balance >= 0 ? "text-success" : "text-warning"
+                    }`}
+                   >
+                    {balance >= 0 ? "+" : "-"}{formatDur(Math.abs(balance))}
+                   </div>
+                </div>
+                <div className={`h-12 w-12 rounded-2xl grid place-items-center ${balance >= 0 ? "bg-success/10 text-success" : "bg-warning/10 text-warning"}`}>
+                   <CheckCircle2 className="h-6 w-6" />
+                </div>
+             </div>
           </div>
-          <div>
-            <div className="text-xs text-muted-foreground">Saldo do dia</div>
-            <div
-              className={`font-mono text-base font-semibold ${
-                balance >= 0 ? "text-success" : "text-warning"
-              }`}
-            >
-              {balance >= 0 ? "+" : "-"}
-              {formatDur(Math.abs(balance))}
-            </div>
-          </div>
+          
+          <p className="mt-8 text-[11px] text-muted-foreground text-center leading-relaxed">
+            Sua jornada diária prevista é de <strong>{employee?.daily_hours || 8} horas</strong>. <br />
+            Qualquer divergência, procure o seu supervisor.
+          </p>
         </div>
       </div>
     </div>
