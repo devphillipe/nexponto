@@ -71,18 +71,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "NexPonto — Controle de ponto multitenant" },
+      { title: "NexPonto — Controle de Ponto Inteligente" },
       {
         name: "description",
         content:
-          "Sistema de ponto digital com painel administrativo e portal do funcionário, isolamento total por escritório.",
+          "NexPonto: A solução definitiva para controle de ponto digital. Multitenant, seguro e altamente intuitivo.",
       },
-      { property: "og:title", content: "NexPonto — Controle de ponto multitenant" },
+      { property: "og:title", content: "NexPonto — Controle de Ponto Inteligente" },
       {
         property: "og:description",
-        content: "Painel do escritório + portal do funcionário em um só lugar.",
+        content: "Gestão simplificada para escritórios e facilidade total para colaboradores.",
       },
-      { name: "twitter:title", content: "NexPonto — Controle de ponto multitenant" },
+      { name: "twitter:title", content: "NexPonto — Controle de Ponto Inteligente" },
       { name: "description", content: "Ponto Digital is a time tracking application for managing employee attendance and work hours." },
       { property: "og:description", content: "Ponto Digital is a time tracking application for managing employee attendance and work hours." },
       { name: "twitter:description", content: "Ponto Digital is a time tracking application for managing employee attendance and work hours." },
