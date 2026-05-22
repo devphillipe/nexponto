@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Building2, Clock, ArrowRight, Users, CheckCircle2, Zap } from "lucide-react";
+import { Building2, ArrowRight, Users, CheckCircle2, Zap } from "lucide-react";
 import { memo } from "react";
+import { Logo, LogoMark } from "@/components/Logo";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -16,14 +17,8 @@ function Landing() {
   return (
     <main className="relative mx-auto flex min-h-screen max-w-6xl flex-col px-6 py-10">
       <header className="flex items-center justify-between">
-        <div className="flex items-center gap-2.5 group cursor-default">
-          <div className="grid h-10 w-10 place-items-center rounded-xl bg-[var(--gradient-primary)] shadow-[var(--shadow-glow)] transition-transform group-hover:scale-105">
-            <Clock className="h-6 w-6 text-primary-foreground" />
-          </div>
-          <span className="font-display text-xl font-bold tracking-tight">
-            NexPonto
-          </span>
-        </div>
+        <Logo size={22} wordmarkClassName="text-xl" />
+
         <nav className="hidden items-center gap-8 text-sm md:flex">
           <Link to="/admin/login" className="nav-link text-muted-foreground font-medium">
             Escritório
@@ -121,11 +116,9 @@ function Landing() {
       </section>
 
       <footer className="mt-auto py-10 flex flex-col md:flex-row items-center justify-between border-t border-border/40 gap-4">
-        <div className="flex items-center gap-2 opacity-80">
-          <div className="h-6 w-6 rounded-lg bg-primary/20 grid place-items-center">
-            <Clock className="h-3.5 w-3.5 text-primary" />
-          </div>
-          <span className="font-display font-bold text-sm tracking-tight">NexPonto</span>
+        <div className="flex items-center gap-2 opacity-80 text-primary">
+          <LogoMark size={20} />
+          <span className="font-display font-bold text-sm tracking-tight text-foreground">NexPonto</span>
         </div>
         <div className="text-[13px] text-muted-foreground">
           © {new Date().getFullYear()} NexPonto — Todos os direitos reservados.

@@ -1,7 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Building2, ArrowLeft, Clock, ShieldCheck } from "lucide-react";
+import { Building2, ArrowLeft, ShieldCheck } from "lucide-react";
+import { Logo } from "@/components/Logo";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -63,11 +64,8 @@ function AdminLogin() {
 
       <div className="w-full max-w-md space-y-8 animate-in fade-in zoom-in-95 duration-500">
         <div className="text-center space-y-2">
-           <Link to="/" className="inline-flex items-center gap-2 group mx-auto mb-4">
-              <div className="h-12 w-12 rounded-2xl bg-[var(--gradient-primary)] shadow-[var(--shadow-glow)] grid place-items-center">
-                 <Clock className="h-6 w-6 text-primary-foreground" />
-              </div>
-              <span className="font-display text-2xl font-bold tracking-tight">NexPonto</span>
+           <Link to="/" className="inline-flex mx-auto mb-4">
+              <Logo size={26} wordmarkClassName="text-2xl" />
            </Link>
            <h1 className="text-3xl font-bold tracking-tight">Portal do Escritório</h1>
            <p className="text-muted-foreground">Acesse sua conta administrativa</p>

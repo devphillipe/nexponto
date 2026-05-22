@@ -1,7 +1,8 @@
 import { createFileRoute, Link, Outlet, redirect, useNavigate, useLocation } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useProfile } from "@/lib/auth";
-import { LayoutDashboard, Users, Clock, LogOut, Building2, Bell, Search, Settings } from "lucide-react";
+import { LayoutDashboard, Users, Clock, LogOut, Bell, Search, Settings } from "lucide-react";
+import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { memo } from "react";
@@ -43,12 +44,10 @@ function AdminLayout() {
     <div className="flex min-h-screen bg-background/50">
       <aside className="hidden w-72 shrink-0 flex-col border-r border-sidebar-border bg-sidebar/50 backdrop-blur-xl p-6 md:flex sticky top-0 h-screen">
         <div className="mb-10 flex items-center gap-3 px-2">
-          <div className="grid h-10 w-10 place-items-center rounded-xl bg-[var(--gradient-primary)] shadow-[var(--shadow-glow)]">
-            <Building2 className="h-6 w-6 text-primary-foreground" />
-          </div>
+          <Logo size={22} showWordmark={false} />
           <div className="min-w-0">
             <div className="truncate font-display text-lg font-bold tracking-tight">
-              NexPonto
+              Nex<span className="text-primary">Ponto</span>
             </div>
             <div className="truncate text-[10px] uppercase font-bold tracking-[0.2em] text-primary">
               Admin Console
