@@ -60,11 +60,16 @@ function AdminSignup() {
       return;
     }
     toast.success("Escritório criado com sucesso!");
-    // Auto-confirm is on, so session should be active. Otherwise sign in.
+    
+    // With auto-confirm on, the signUp call often returns the session directly.
+    // If not, we try to get it or sign in manually just to be sure.
     const { data: sess } = await supabase.auth.getSession();
     if (!sess.session) {
       await supabase.auth.signInWithPassword({ email: form.email, password: form.password });
     }
+    
+    // Force a small delay to ensure trigger-created records are ready for the next page's beforeLoad
+    await new Promise(r => setTimeout(r, 500));
     navigate({ to: "/admin/dashboard" });
   }
 

@@ -21,23 +21,41 @@ function AdminLogin() {
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error || !data.user) {
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error || !data.user) {
+        setLoading(false);
+        toast.error(error?.message ?? "Falha no login");
+        return;
+      }
+
+      // We use a small delay or retry to ensure the session is fully processed by the browser
+      // before querying roles, although with the new RLS policies this should be immediate.
+      const { data: roles, error: roleError } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", data.user.id);
+
+      if (roleError) {
+        console.error("Role check error:", roleError);
+        setLoading(false);
+        toast.error("Erro ao verificar permissões.");
+        return;
+      }
+
+      if (!roles?.some((r) => r.role === "admin")) {
+        await supabase.auth.signOut();
+        setLoading(false);
+        toast.error("Esta conta não tem acesso administrativo.");
+        return;
+      }
+      
+      navigate({ to: "/admin/dashboard" });
+    } catch (err) {
+      console.error("Login unexpected error:", err);
       setLoading(false);
-      toast.error(error?.message ?? "Falha no login");
-      return;
+      toast.error("Ocorreu um erro inesperado.");
     }
-    const { data: roles } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", data.user.id);
-    if (!roles?.some((r) => r.role === "admin")) {
-      await supabase.auth.signOut();
-      setLoading(false);
-      toast.error("Esta conta não tem acesso administrativo.");
-      return;
-    }
-    navigate({ to: "/admin/dashboard" });
   }
 
   return (
