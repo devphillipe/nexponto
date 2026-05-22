@@ -17,14 +17,8 @@ function Landing() {
   return (
     <main className="relative mx-auto flex min-h-screen max-w-6xl flex-col px-6 py-10">
       <header className="flex items-center justify-between">
-        <div className="flex items-center gap-2.5 group cursor-default">
-          <div className="grid h-10 w-10 place-items-center rounded-xl bg-[var(--gradient-primary)] shadow-[var(--shadow-glow)] transition-transform group-hover:scale-105">
-            <Clock className="h-6 w-6 text-primary-foreground" />
-          </div>
-          <span className="font-display text-xl font-bold tracking-tight">
-            NexPonto
-          </span>
-        </div>
+        <Logo size={22} wordmarkClassName="text-xl" />
+
         <nav className="hidden items-center gap-8 text-sm md:flex">
           <Link to="/admin/login" className="nav-link text-muted-foreground font-medium">
             Escritório
