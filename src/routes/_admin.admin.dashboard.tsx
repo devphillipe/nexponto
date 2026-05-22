@@ -9,10 +9,12 @@ export const Route = createFileRoute("/_admin/admin/dashboard")({
   component: Dashboard,
 });
 
+import { useMemo } from "react";
+
 function Dashboard() {
   const { data: profile } = useProfile();
 
-  const { data: stats } = useQuery({
+  const { data: stats, isLoading } = useQuery({
     queryKey: ["admin-dashboard"],
     queryFn: async () => {
       const today = new Date().toISOString().slice(0, 10);
@@ -35,12 +37,12 @@ function Dashboard() {
     },
   });
 
-  const cards = [
+  const cards = useMemo(() => [
     { label: "Total Equipe", value: stats?.total ?? "—", icon: Users, trend: "+2 este mês", color: "text-primary" },
     { label: "Colaboradores Ativos", value: stats?.active ?? "—", icon: CheckCircle2, trend: "Status: OK", color: "text-success" },
     { label: "Batidas Hoje", value: stats?.todayPunches ?? "—", icon: Clock, trend: "Tempo real", color: "text-primary" },
     { label: "Pendências", value: "0", icon: AlertCircle, trend: "Tudo em dia", color: "text-muted-foreground" },
-  ];
+  ], [stats]);
 
   return (
     <div className="space-y-10 animate-fade-in">
