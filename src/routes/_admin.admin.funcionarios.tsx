@@ -51,10 +51,12 @@ function EmployeesPage() {
     }
   }
 
-  const filtered = employees?.filter(e => 
-    e.full_name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    e.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filtered = useMemo(() => {
+    return employees?.filter(e => 
+      e.full_name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+      e.email.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [employees, searchTerm]);
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">

@@ -47,10 +47,13 @@ function HistoryPage() {
     },
   });
 
-  const grouped: Record<string, typeof entries> = {};
-  (entries ?? []).forEach((e) => {
-    (grouped[e.entry_date] ||= [] as any).push(e);
-  });
+  const grouped = useMemo(() => {
+    const res: Record<string, typeof entries> = {};
+    (entries ?? []).forEach((e) => {
+      (res[e.entry_date] ||= [] as any).push(e);
+    });
+    return res;
+  }, [entries]);
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
