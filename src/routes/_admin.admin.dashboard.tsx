@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useProfile } from "@/lib/auth";
 import { Users, Clock, CheckCircle2, AlertCircle, ArrowUpRight, TrendingUp } from "lucide-react";
+import { CardSkeleton } from "@/components/SkeletonLoader";
 
 export const Route = createFileRoute("/_admin/admin/dashboard")({
   head: () => ({ meta: [{ title: "Painel — NexPonto" }] }),
@@ -16,6 +17,7 @@ function Dashboard() {
 
   const { data: stats, isLoading } = useQuery({
     queryKey: ["admin-dashboard"],
+    staleTime: 1000 * 60 * 5, // 5 minutes
     queryFn: async () => {
       const today = new Date().toISOString().slice(0, 10);
       const [emps, actives, todayEntries] = await Promise.all([
@@ -57,28 +59,32 @@ function Dashboard() {
         </div>
       </div>
 
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {cards.map((c, i) => (
-          <div key={c.label} className="glass-card rounded-3xl p-6 group hover:-translate-y-1 transition-all duration-300">
-            <div className="mb-4 flex items-center justify-between">
-              <div className={`p-3 rounded-2xl bg-muted/50 ${c.color} group-hover:scale-110 transition-transform`}>
-                <c.icon className="h-6 w-6" />
+      {isLoading ? (
+        <CardSkeleton />
+      ) : (
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {cards.map((c, i) => (
+            <div key={c.label} className="glass-card rounded-3xl p-6 group hover:-translate-y-1 transition-all duration-300">
+              <div className="mb-4 flex items-center justify-between">
+                <div className={`p-3 rounded-2xl bg-muted/50 ${c.color} group-hover:scale-110 transition-transform`}>
+                  <c.icon className="h-6 w-6" />
+                </div>
+                <ArrowUpRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
-              <ArrowUpRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="space-y-1">
+                <span className="text-sm font-medium text-muted-foreground">
+                  {c.label}
+                </span>
+                <div className="font-display text-4xl font-bold tracking-tight">{c.value}</div>
+              </div>
+              <div className="mt-4 flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
+                 <div className="h-1.5 w-1.5 rounded-full bg-success"></div>
+                 {c.trend}
+              </div>
             </div>
-            <div className="space-y-1">
-              <span className="text-sm font-medium text-muted-foreground">
-                {c.label}
-              </span>
-              <div className="font-display text-4xl font-bold tracking-tight">{c.value}</div>
-            </div>
-            <div className="mt-4 flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
-               <div className="h-1.5 w-1.5 rounded-full bg-success"></div>
-               {c.trend}
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2 glass-card rounded-3xl p-8">
