@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { memo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,6 +24,7 @@ function PontosPage() {
 
   const { data, isLoading } = useQuery({
     queryKey: ["time-entries", date],
+    staleTime: 1000 * 60, // 1 minute
     queryFn: async () => {
       const { data, error } = await supabase
         .from("time_entries")

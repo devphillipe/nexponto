@@ -1,8 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Building2, Clock, ShieldCheck, ArrowRight, Users, CheckCircle2, Zap } from "lucide-react";
+import { Building2, Clock, ArrowRight, Users, CheckCircle2, Zap } from "lucide-react";
+import { memo } from "react";
 
 export const Route = createFileRoute("/")({
-  component: Landing,
+  head: () => ({
+    meta: [
+      { title: "NexPonto — Controle de Ponto Inteligente" },
+      { name: "description", content: "A solução definitiva para controle de ponto digital. Multitenant, seguro e altamente intuitivo." },
+    ],
+  }),
+  component: memo(Landing),
 });
 
 function Landing() {

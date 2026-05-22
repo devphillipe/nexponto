@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { memo } from "react";
+import { useState, useMemo } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -17,6 +18,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Plus, Mail, User, Briefcase, Calendar, ShieldCheck, Search } from "lucide-react";
+import { TableSkeleton } from "@/components/SkeletonLoader";
 
 export const Route = createFileRoute("/_admin/admin/funcionarios")({
   head: () => ({ meta: [{ title: "Funcionários — NexPonto Admin" }] }),
@@ -51,10 +53,12 @@ function EmployeesPage() {
     }
   }
 
-  const filtered = employees?.filter(e => 
-    e.full_name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    e.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filtered = useMemo(() => {
+    return employees?.filter(e => 
+      e.full_name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+      e.email.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [employees, searchTerm]);
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
@@ -96,7 +100,7 @@ function EmployeesPage() {
 
       <div className="glass-card overflow-hidden rounded-[2rem] border border-border/40">
         {isLoading ? (
-          <div className="p-16 text-center text-sm text-muted-foreground animate-pulse">Carregando equipe...</div>
+          <TableSkeleton rows={6} cols={4} />
         ) : !filtered?.length ? (
           <div className="p-20 text-center space-y-4">
              <div className="h-20 w-20 bg-muted/30 rounded-[1.5rem] grid place-items-center mx-auto mb-2">
@@ -117,7 +121,7 @@ function EmployeesPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border/20">
-              {filtered.map((e) => (
+              {filtered.map((e: any) => (
                 <tr key={e.id} className="hover:bg-muted/10 transition-colors group">
                   <td className="px-8 py-5">
                     <div className="flex items-center gap-4">

@@ -43,6 +43,7 @@ export function useProfile() {
   const { user } = useAuth();
   return useQuery({
     queryKey: ["profile", user?.id],
+    staleTime: 1000 * 60 * 30, // 30 minutes (profile info is very stable)
     enabled: !!user,
     queryFn: async (): Promise<ProfileInfo | null> => {
       if (!user) return null;

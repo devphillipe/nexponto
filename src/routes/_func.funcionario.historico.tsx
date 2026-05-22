@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { memo } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useProfile } from "@/lib/auth";
 import { Calendar, Clock, ChevronRight, History } from "lucide-react";
@@ -47,10 +49,13 @@ function HistoryPage() {
     },
   });
 
-  const grouped: Record<string, typeof entries> = {};
-  (entries ?? []).forEach((e) => {
-    (grouped[e.entry_date] ||= [] as any).push(e);
-  });
+  const grouped = useMemo(() => {
+    const res: Record<string, typeof entries> = {};
+    (entries ?? []).forEach((e) => {
+      (res[e.entry_date] ||= [] as any).push(e);
+    });
+    return res;
+  }, [entries]);
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -72,7 +77,7 @@ function HistoryPage() {
         </div>
       ) : (
         <div className="space-y-6">
-          {Object.entries(grouped).map(([date, items]) => (
+          {Object.entries(grouped as Record<string, any[]>).map(([date, items]) => (
             <div key={date} className="glass-card rounded-[2rem] p-6 border border-border/40 overflow-hidden relative">
               <div className="absolute top-0 left-0 w-1.5 h-full bg-primary/20"></div>
               <div className="mb-4 flex items-center justify-between px-2">

@@ -4,6 +4,7 @@ import { useProfile } from "@/lib/auth";
 import { LayoutDashboard, Users, Clock, LogOut, Building2, Bell, Search, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { memo } from "react";
 
 export const Route = createFileRoute("/_admin")({
   beforeLoad: async () => {
@@ -19,7 +20,7 @@ export const Route = createFileRoute("/_admin")({
       throw redirect({ to: "/admin/login" });
     }
   },
-  component: AdminLayout,
+  component: memo(AdminLayout),
 });
 
 const nav = [
