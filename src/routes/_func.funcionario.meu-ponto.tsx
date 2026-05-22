@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { memo } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
