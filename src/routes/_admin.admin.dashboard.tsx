@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useProfile } from "@/lib/auth";
 import { Users, Clock, CheckCircle2, AlertCircle, ArrowUpRight, TrendingUp } from "lucide-react";
+import { useNavigate } from "@tanstack/react-router";
 import { CardSkeleton } from "@/components/SkeletonLoader";
 
 export const Route = createFileRoute("/_admin/admin/dashboard")({
@@ -24,6 +25,7 @@ const TYPE_LABEL: Record<string, string> = {
 
 function Dashboard() {
   const { data: profile } = useProfile();
+  const navigate = useNavigate();
 
   const { data: stats, isLoading } = useQuery({
     queryKey: ["admin-dashboard", profile?.tenant_id],
@@ -110,7 +112,12 @@ function Dashboard() {
         <div className="lg:col-span-2 glass-card rounded-3xl p-8">
            <div className="flex items-center justify-between mb-8">
               <h2 className="font-display text-2xl font-bold">Resumo de Atividades</h2>
-              <button className="text-sm font-bold text-primary hover:underline">Ver relatório completo</button>
+              <button 
+                onClick={() => navigate({ to: "/admin/pontos" })}
+                className="text-sm font-bold text-primary hover:underline"
+              >
+                Ver relatório completo
+              </button>
            </div>
            
            <div className="space-y-6">
