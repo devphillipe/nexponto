@@ -38,29 +38,25 @@ function FuncLayout() {
   }
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-2xl flex-col px-4 py-8 animate-fade-in">
-      <header className="mb-8 flex items-center justify-between glass-card p-4 rounded-3xl">
+    <div className="mx-auto flex h-screen max-w-2xl flex-col px-4 py-4 animate-fade-in overflow-hidden">
+      <header className="mb-4 flex items-center justify-between glass-card p-3 rounded-2xl">
         <div className="flex items-center gap-3">
-           <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 grid place-items-center font-bold text-primary border border-primary/10">
+           <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 grid place-items-center font-bold text-primary border border-primary/10">
               {profile?.full_name?.charAt(0) || "U"}
            </div>
            <div className="min-w-0">
-             <div className="font-display text-sm font-bold tracking-tight truncate">{profile?.full_name}</div>
-             <div className="truncate text-[10px] text-muted-foreground uppercase font-bold tracking-widest">{profile?.tenant_name}</div>
+             <div className="font-display text-xs font-bold tracking-tight truncate">{profile?.full_name}</div>
+             <div className="truncate text-[9px] text-muted-foreground uppercase font-bold tracking-widest">{profile?.tenant_name}</div>
            </div>
         </div>
         <div className="flex items-center gap-2">
-           <button className="p-2 rounded-xl hover:bg-muted/50 transition-colors text-muted-foreground">
-             <Bell className="h-5 w-5" />
-           </button>
-           <div className="h-8 w-[1px] bg-border/50 mx-1"></div>
-           <Button variant="ghost" size="icon" onClick={logout} className="rounded-xl text-destructive/70 hover:text-destructive hover:bg-destructive/10">
-             <LogOut className="h-5 w-5" />
+           <Button variant="ghost" size="icon" onClick={logout} className="h-9 w-9 rounded-xl text-destructive/70 hover:text-destructive hover:bg-destructive/10">
+             <LogOut className="h-4.5 w-4.5" />
            </Button>
         </div>
       </header>
 
-      <nav className="mb-8 flex gap-2 p-1.5 glass-card rounded-2xl border border-border/40">
+      <nav className="mb-4 flex gap-2 p-1 glass-card rounded-xl border border-border/40">
         {nav.map((item) => {
           const active = loc.pathname.startsWith(item.to);
           return (
@@ -80,14 +76,14 @@ function FuncLayout() {
         })}
       </nav>
 
-      <main className="flex-1 pb-10">
+      <main className="flex-1 overflow-y-auto no-scrollbar">
         <Outlet />
       </main>
 
-      <footer className="py-6 text-center">
-         <div className="flex items-center justify-center gap-2 mb-2">
-            <div className="h-1.5 w-1.5 rounded-full bg-success animate-pulse"></div>
-            <span className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground/60">Sistema Operacional · NexPonto</span>
+      <footer className="py-2 text-center">
+         <div className="flex items-center justify-center gap-2">
+            <div className="h-1 w-1 rounded-full bg-success animate-pulse"></div>
+            <span className="text-[8px] uppercase font-bold tracking-widest text-muted-foreground/50">NexPonto v1.0</span>
          </div>
       </footer>
     </div>
