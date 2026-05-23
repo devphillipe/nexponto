@@ -231,72 +231,93 @@ function PontosPage() {
         </div>
       </div>
 
-      <div className="glass-card overflow-hidden rounded-[2rem] border border-border/40">
+      <div className="space-y-6">
         {isLoading ? (
-          <div className="p-16 text-center text-sm text-muted-foreground animate-pulse">Carregando registros...</div>
-        ) : !data?.length ? (
-          <div className="p-20 text-center space-y-4">
+          <div className="glass-card p-16 text-center text-sm text-muted-foreground animate-pulse rounded-[2rem]">Carregando registros...</div>
+        ) : !Object.keys(groupedData).length ? (
+          <div className="glass-card p-20 text-center space-y-4 rounded-[2rem]">
              <div className="h-16 w-16 bg-muted/30 rounded-full grid place-items-center mx-auto">
                 <Clock className="h-8 w-8 text-muted-foreground" />
              </div>
              <p className="text-muted-foreground">Nenhum ponto registrado nesta data.</p>
           </div>
         ) : (
-          <table className="w-full text-sm">
-            <thead className="border-b border-border/40 bg-muted/20 text-left text-[11px] uppercase font-bold tracking-widest text-muted-foreground">
-              <tr>
-                <th className="px-8 py-4">Horário</th>
-                <th className="px-6 py-4">Colaborador</th>
-                <th className="px-6 py-4">Tipo de Registro</th>
-                <th className="px-6 py-4">Origem</th>
-                <th className="px-6 py-4 text-right">Ações</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border/20">
-              {data.map((e: any) => (
-                <tr key={e.id} className="hover:bg-muted/10 transition-colors">
-                  <td className="px-8 py-5 font-mono font-bold text-primary flex items-center gap-2">
-                    {new Date(e.entry_at).toLocaleTimeString("pt-BR", {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                      second: "2-digit",
-                    })}
-                    {e.is_adjustment && (
-                      <span title="Registro Ajustado">
-                        <History className="h-3 w-3 text-warning" />
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-6 py-5 font-semibold">{e.employees?.full_name}</td>
-                  <td className="px-6 py-5 text-muted-foreground font-medium">
-                    {TYPE_LABEL[e.entry_type]}
-                  </td>
-                  <td className="px-6 py-5">
-                    <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${e.source === "manual_admin" ? "bg-warning/10 text-warning" : "bg-success/10 text-success"}`}>
-                      {e.source === "manual_admin" ? "Admin" : "App"}
-                    </span>
-                  </td>
-                  <td className="px-6 py-5 text-right space-x-2">
-                    <Button variant="ghost" size="icon" onClick={() => handleEdit(e)} className="h-8 w-8 rounded-lg text-primary/60 hover:text-primary hover:bg-primary/10">
-                      <Edit2 className="h-3.5 w-3.5" />
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      onClick={() => {
-                        if (confirm("Excluir este registro permanentemente?")) {
-                          deleteMutation.mutate(e.id);
-                        }
-                      }}
-                      className="h-8 w-8 rounded-lg text-destructive/60 hover:text-destructive hover:bg-destructive/10"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          Object.entries(groupedData).map(([employeeName, entries]: [string, any]) => (
+            <div key={employeeName} className="glass-card overflow-hidden rounded-[2rem] border border-border/40 bg-background/30 backdrop-blur-sm">
+              <div className="px-8 py-5 border-b border-border/40 bg-muted/10 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                    <User className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-lg">{employeeName}</h3>
+                    <p className="text-xs text-muted-foreground">{entries.length} registro(s) no dia</p>
+                  </div>
+                </div>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="bg-muted/5 text-left text-[10px] uppercase font-bold tracking-widest text-muted-foreground">
+                    <tr>
+                      <th className="px-8 py-4">Horário</th>
+                      <th className="px-6 py-4">Tipo de Registro</th>
+                      <th className="px-6 py-4">Origem</th>
+                      <th className="px-6 py-4 text-right">Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border/20">
+                    {entries.sort((a: any, b: any) => new Date(a.entry_at).getTime() - new Date(b.entry_at).getTime()).map((e: any) => (
+                      <tr key={e.id} className="hover:bg-muted/10 transition-colors">
+                        <td className="px-8 py-5 font-mono font-bold text-primary flex items-center gap-2">
+                          {new Date(e.entry_at).toLocaleTimeString("pt-BR", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            second: "2-digit",
+                          })}
+                          {e.is_adjustment && (
+                            <span title="Registro Ajustado">
+                              <History className="h-3 w-3 text-warning" />
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-6 py-5 text-muted-foreground font-medium">
+                          <span className={`px-3 py-1 rounded-lg text-xs font-bold ${
+                            e.entry_type === 'entrada' ? 'bg-success/10 text-success' :
+                            e.entry_type === 'saida' ? 'bg-destructive/10 text-destructive' :
+                            'bg-primary/10 text-primary'
+                          }`}>
+                            {TYPE_LABEL[e.entry_type]}
+                          </span>
+                        </td>
+                        <td className="px-6 py-5">
+                          <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${e.source === "manual_admin" ? "bg-warning/10 text-warning" : "bg-success/10 text-success"}`}>
+                            {e.source === "manual_admin" ? "Admin" : "App"}
+                          </span>
+                        </td>
+                        <td className="px-6 py-5 text-right space-x-2">
+                          <Button variant="ghost" size="icon" onClick={() => handleEdit(e)} className="h-8 w-8 rounded-lg text-primary/60 hover:text-primary hover:bg-primary/10">
+                            <Edit2 className="h-3.5 w-3.5" />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            onClick={() => {
+                              if (confirm("Excluir este registro permanentemente?")) {
+                                deleteMutation.mutate(e.id);
+                              }
+                            }}
+                            className="h-8 w-8 rounded-lg text-destructive/60 hover:text-destructive hover:bg-destructive/10"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          ))
         )}
       </div>
     </div>
