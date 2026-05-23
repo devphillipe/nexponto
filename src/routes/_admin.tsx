@@ -29,6 +29,7 @@ const nav = [
   { to: "/admin/funcionarios", label: "Funcionários", icon: Users },
   { to: "/admin/pontos", label: "Pontos", icon: Clock },
   { to: "/admin/abonos", label: "Abonos", icon: FileText },
+  { to: "/admin/relatorios", label: "Relatórios", icon: FileText },
 ] as const;
 
 function AdminLayout() {

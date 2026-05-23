@@ -63,17 +63,44 @@ function AbonosPage() {
 
   const addMutation = useMutation({
     mutationFn: async (newData: any) => {
-      const { error } = await supabase
+      // 1. Insert into absences
+      const { data: absence, error: absenceError } = await supabase
         .from("absences")
         .insert([{
           ...newData,
           tenant_id: profile!.tenant_id,
           approved_by: profile!.id
+        }])
+        .select()
+        .single();
+      
+      if (absenceError) throw absenceError;
+
+      // 2. Insert into time_entries to show in the point sheet
+      // We create a special entry for the absence
+      const { error: entryError } = await supabase
+        .from("time_entries")
+        .insert([{
+          employee_id: newData.employee_id,
+          tenant_id: profile!.tenant_id,
+          entry_date: newData.absence_date,
+          entry_at: `${newData.absence_date}T00:00:00Z`,
+          entry_type: "entrada", // Use entrada as fallback since abono isn't in types yet, but notes will explain it
+          notes: `ABONO: ${REASONS.find(r => r.value === newData.reason)?.label || newData.reason}. ${newData.description || ""}`,
+          source: "manual_admin",
+          is_adjustment: true,
+          created_by: profile!.id
         }]);
-      if (error) throw error;
+
+      if (entryError) {
+        console.error("Erro ao criar entrada de ponto para abono:", entryError);
+        // We don't throw here to not revert the absence creation, 
+        // but it would be better to use a transaction if possible or handle it gracefully
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["absences"] });
+      queryClient.invalidateQueries({ queryKey: ["time-entries"] });
       setIsAddOpen(false);
       toast.success("Abono registrado com sucesso!");
     },

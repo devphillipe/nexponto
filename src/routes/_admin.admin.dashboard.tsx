@@ -5,11 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useProfile } from "@/lib/auth";
 import { Users, Clock, CheckCircle2, AlertCircle, ArrowUpRight, TrendingUp } from "lucide-react";
 import { CardSkeleton } from "@/components/SkeletonLoader";
-
-export const Route = createFileRoute("/_admin/admin/dashboard")({
-  head: () => ({ meta: [{ title: "Painel — NexPonto" }] }),
-  component: Dashboard,
-});
+import { useNavigate } from "@tanstack/react-router";
 
 import { useMemo } from "react";
 import { format } from "date-fns";
@@ -22,8 +18,14 @@ const TYPE_LABEL: Record<string, string> = {
   saida: "Saída Final",
 };
 
+export const Route = createFileRoute("/_admin/admin/dashboard")({
+  head: () => ({ meta: [{ title: "Painel — NexPonto" }] }),
+  component: Dashboard,
+});
+
 function Dashboard() {
   const { data: profile } = useProfile();
+  const navigate = useNavigate();
 
   const { data: stats, isLoading } = useQuery({
     queryKey: ["admin-dashboard", profile?.tenant_id],
@@ -110,7 +112,12 @@ function Dashboard() {
         <div className="lg:col-span-2 glass-card rounded-3xl p-8">
            <div className="flex items-center justify-between mb-8">
               <h2 className="font-display text-2xl font-bold">Resumo de Atividades</h2>
-              <button className="text-sm font-bold text-primary hover:underline">Ver relatório completo</button>
+              <button 
+                onClick={() => navigate({ to: "/admin/pontos" })}
+                className="text-sm font-bold text-primary hover:underline"
+              >
+                Ver relatório completo
+              </button>
            </div>
            
            <div className="space-y-6">
@@ -174,10 +181,12 @@ function Dashboard() {
             </ul>
           </div>
           
-          <div className="mt-10 p-4 rounded-2xl bg-gradient-to-br from-primary to-accent text-primary-foreground">
-             <div className="font-bold text-sm mb-1">NexPonto Pro</div>
-             <p className="text-[11px] opacity-90 leading-tight">Você está no plano gratuito. Desbloqueie relatórios avançados em PDF.</p>
-             <button className="mt-3 w-full bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-lg py-2 text-xs font-bold transition-all">Fazer Upgrade</button>
+          <div className="mt-10 p-6 rounded-[2rem] bg-gradient-to-br from-primary/10 to-accent/10 border border-primary/20">
+             <div className="font-bold text-sm mb-2 text-primary">Sistema NexPonto</div>
+             <p className="text-xs text-muted-foreground leading-relaxed">
+               Todas as funcionalidades estão liberadas durante o período de implantação. 
+               Aproveite para configurar sua equipe e gerenciar os pontos com total controle.
+             </p>
           </div>
         </div>
       </div>
