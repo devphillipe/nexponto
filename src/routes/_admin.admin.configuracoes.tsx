@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Building2, Mail, Phone, MapPin, Clock, Globe, Upload, Loader2, Image as ImageIcon } from "lucide-react";
+import { Building2, Mail, Phone, MapPin, Clock, Globe, Upload, Loader2, Image as ImageIcon, Search as SearchIcon } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 
 export const Route = createFileRoute("/_admin/admin/configuracoes")({
@@ -123,6 +123,23 @@ function ConfiguracoesPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     updateMutation.mutate(formData);
+  };
+
+  const fetchAddress = async (cep: string) => {
+    const cleanCep = cep.replace(/\D/g, "");
+    if (cleanCep.length === 8) {
+      try {
+        const response = await fetch(`https://viacep.com.br/ws/${cleanCep}/json/`);
+        const data = await response.json();
+        if (!data.erro) {
+          const newAddress = `${data.logradouro}, ${data.bairro}, ${data.localidade} - ${data.uf}`;
+          setFormData(prev => ({ ...prev, address: newAddress }));
+          toast.success("Endereço localizado!");
+        }
+      } catch (error) {
+        console.error("Erro ao buscar CEP:", error);
+      }
+    }
   };
 
   if (isLoading) return <div className="p-10 text-center">Carregando configurações...</div>;
@@ -247,7 +264,19 @@ function ConfiguracoesPage() {
                 />
               </div>
             </div>
-            <div className="space-y-2 md:col-span-2">
+            <div className="space-y-2 md:col-span-1">
+              <Label htmlFor="cep">CEP (Busca Automática)</Label>
+              <div className="relative">
+                <SearchIcon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input 
+                  id="cep" 
+                  placeholder="00000-000"
+                  onChange={e => fetchAddress(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            </div>
+            <div className="space-y-2 md:col-span-1">
               <Label htmlFor="address">Endereço Completo</Label>
               <div className="relative">
                 <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />

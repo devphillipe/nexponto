@@ -59,7 +59,7 @@ function PontosPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("time_entries")
-        .select("id, entry_date, entry_at, entry_type, source, is_adjustment, notes, employee_id, employees(full_name)")
+        .select("id, entry_date, entry_at, entry_type, source, is_adjustment, notes, employee_id, employees(id, full_name)")
         .eq("tenant_id", profile!.tenant_id)
         .eq("entry_date", date)
         .order("entry_at", { ascending: false });
@@ -68,15 +68,37 @@ function PontosPage() {
     },
   });
 
+  const { data: absencesData } = useQuery({
+    queryKey: ["absences", date, profile?.tenant_id],
+    enabled: !!profile?.tenant_id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("absences")
+        .select("*, employees(id, full_name)")
+        .eq("tenant_id", profile!.tenant_id)
+        .eq("absence_date", date);
+      if (error) throw error;
+      return data;
+    },
+  });
+
   const groupedData = useMemo(() => {
-    if (!data) return {};
-    return data.reduce((acc: any, entry: any) => {
+    const acc: any = {};
+    
+    data?.forEach((entry: any) => {
       const name = entry.employees?.full_name || "Sem Nome";
-      if (!acc[name]) acc[name] = [];
-      acc[name].push(entry);
-      return acc;
-    }, {});
-  }, [data]);
+      if (!acc[name]) acc[name] = { entries: [], absences: [] };
+      acc[name].entries.push(entry);
+    });
+
+    absencesData?.forEach((abs: any) => {
+      const name = abs.employees?.full_name || "Sem Nome";
+      if (!acc[name]) acc[name] = { entries: [], absences: [] };
+      acc[name].absences.push(abs);
+    });
+
+    return acc;
+  }, [data, absencesData]);
 
   const addMutation = useMutation({
     mutationFn: async (newData: any) => {
