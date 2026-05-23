@@ -321,22 +321,22 @@ function RelatoriosPage() {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
-      <div>
-        <h1 className="font-display text-4xl font-bold tracking-tight">Relatórios</h1>
-        <p className="text-muted-foreground mt-2">Gere relatórios de ponto detalhados em Excel ou PDF.</p>
+      <div className="mb-10">
+        <h1 className="font-display text-5xl font-bold tracking-tight text-foreground">Relatórios</h1>
+        <p className="text-muted-foreground mt-3 text-xl font-medium">Gere e exporte relatórios de ponto detalhados com um clique.</p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
-        <Card className="glass-card border-none rounded-[2rem] overflow-hidden">
-          <CardHeader className="p-8">
+        <Card className="glass-card border-border/40 rounded-[2.5rem] overflow-hidden shadow-sm">
+          <CardHeader className="p-10 pb-6 border-b border-border/20">
             <CardTitle className="text-2xl font-bold flex items-center gap-2">
               <FileDown className="h-6 w-6 text-primary" />
               Configurar Relatório
             </CardTitle>
             <CardDescription>Selecione o período e os colaboradores para exportação.</CardDescription>
           </CardHeader>
-          <CardContent className="p-8 pt-0 space-y-6">
-            <div className="space-y-2">
+          <CardContent className="p-10 space-y-8">
+            <div className="space-y-3">
               <Label>Mês de Referência</Label>
               <Input 
                 type="month" 
@@ -366,7 +366,7 @@ function RelatoriosPage() {
                 onClick={() => generateReport("xlsx")} 
                 disabled={loading}
                 variant="outline"
-                className="rounded-xl h-14 font-bold border-2 gap-2"
+                className="rounded-2xl h-16 font-black uppercase tracking-widest text-[10px] border-2 gap-3"
               >
                 {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <FileSpreadsheet className="h-5 w-5 text-success" />}
                 Exportar Excel
@@ -374,7 +374,7 @@ function RelatoriosPage() {
               <Button 
                 onClick={() => generateReport("pdf")} 
                 disabled={loading}
-                className="rounded-xl h-14 font-bold gap-2"
+                className="rounded-2xl h-16 font-black uppercase tracking-widest text-[10px] gap-3 shadow-lg shadow-primary/20"
               >
                 {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <FilePdf className="h-5 w-5" />}
                 Gerar PDF
@@ -384,9 +384,9 @@ function RelatoriosPage() {
         </Card>
 
         <div className="space-y-6">
-          <div className="glass-card p-8 rounded-[2rem] border border-border/40 bg-primary/5">
-             <h3 className="font-bold text-lg mb-2">Informações Importantes</h3>
-             <ul className="text-sm text-muted-foreground space-y-3">
+          <div className="glass-card p-10 rounded-[2.5rem] border border-border/40 bg-gradient-to-br from-primary/5 to-transparent">
+             <h3 className="font-display text-xl font-bold mb-4 tracking-tight">Informações Importantes</h3>
+             <ul className="text-sm text-muted-foreground space-y-5">
                <li className="flex items-start gap-2">
                  <div className="h-5 w-5 rounded-full bg-primary/20 flex items-center justify-center text-primary text-[10px] font-bold shrink-0">1</div>
                  Os relatórios agora separam Entrada, Saída de Almoço, Retorno de Almoço e Saída Final em colunas distintas.
