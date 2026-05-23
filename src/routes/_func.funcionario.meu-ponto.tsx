@@ -104,19 +104,19 @@ function MyClockPage() {
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="text-center md:text-left">
-        <h1 className="font-display text-4xl font-bold tracking-tight">
+      <div className="text-center md:text-left space-y-2">
+        <h1 className="font-display text-5xl font-bold tracking-tight text-foreground">
           Olá, {profile?.full_name?.split(" ")[0]}!
         </h1>
-        <p className="text-muted-foreground mt-1 text-lg capitalize">{dateStr}</p>
+        <p className="text-muted-foreground text-xl font-medium capitalize opacity-80">{dateStr}</p>
       </div>
 
-      <div className="glass-card rounded-[2.5rem] p-10 text-center relative overflow-hidden group">
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-50"></div>
+      <div className="glass-card rounded-[3rem] p-12 text-center relative overflow-hidden group border border-border/40 shadow-2xl shadow-primary/5">
+        <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-transparent via-primary to-transparent opacity-60"></div>
         
         <div className="mb-8 space-y-2">
-           <div className="font-mono text-7xl font-bold tracking-tighter text-primary animate-pulse-slow">
-             {now.toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' })}<span className="text-4xl opacity-50">:{now.toLocaleTimeString("pt-BR", { second: '2-digit' })}</span>
+           <div className="font-mono text-8xl font-black tracking-tighter text-primary drop-shadow-sm select-none">
+             {now.toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' })}<span className="text-5xl opacity-30">:{now.toLocaleTimeString("pt-BR", { second: '2-digit' })}</span>
            </div>
            <div className="flex items-center justify-center gap-2 text-xs font-bold text-muted-foreground uppercase tracking-widest">
               <MapPin className="h-3 w-3" /> Localização: Escritório Central
@@ -131,14 +131,14 @@ function MyClockPage() {
           </div>
         ) : nextType ? (
           <div className="max-w-md mx-auto space-y-8">
-            <div className="p-6 rounded-3xl bg-muted/30 border border-border/40 relative">
-               <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-background border border-border text-[10px] uppercase font-bold tracking-widest text-muted-foreground">
+            <div className="p-8 rounded-[2rem] bg-muted/20 border border-border/20 relative shadow-inner">
+               <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-5 py-1.5 rounded-full bg-background border border-border text-[9px] font-black uppercase tracking-[0.2em] text-primary shadow-sm">
                  Próximo Registro
                </span>
-               <div className={`text-2xl font-bold flex items-center justify-center gap-3 ${META[nextType].tone}`}>
+               <div className={`text-3xl font-black uppercase tracking-tighter flex items-center justify-center gap-4 ${META[nextType].tone}`}>
                   {(() => {
                     const Icon = META[nextType].icon;
-                    return <Icon className="h-7 w-7" />;
+                    return <Icon className="h-8 w-8" />;
                   })()}
                   {META[nextType].label}
                </div>
@@ -148,10 +148,10 @@ function MyClockPage() {
               size="lg"
               onClick={punch}
               disabled={punching}
-              className="premium-button h-20 w-full rounded-3xl text-xl font-bold gap-3"
+              className="premium-button h-24 w-full rounded-[2rem] text-2xl font-black uppercase tracking-widest gap-4 shadow-2xl shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
             >
-              <Smartphone className="h-6 w-6" />
-              {punching ? "Registrando..." : "Registrar Agora"}
+              <Smartphone className="h-7 w-7" />
+              {punching ? "Sincronizando..." : "Registrar Agora"}
             </Button>
             
             <p className="text-xs text-muted-foreground">
@@ -209,33 +209,33 @@ function MyClockPage() {
           </div>
         </div>
 
-        <div className="glass-card rounded-[2rem] p-8 flex flex-col">
-          <h2 className="mb-6 font-display text-xl font-bold">Resumo da Jornada</h2>
+        <div className="glass-card rounded-[2.5rem] p-10 flex flex-col border border-border/40 shadow-sm transition-all hover:shadow-md">
+          <h2 className="mb-8 font-display text-2xl font-bold tracking-tight text-foreground">Resumo da Jornada</h2>
           
-          <div className="space-y-8 flex-1">
-             <div className="flex items-center justify-between p-6 rounded-3xl bg-muted/20 border border-border/20">
+          <div className="space-y-6 flex-1">
+             <div className="flex items-center justify-between p-7 rounded-[2rem] bg-muted/10 border border-border/20 group hover:bg-muted/20 transition-all">
                 <div>
-                   <div className="text-xs uppercase font-bold tracking-widest text-muted-foreground mb-1">Total Trabalhado</div>
-                   <div className="font-mono text-3xl font-bold">{formatDur(totalWorkedMs)}</div>
+                   <div className="text-[10px] uppercase font-black tracking-[0.2em] text-muted-foreground opacity-70 mb-2">Tempo Trabalhado</div>
+                   <div className="font-mono text-4xl font-black text-foreground">{formatDur(totalWorkedMs)}</div>
                 </div>
-                <div className="h-12 w-12 rounded-2xl bg-primary/10 grid place-items-center text-primary">
-                   <Clock className="h-6 w-6" />
+                <div className="h-14 w-14 rounded-2xl bg-primary/10 grid place-items-center text-primary group-hover:scale-110 transition-transform">
+                   <Clock className="h-7 w-7" />
                 </div>
              </div>
 
-             <div className="flex items-center justify-between p-6 rounded-3xl bg-muted/20 border border-border/20">
+             <div className="flex items-center justify-between p-7 rounded-[2rem] bg-muted/10 border border-border/20 group hover:bg-muted/20 transition-all">
                 <div>
-                   <div className="text-xs uppercase font-bold tracking-widest text-muted-foreground mb-1">Saldo do Dia</div>
+                   <div className="text-[10px] uppercase font-black tracking-[0.2em] text-muted-foreground opacity-70 mb-2">Saldo do Dia</div>
                    <div
-                    className={`font-mono text-3xl font-bold ${
+                    className={`font-mono text-4xl font-black ${
                       balance >= 0 ? "text-success" : "text-warning"
                     }`}
                    >
                     {balance >= 0 ? "+" : "-"}{formatDur(Math.abs(balance))}
                    </div>
                 </div>
-                <div className={`h-12 w-12 rounded-2xl grid place-items-center ${balance >= 0 ? "bg-success/10 text-success" : "bg-warning/10 text-warning"}`}>
-                   <CheckCircle2 className="h-6 w-6" />
+                <div className={`h-14 w-14 rounded-2xl grid place-items-center group-hover:scale-110 transition-transform ${balance >= 0 ? "bg-success/10 text-success" : "bg-warning/10 text-warning"}`}>
+                   <CheckCircle2 className="h-7 w-7" />
                 </div>
              </div>
           </div>

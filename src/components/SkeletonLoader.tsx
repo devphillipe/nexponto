@@ -1,4 +1,5 @@
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 
 export function TableSkeleton({ rows = 5, cols = 4 }: { rows?: number; cols?: number }) {
   return (
@@ -6,7 +7,7 @@ export function TableSkeleton({ rows = 5, cols = 4 }: { rows?: number; cols?: nu
       {Array.from({ length: rows }).map((_, i) => (
         <div key={i} className="flex items-center space-x-4">
           {Array.from({ length: cols }).map((_, j) => (
-            <Skeleton key={j} className="h-12 flex-1 rounded-xl" />
+            <Skeleton key={j} className="h-16 flex-1 rounded-2xl bg-muted/10" />
           ))}
         </div>
       ))}
@@ -18,7 +19,7 @@ export function CardSkeleton() {
   return (
     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
       {Array.from({ length: 4 }).map((_, i) => (
-        <Skeleton key={i} className="h-40 w-full rounded-3xl" />
+        <Skeleton key={i} className="h-44 w-full rounded-[2.5rem] bg-muted/10 border border-border/20" />
       ))}
     </div>
   );

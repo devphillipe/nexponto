@@ -147,12 +147,12 @@ function ConfiguracoesPage() {
   return (
     <div className="max-w-4xl space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div>
-        <h1 className="font-display text-4xl font-bold tracking-tight text-foreground">Configurações da Empresa</h1>
-        <p className="text-muted-foreground mt-2 text-lg">Gerencie as informações e preferências do seu escritório.</p>
+        <h1 className="font-display text-5xl font-bold tracking-tight text-foreground">Configurações da Empresa</h1>
+        <p className="text-muted-foreground mt-3 text-xl font-medium">Gerencie as informações e preferências estratégicas do seu escritório.</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <Card className="glass-card border-none shadow-xl rounded-[2rem] overflow-hidden">
+        <Card className="glass-card border-border/40 shadow-sm rounded-[2.5rem] overflow-hidden transition-all hover:shadow-md">
           <CardHeader className="p-8 pb-4">
             <CardTitle className="text-xl flex items-center gap-2 text-primary">
               <ImageIcon className="h-5 w-5" />
@@ -210,7 +210,7 @@ function ConfiguracoesPage() {
           </CardContent>
         </Card>
 
-        <Card className="glass-card border-none shadow-xl rounded-[2rem] overflow-hidden">
+        <Card className="glass-card border-border/40 shadow-sm rounded-[2.5rem] overflow-hidden transition-all hover:shadow-md">
           <CardHeader className="p-8 pb-4">
             <CardTitle className="text-xl flex items-center gap-2 text-primary">
               <Building2 className="h-5 w-5" />
@@ -291,7 +291,7 @@ function ConfiguracoesPage() {
           </CardContent>
         </Card>
 
-        <Card className="glass-card border-none shadow-xl rounded-[2rem] overflow-hidden">
+        <Card className="glass-card border-border/40 shadow-sm rounded-[2.5rem] overflow-hidden transition-all hover:shadow-md">
           <CardHeader className="p-8 pb-4">
             <CardTitle className="text-xl flex items-center gap-2 text-primary">
               <Clock className="h-5 w-5" />
@@ -329,7 +329,7 @@ function ConfiguracoesPage() {
         </Card>
 
         <div className="flex justify-end gap-4">
-          <Button type="submit" size="lg" disabled={updateMutation.isPending} className="rounded-xl px-12 py-6 text-lg font-bold">
+          <Button type="submit" size="lg" disabled={updateMutation.isPending} className="rounded-[1.5rem] px-16 h-16 text-lg font-black uppercase tracking-widest shadow-xl shadow-primary/20">
             {updateMutation.isPending ? "Salvando..." : "Salvar Alterações"}
           </Button>
         </div>

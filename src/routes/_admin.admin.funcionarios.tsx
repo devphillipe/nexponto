@@ -64,22 +64,22 @@ function EmployeesPage() {
     <div className="space-y-8 animate-in fade-in duration-500">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <h1 className="font-display text-4xl font-bold tracking-tight">Equipe</h1>
-          <p className="text-muted-foreground mt-2">Gerencie todos os colaboradores do seu escritório.</p>
+          <h1 className="font-display text-5xl font-bold tracking-tight text-foreground">Equipe</h1>
+          <p className="text-muted-foreground mt-3 text-xl font-medium">Gerencie todos os colaboradores do seu escritório.</p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-4">
           <div className="relative hidden sm:block">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-primary" />
             <Input 
               placeholder="Buscar por nome ou e-mail..." 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 h-11 w-64 bg-muted/20 border-border/40 rounded-xl"
+              className="pl-12 h-14 w-80 bg-muted/10 border-border/40 rounded-2xl transition-all hover:border-primary/20 focus:w-96 font-medium"
             />
           </div>
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-              <Button className="premium-button h-11 px-6 rounded-xl font-bold">
+              <Button size="lg" className="rounded-2xl shadow-xl shadow-primary/20 font-black uppercase tracking-widest text-xs px-8 h-14">
                 <Plus className="mr-2 h-5 w-5" /> Novo Colaborador
               </Button>
             </DialogTrigger>
@@ -98,7 +98,7 @@ function EmployeesPage() {
         </div>
       </div>
 
-      <div className="glass-card overflow-hidden rounded-[2rem] border border-border/40">
+      <div className="glass-card overflow-hidden rounded-[2.5rem] border border-border/40 shadow-sm transition-all duration-500 hover:shadow-md">
         {isLoading ? (
           <TableSkeleton rows={6} cols={4} />
         ) : !filtered?.length ? (

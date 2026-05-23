@@ -47,8 +47,8 @@ export const Logo = memo(function Logo({
   wordmarkClassName = "",
 }: LogoProps2) {
   return (
-    <div className={`inline-flex items-center gap-2.5 ${className}`}>
-      <span className="grid place-items-center rounded-xl bg-primary/10 text-primary p-2 border border-primary/20">
+    <div className={`inline-flex items-center gap-3.5 ${className}`}>
+      <span className="grid place-items-center rounded-2xl bg-primary text-primary-foreground p-2.5 shadow-lg shadow-primary/20 border border-primary/20 transition-transform hover:scale-105">
         <LogoMark size={size} />
       </span>
       {showWordmark && (

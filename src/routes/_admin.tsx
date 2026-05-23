@@ -44,24 +44,24 @@ function AdminLayout() {
 
   return (
     <div className="flex min-h-screen bg-background/50">
-      <aside className="hidden w-72 shrink-0 flex-col border-r border-sidebar-border bg-sidebar/50 backdrop-blur-xl p-6 md:flex sticky top-0 h-screen">
-        <div className="mb-10 flex items-center gap-3 px-2">
-          <Logo size={22} showWordmark={false} />
+      <aside className="hidden w-72 shrink-0 flex-col border-r border-border/40 bg-background/40 backdrop-blur-2xl p-8 md:flex sticky top-0 h-screen transition-all duration-300">
+        <div className="mb-10 flex items-center gap-3 px-1">
+          <Logo size={24} showWordmark={false} />
           <div className="min-w-0">
-            <div className="truncate font-display text-lg font-bold tracking-tight">
+            <div className="truncate font-display text-xl font-bold tracking-tight">
               Nex<span className="text-primary">Ponto</span>
             </div>
-            <div className="truncate text-[10px] uppercase font-bold tracking-[0.2em] text-primary">
+            <div className="truncate text-[9px] uppercase font-black tracking-[0.25em] text-primary/80 opacity-80">
               Admin Console
             </div>
           </div>
         </div>
 
-        <div className="mb-8 p-4 glass-card rounded-2xl bg-primary/5">
+        <div className="mb-8 p-5 glass-card rounded-2xl bg-gradient-to-br from-primary/10 to-transparent border-primary/10 shadow-sm transition-all hover:shadow-md">
            <div className="flex items-center gap-3">
              <div className="min-w-0">
-               <div className="truncate text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Conta Ativa</div>
-               <div className="truncate text-xs font-semibold text-primary">Painel do Administrador</div>
+               <div className="truncate text-[9px] text-primary uppercase font-black tracking-widest mb-0.5">Assinatura Ativa</div>
+               <div className="truncate text-xs font-bold text-foreground">Escritório Central</div>
              </div>
            </div>
         </div>
@@ -76,13 +76,13 @@ function AdminLayout() {
               <Link
                 key={item.to}
                 to={item.to}
-                className={`group flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all ${
+                className={`group flex items-center gap-3 rounded-2xl px-5 py-3.5 text-sm font-semibold transition-all duration-300 ${
                   active
-                    ? "bg-primary/10 text-primary border border-primary/20"
-                    : "text-muted-foreground hover:bg-sidebar-accent/50 hover:text-foreground"
+                    ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-[1.02] border border-primary/20"
+                    : "text-muted-foreground hover:bg-muted/50 hover:text-foreground hover:translate-x-1"
                 }`}
               >
-                <item.icon className={`h-4.5 w-4.5 transition-colors ${active ? "text-primary" : "group-hover:text-primary"}`} />
+                <item.icon className={`h-4.5 w-4.5 transition-colors duration-300 ${active ? "text-primary-foreground" : "group-hover:text-primary"}`} />
                 {item.label}
               </Link>
             );
@@ -92,17 +92,17 @@ function AdminLayout() {
         <div className="mt-auto space-y-4 pt-6 border-t border-border/40">
            <Link 
              to="/admin/configuracoes"
-             className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all ${
+             className={`flex w-full items-center gap-3 rounded-2xl px-5 py-3.5 text-sm font-semibold transition-all duration-300 ${
                loc.pathname.startsWith("/admin/configuracoes")
-                 ? "bg-primary/10 text-primary border border-primary/20"
-                 : "text-muted-foreground hover:bg-sidebar-accent/50 hover:text-foreground"
+                 ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
+                 : "text-muted-foreground hover:bg-muted/50 hover:text-foreground hover:translate-x-1"
              }`}
            >
              <Settings className="h-4.5 w-4.5" /> Configurações
            </Link>
            <button 
              onClick={logout}
-             className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-destructive/80 hover:bg-destructive/10 hover:text-destructive transition-all"
+             className="flex w-full items-center gap-3 rounded-2xl px-5 py-3.5 text-sm font-semibold text-destructive/80 hover:bg-destructive/10 hover:text-destructive transition-all duration-300 hover:translate-x-1"
            >
              <LogOut className="h-4.5 w-4.5" /> Sair do Sistema
            </button>
@@ -110,17 +110,23 @@ function AdminLayout() {
       </aside>
 
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="h-20 border-b border-border/40 flex items-center justify-between px-6 md:px-10 bg-background/20 backdrop-blur-md sticky top-0 z-30">
+        <header className="h-24 border-b border-border/40 flex items-center justify-between px-8 md:px-12 bg-background/60 backdrop-blur-2xl sticky top-0 z-30 transition-all duration-300">
            <CommandMenu />
-            <div className="flex items-center gap-4 ml-auto">
-              <div className="h-8 w-[1px] bg-border/50 mx-2"></div>
-              <div className="flex items-center gap-3">
-                <span className="text-sm font-medium text-muted-foreground">{profile?.full_name}</span>
+            <div className="flex items-center gap-6 ml-auto">
+              <div className="h-10 w-[1px] bg-border mx-2"></div>
+              <div className="flex items-center gap-4">
+                <div className="text-right hidden sm:block">
+                  <div className="text-sm font-bold text-foreground leading-none mb-1">{profile?.full_name}</div>
+                  <div className="text-[10px] font-black uppercase tracking-widest text-primary/70">Administrador</div>
+                </div>
+                <div className="h-11 w-11 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 flex items-center justify-center font-bold text-primary shadow-sm">
+                  {profile?.full_name?.charAt(0)}
+                </div>
               </div>
             </div>
         </header>
         
-        <main className="flex-1 p-6 md:p-10 max-w-[1600px] mx-auto w-full">
+        <main className="flex-1 p-8 md:p-12 max-w-[1600px] mx-auto w-full animate-in fade-in slide-in-from-bottom-4 duration-700">
           <Outlet />
         </main>
       </div>
