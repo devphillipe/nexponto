@@ -41,7 +41,12 @@
   body {
     @apply bg-background text-foreground font-sans selection:bg-primary/30;
     overflow-x: hidden;
+    scroll-behavior: smooth;
   }
+}
+
+.animate-in {
+  will-change: transform, opacity;
 }
 
 @layer components {
