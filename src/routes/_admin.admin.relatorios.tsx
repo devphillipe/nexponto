@@ -11,9 +11,10 @@ import { FileDown, Loader2, FileSpreadsheet, File as FilePdf } from "lucide-reac
 import { useState } from "react";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import * as XLSX from "xlsx";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
+// Dynamically imported below for performance
+// import * as XLSX from "xlsx";
+// import jsPDF from "jspdf";
+// import autoTable from "jspdf-autotable";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_admin/admin/relatorios")({
@@ -135,6 +136,7 @@ function RelatoriosPage() {
       });
 
       if (reportFormat === "xlsx") {
+        const XLSX = await import("xlsx");
         const wb = XLSX.utils.book_new();
         reportData.forEach(rd => {
           const ws = XLSX.utils.json_to_sheet(rd.dailyReports.map(d => ({
@@ -160,6 +162,8 @@ function RelatoriosPage() {
         });
         XLSX.writeFile(wb, `Relatorio_Ponto_${month}.xlsx`);
       } else {
+        const { default: jsPDF } = await import("jspdf");
+        const { default: autoTable } = await import("jspdf-autotable");
         const doc = new jsPDF();
         
         const loadImage = (url: string): Promise<string | null> => {

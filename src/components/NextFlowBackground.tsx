@@ -55,10 +55,11 @@ export const NextFlowBackground: React.FC = () => {
               strokeWidth={line.width}
               filter="url(#glow)"
               style={{
-                transform: `translateX(${(parseInt(line.left) - 50) * 5}px)`,
-                animation: `nextFlowMove ${line.duration} linear infinite`,
-                animationDelay: line.delay,
-              }}
+              transform: `translateX(${(parseInt(line.left) - 50) * 5}px)`,
+              animation: `nextFlowMove ${line.duration} linear infinite`,
+              animationDelay: line.delay,
+              willChange: 'transform, stroke-dashoffset'
+            }}
               className="motion-reduce:hidden"
             />
           </g>
