@@ -15,9 +15,9 @@ export const Route = createFileRoute("/")({
 
 function Landing() {
   return (
-    <main className="relative mx-auto flex min-h-screen max-w-6xl flex-col px-6 py-10">
-      <header className="flex items-center justify-between">
-        <Logo size={22} wordmarkClassName="text-xl" />
+    <main className="relative mx-auto flex min-h-screen max-w-7xl flex-col px-8 py-12">
+      <header className="flex items-center justify-between mb-20 animate-in fade-in slide-in-from-top-4 duration-1000">
+        <Logo size={28} wordmarkClassName="text-2xl" />
 
         <nav className="hidden items-center gap-8 text-sm md:flex">
           <Link to="/admin/login" className="nav-link text-muted-foreground font-medium">
@@ -55,48 +55,48 @@ function Landing() {
           Multitenant · Isolamento total de dados
         </div>
         
-        <h1 className="font-display text-6xl font-bold leading-[1.1] tracking-tight md:text-7xl lg:text-8xl max-w-4xl">
+        <h1 className="font-display text-7xl font-black leading-[1.05] tracking-tighter md:text-8xl lg:text-[10rem] max-w-5xl mb-10 drop-shadow-sm">
           Controle de ponto <br />
           <span className="text-gradient">inteligente.</span>
         </h1>
         
-        <p className="mt-8 max-w-2xl text-lg md:text-xl text-balance text-muted-foreground leading-relaxed">
-          A solução definitiva para escritórios modernos. Gestão simplificada para administradores e facilidade total para colaboradores.
+        <p className="mt-4 max-w-3xl text-xl md:text-2xl text-balance text-muted-foreground leading-relaxed font-medium opacity-90">
+          A solução definitiva para escritórios modernos e equipes dinâmicas. Gestão automatizada e experiência sem fricção.
         </p>
 
-        <div className="mt-14 grid w-full max-w-3xl gap-6 sm:grid-cols-2 px-2">
+        <div className="mt-20 grid w-full max-w-5xl gap-10 sm:grid-cols-2 px-4 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-300">
           <Link
             to="/admin/cadastro"
-            className="glass-card group flex flex-col items-start gap-4 rounded-3xl p-8 text-left transition-all hover:-translate-y-1 hover:border-primary/40"
+            className="glass-card group flex flex-col items-start gap-6 rounded-[3rem] p-12 text-left transition-all duration-500 hover:-translate-y-3 hover:shadow-2xl hover:shadow-primary/10 border-border/40 hover:border-primary/30"
           >
-            <div className="grid h-12 w-12 place-items-center rounded-2xl bg-primary/10 text-primary transition-transform group-hover:scale-110">
-              <Building2 className="h-6 w-6" />
+            <div className="grid h-16 w-16 place-items-center rounded-2xl bg-gradient-to-br from-primary to-primary/80 text-primary-foreground transition-all duration-500 group-hover:scale-110 shadow-lg shadow-primary/20">
+              <Building2 className="h-8 w-8" />
             </div>
             <div>
-              <h3 className="font-display text-xl font-bold mb-2">Para o Escritório</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
+              <h3 className="font-display text-3xl font-black mb-3 tracking-tighter text-foreground">Para o Escritório</h3>
+              <p className="text-base text-muted-foreground leading-relaxed font-medium">
                 Cadastre sua empresa em segundos. Gerencie sua equipe, visualize relatórios e tenha controle total.
               </p>
             </div>
-            <div className="mt-4 flex items-center gap-2 text-sm font-bold text-primary">
+            <div className="mt-6 flex items-center gap-2 text-sm font-black uppercase tracking-widest text-primary">
               Criar conta gratuita <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </div>
           </Link>
 
           <Link
             to="/funcionario/login"
-            className="glass-card group flex flex-col items-start gap-4 rounded-3xl p-8 text-left transition-all hover:-translate-y-1 hover:border-primary/40"
+            className="glass-card group flex flex-col items-start gap-6 rounded-[3rem] p-12 text-left transition-all duration-500 hover:-translate-y-3 hover:shadow-2xl hover:shadow-primary/10 border-border/40 hover:border-primary/30"
           >
-            <div className="grid h-12 w-12 place-items-center rounded-2xl bg-primary/10 text-primary transition-transform group-hover:scale-110">
-              <Users className="h-6 w-6" />
+            <div className="grid h-16 w-16 place-items-center rounded-2xl bg-gradient-to-br from-primary to-primary/80 text-primary-foreground transition-all duration-500 group-hover:scale-110 shadow-lg shadow-primary/20">
+              <Users className="h-8 w-8" />
             </div>
             <div>
-              <h3 className="font-display text-xl font-bold mb-2">Para o Funcionário</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
+              <h3 className="font-display text-3xl font-black mb-3 tracking-tighter text-foreground">Para o Funcionário</h3>
+              <p className="text-base text-muted-foreground leading-relaxed font-medium">
                 Bata seu ponto de forma rápida e segura. Acesse seu histórico de qualquer lugar, a qualquer hora.
               </p>
             </div>
-            <div className="mt-4 flex items-center gap-2 text-sm font-bold text-primary">
+            <div className="mt-6 flex items-center gap-2 text-sm font-black uppercase tracking-widest text-primary">
               Acessar portal <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </div>
           </Link>
