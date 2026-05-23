@@ -170,6 +170,32 @@ function ResetPassword() {
     );
   }
 
+  if (status === "success") {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden">
+        <NextFlowBackground />
+        <div className="absolute top-0 left-0 w-full h-full -z-10 opacity-30 pointer-events-none">
+          <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-emerald-500/20 blur-[120px] rounded-full"></div>
+          <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-primary/20 blur-[120px] rounded-full"></div>
+        </div>
+        <div className="w-full max-w-md glass-card rounded-3xl p-10 border border-emerald-500/20 shadow-2xl bg-background/40 backdrop-blur-2xl text-center space-y-6 relative z-10 animate-in fade-in zoom-in-95 duration-700">
+          <div className="mx-auto h-16 w-16 rounded-2xl bg-emerald-500/10 text-emerald-500 grid place-items-center">
+            <CheckCircle2 className="h-8 w-8" />
+          </div>
+          <div className="space-y-2">
+            <h1 className="text-3xl font-black tracking-tight">Senha alterada!</h1>
+            <p className="text-muted-foreground text-sm leading-relaxed">
+              Sua nova senha foi configurada com sucesso. Agora você já pode fazer login com a nova senha.
+            </p>
+          </div>
+          <Button asChild className="premium-button w-full h-14 rounded-2xl font-bold uppercase tracking-widest">
+            <Link to="/admin/login">Ir para o Login</Link>
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden">
       <NextFlowBackground />
