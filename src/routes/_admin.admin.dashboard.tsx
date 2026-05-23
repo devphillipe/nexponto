@@ -12,6 +12,15 @@ export const Route = createFileRoute("/_admin/admin/dashboard")({
 });
 
 import { useMemo } from "react";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
+
+const TYPE_LABEL: Record<string, string> = {
+  entrada: "Entrada",
+  saida_almoco: "Saída Almoço",
+  retorno_almoco: "Retorno Almoço",
+  saida: "Saída Final",
+};
 
 function Dashboard() {
   const { data: profile } = useProfile();
