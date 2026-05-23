@@ -209,33 +209,33 @@ function MyClockPage() {
           </div>
         </div>
 
-        <div className="glass-card rounded-2xl md:rounded-[2.5rem] p-6 md:p-10 flex flex-col border border-border/40 shadow-sm transition-all hover:shadow-md">
-          <h2 className="mb-8 font-display text-2xl font-bold tracking-tight text-foreground">Resumo da Jornada</h2>
+        <div className="glass-card rounded-2xl p-6 flex flex-col border border-border/40 shadow-sm">
+          <h2 className="mb-4 font-display text-lg font-bold tracking-tight text-foreground">Resumo da Jornada</h2>
           
-          <div className="space-y-4 sm:space-y-6 flex-1">
-             <div className="flex items-center justify-between p-5 sm:p-7 rounded-xl sm:rounded-[2rem] bg-muted/10 border border-border/20 group hover:bg-muted/20 transition-all">
+          <div className="space-y-3 flex-1">
+             <div className="flex items-center justify-between p-4 rounded-xl bg-muted/10 border border-border/20 group hover:bg-muted/20 transition-all">
                 <div>
-                   <div className="text-[9px] sm:text-[10px] uppercase font-black tracking-[0.2em] text-muted-foreground opacity-70 mb-1 sm:mb-2">Tempo Trabalhado</div>
-                   <div className="font-mono text-2xl sm:text-4xl font-black text-foreground">{formatDur(totalWorkedMs)}</div>
+                   <div className="text-[8px] uppercase font-black tracking-[0.2em] text-muted-foreground opacity-70 mb-1">Tempo Trabalhado</div>
+                   <div className="font-mono text-2xl font-black text-foreground">{formatDur(totalWorkedMs)}</div>
                 </div>
-                <div className="h-14 w-14 rounded-2xl bg-primary/10 grid place-items-center text-primary group-hover:scale-110 transition-transform">
-                   <Clock className="h-7 w-7" />
+                <div className="h-10 w-10 rounded-xl bg-primary/10 grid place-items-center text-primary group-hover:scale-110 transition-transform">
+                   <Clock className="h-5 w-5" />
                 </div>
              </div>
 
-             <div className="flex items-center justify-between p-5 sm:p-7 rounded-xl sm:rounded-[2rem] bg-muted/10 border border-border/20 group hover:bg-muted/20 transition-all">
+             <div className="flex items-center justify-between p-4 rounded-xl bg-muted/10 border border-border/20 group hover:bg-muted/20 transition-all">
                 <div>
-                   <div className="text-[9px] sm:text-[10px] uppercase font-black tracking-[0.2em] text-muted-foreground opacity-70 mb-1 sm:mb-2">Saldo do Dia</div>
+                   <div className="text-[8px] uppercase font-black tracking-[0.2em] text-muted-foreground opacity-70 mb-1">Saldo do Dia</div>
                    <div
-                    className={`font-mono text-2xl sm:text-4xl font-black ${
+                    className={`font-mono text-2xl font-black ${
                       balance >= 0 ? "text-success" : "text-warning"
                     }`}
                    >
                     {balance >= 0 ? "+" : "-"}{formatDur(Math.abs(balance))}
                    </div>
                 </div>
-                <div className={`h-14 w-14 rounded-2xl grid place-items-center group-hover:scale-110 transition-transform ${balance >= 0 ? "bg-success/10 text-success" : "bg-warning/10 text-warning"}`}>
-                   <CheckCircle2 className="h-7 w-7" />
+                <div className={`h-10 w-10 rounded-xl grid place-items-center group-hover:scale-110 transition-transform ${balance >= 0 ? "bg-success/10 text-success" : "bg-warning/10 text-warning"}`}>
+                   <CheckCircle2 className="h-5 w-5" />
                 </div>
              </div>
           </div>
