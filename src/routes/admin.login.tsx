@@ -33,7 +33,7 @@ function AdminLogin() {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error || !data.user) {
         setLoading(false);
-        toast.error(error?.message ?? "Falha no login");
+        toast.error(translateAuthError(error, "Falha no login. Verifique seus dados."));
         return;
       }
 
@@ -44,7 +44,7 @@ function AdminLogin() {
 
       if (roleError) {
         setLoading(false);
-        toast.error("Erro ao verificar permissões.");
+        toast.error("Erro ao verificar permissões. Tente novamente.");
         return;
       }
 
@@ -58,7 +58,7 @@ function AdminLogin() {
       navigate({ to: "/admin/dashboard" });
     } catch (err) {
       setLoading(false);
-      toast.error("Ocorreu um erro inesperado.");
+      toast.error(translateAuthError(err));
     }
   }
 
