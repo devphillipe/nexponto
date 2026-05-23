@@ -88,18 +88,18 @@ function Dashboard() {
       ) : (
         <div className="grid gap-4 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
           {cards.map((c, i) => (
-            <div key={c.label} className="glass-card rounded-[2.5rem] p-8 group hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500 border border-border/40 hover:border-primary/20">
-              <div className="mb-6 flex items-center justify-between">
-                <div className={`p-4 rounded-2xl bg-gradient-to-br from-muted to-transparent ${c.color} group-hover:scale-110 group-hover:bg-primary/5 transition-all duration-500`}>
-                  <c.icon className="h-7 w-7" />
+            <div key={c.label} className="glass-card rounded-2xl md:rounded-[2.5rem] p-6 md:p-8 group hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500 border border-border/40 hover:border-primary/20">
+              <div className="mb-4 md:mb-6 flex items-center justify-between">
+                <div className={`p-3 md:p-4 rounded-xl md:rounded-2xl bg-gradient-to-br from-muted to-transparent ${c.color} group-hover:scale-110 group-hover:bg-primary/5 transition-all duration-500`}>
+                  <c.icon className="h-6 w-6 md:h-7 md:w-7" />
                 </div>
-                <ArrowUpRight className="h-5 w-5 text-muted-foreground opacity-0 group-hover:opacity-100 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all duration-500" />
+                <ArrowUpRight className="h-4 w-4 md:h-5 md:w-5 text-muted-foreground opacity-0 group-hover:opacity-100 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all duration-500" />
               </div>
-              <div className="space-y-2">
-                <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground opacity-80">
+              <div className="space-y-1 md:space-y-2">
+                <span className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-muted-foreground opacity-80">
                   {c.label}
                 </span>
-                <div className="font-display text-5xl font-black tracking-tighter text-foreground">{c.value}</div>
+                <div className="font-display text-3xl md:text-5xl font-black tracking-tighter text-foreground">{c.value}</div>
               </div>
               <div className="mt-4 flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
                  <div className="h-1.5 w-1.5 rounded-full bg-success"></div>
@@ -111,14 +111,14 @@ function Dashboard() {
       )}
 
       <div className="grid gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2 glass-card rounded-[2.5rem] p-10 border border-border/40 shadow-sm">
-           <div className="flex items-center justify-between mb-10">
-              <h2 className="font-display text-3xl font-bold tracking-tight">Resumo de Atividades</h2>
+        <div className="lg:col-span-2 glass-card rounded-2xl md:rounded-[2.5rem] p-6 md:p-10 border border-border/40 shadow-sm">
+           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 md:mb-10">
+              <h2 className="font-display text-2xl md:text-3xl font-bold tracking-tight">Resumo de Atividades</h2>
               <button 
                 onClick={() => navigate({ to: "/admin/pontos" })}
-                className="text-sm font-black uppercase tracking-widest text-primary hover:text-primary/80 transition-colors group flex items-center gap-2"
+                className="text-[10px] md:text-sm font-black uppercase tracking-widest text-primary hover:text-primary/80 transition-colors group flex items-center gap-2"
               >
-                Ver relatório completo <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
+                Ver completo <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
               </button>
            </div>
            
@@ -146,10 +146,10 @@ function Dashboard() {
            </div>
         </div>
 
-        <div className="glass-card rounded-[2.5rem] p-10 flex flex-col justify-between border border-border/40 shadow-sm bg-gradient-to-br from-primary/[0.02] to-transparent">
+        <div className="glass-card rounded-2xl md:rounded-[2.5rem] p-6 md:p-10 flex flex-col justify-between border border-border/40 shadow-sm bg-gradient-to-br from-primary/[0.02] to-transparent">
           <div>
-            <h2 className="mb-8 font-display text-3xl font-bold tracking-tight">Configuração</h2>
-            <p className="text-muted-foreground text-base leading-relaxed mb-10 font-medium">
+            <h2 className="mb-6 md:mb-8 font-display text-2xl md:text-3xl font-bold tracking-tight">Configuração</h2>
+            <p className="text-muted-foreground text-sm md:text-base leading-relaxed mb-8 md:mb-10 font-medium">
               Seu escritório está configurado corretamente. Veja o que você pode fazer agora:
             </p>
             <ul className="space-y-6">
