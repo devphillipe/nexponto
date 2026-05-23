@@ -14,6 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
+      absences: {
+        Row: {
+          absence_date: string
+          approved_by: string | null
+          created_at: string
+          description: string | null
+          document_url: string | null
+          employee_id: string
+          id: string
+          reason: Database["public"]["Enums"]["absence_reason"]
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          absence_date: string
+          approved_by?: string | null
+          created_at?: string
+          description?: string | null
+          document_url?: string | null
+          employee_id: string
+          id?: string
+          reason?: Database["public"]["Enums"]["absence_reason"]
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          absence_date?: string
+          approved_by?: string | null
+          created_at?: string
+          description?: string | null
+          document_url?: string | null
+          employee_id?: string
+          id?: string
+          reason?: Database["public"]["Enums"]["absence_reason"]
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "absences_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "absences_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       employees: {
         Row: {
           active: boolean
@@ -104,31 +158,40 @@ export type Database = {
       }
       tenants: {
         Row: {
+          address: string | null
           created_at: string
           default_daily_hours: number
           document: string | null
           email: string | null
           id: string
+          logo_url: string | null
           name: string
           phone: string | null
+          timezone: string | null
         }
         Insert: {
+          address?: string | null
           created_at?: string
           default_daily_hours?: number
           document?: string | null
           email?: string | null
           id?: string
+          logo_url?: string | null
           name: string
           phone?: string | null
+          timezone?: string | null
         }
         Update: {
+          address?: string | null
           created_at?: string
           default_daily_hours?: number
           document?: string | null
           email?: string | null
           id?: string
+          logo_url?: string | null
           name?: string
           phone?: string | null
+          timezone?: string | null
         }
         Relationships: []
       }
@@ -142,7 +205,9 @@ export type Database = {
           entry_type: Database["public"]["Enums"]["entry_type"]
           id: string
           ip: string | null
+          is_adjustment: boolean | null
           notes: string | null
+          original_entry_at: string | null
           source: Database["public"]["Enums"]["entry_source"]
           tenant_id: string
           user_agent: string | null
@@ -156,7 +221,9 @@ export type Database = {
           entry_type: Database["public"]["Enums"]["entry_type"]
           id?: string
           ip?: string | null
+          is_adjustment?: boolean | null
           notes?: string | null
+          original_entry_at?: string | null
           source?: Database["public"]["Enums"]["entry_source"]
           tenant_id: string
           user_agent?: string | null
@@ -170,7 +237,9 @@ export type Database = {
           entry_type?: Database["public"]["Enums"]["entry_type"]
           id?: string
           ip?: string | null
+          is_adjustment?: boolean | null
           notes?: string | null
+          original_entry_at?: string | null
           source?: Database["public"]["Enums"]["entry_source"]
           tenant_id?: string
           user_agent?: string | null
@@ -241,6 +310,13 @@ export type Database = {
       is_tenant_admin: { Args: { _tenant_id: string }; Returns: boolean }
     }
     Enums: {
+      absence_reason:
+        | "atestado"
+        | "folga"
+        | "feriado"
+        | "licenca"
+        | "falta_justificada"
+        | "outro"
       app_role: "admin" | "employee"
       entry_source: "automatico" | "manual_admin"
       entry_type: "entrada" | "saida_almoco" | "retorno_almoco" | "saida"
@@ -371,6 +447,14 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      absence_reason: [
+        "atestado",
+        "folga",
+        "feriado",
+        "licenca",
+        "falta_justificada",
+        "outro",
+      ],
       app_role: ["admin", "employee"],
       entry_source: ["automatico", "manual_admin"],
       entry_type: ["entrada", "saida_almoco", "retorno_almoco", "saida"],

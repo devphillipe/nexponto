@@ -20,6 +20,8 @@ import { Route as FuncFuncionarioHistoricoRouteImport } from './routes/_func.fun
 import { Route as AdminAdminPontosRouteImport } from './routes/_admin.admin.pontos'
 import { Route as AdminAdminFuncionariosRouteImport } from './routes/_admin.admin.funcionarios'
 import { Route as AdminAdminDashboardRouteImport } from './routes/_admin.admin.dashboard'
+import { Route as AdminAdminConfiguracoesRouteImport } from './routes/_admin.admin.configuracoes'
+import { Route as AdminAdminAbonosRouteImport } from './routes/_admin.admin.abonos'
 
 const FuncRoute = FuncRouteImport.update({
   id: '/_func',
@@ -75,12 +77,24 @@ const AdminAdminDashboardRoute = AdminAdminDashboardRouteImport.update({
   path: '/admin/dashboard',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminAdminConfiguracoesRoute = AdminAdminConfiguracoesRouteImport.update({
+  id: '/admin/configuracoes',
+  path: '/admin/configuracoes',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAdminAbonosRoute = AdminAdminAbonosRouteImport.update({
+  id: '/admin/abonos',
+  path: '/admin/abonos',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin/cadastro': typeof AdminCadastroRoute
   '/admin/login': typeof AdminLoginRoute
   '/funcionario/login': typeof FuncionarioLoginRoute
+  '/admin/abonos': typeof AdminAdminAbonosRoute
+  '/admin/configuracoes': typeof AdminAdminConfiguracoesRoute
   '/admin/dashboard': typeof AdminAdminDashboardRoute
   '/admin/funcionarios': typeof AdminAdminFuncionariosRoute
   '/admin/pontos': typeof AdminAdminPontosRoute
@@ -92,6 +106,8 @@ export interface FileRoutesByTo {
   '/admin/cadastro': typeof AdminCadastroRoute
   '/admin/login': typeof AdminLoginRoute
   '/funcionario/login': typeof FuncionarioLoginRoute
+  '/admin/abonos': typeof AdminAdminAbonosRoute
+  '/admin/configuracoes': typeof AdminAdminConfiguracoesRoute
   '/admin/dashboard': typeof AdminAdminDashboardRoute
   '/admin/funcionarios': typeof AdminAdminFuncionariosRoute
   '/admin/pontos': typeof AdminAdminPontosRoute
@@ -106,6 +122,8 @@ export interface FileRoutesById {
   '/admin/cadastro': typeof AdminCadastroRoute
   '/admin/login': typeof AdminLoginRoute
   '/funcionario/login': typeof FuncionarioLoginRoute
+  '/_admin/admin/abonos': typeof AdminAdminAbonosRoute
+  '/_admin/admin/configuracoes': typeof AdminAdminConfiguracoesRoute
   '/_admin/admin/dashboard': typeof AdminAdminDashboardRoute
   '/_admin/admin/funcionarios': typeof AdminAdminFuncionariosRoute
   '/_admin/admin/pontos': typeof AdminAdminPontosRoute
@@ -119,6 +137,8 @@ export interface FileRouteTypes {
     | '/admin/cadastro'
     | '/admin/login'
     | '/funcionario/login'
+    | '/admin/abonos'
+    | '/admin/configuracoes'
     | '/admin/dashboard'
     | '/admin/funcionarios'
     | '/admin/pontos'
@@ -130,6 +150,8 @@ export interface FileRouteTypes {
     | '/admin/cadastro'
     | '/admin/login'
     | '/funcionario/login'
+    | '/admin/abonos'
+    | '/admin/configuracoes'
     | '/admin/dashboard'
     | '/admin/funcionarios'
     | '/admin/pontos'
@@ -143,6 +165,8 @@ export interface FileRouteTypes {
     | '/admin/cadastro'
     | '/admin/login'
     | '/funcionario/login'
+    | '/_admin/admin/abonos'
+    | '/_admin/admin/configuracoes'
     | '/_admin/admin/dashboard'
     | '/_admin/admin/funcionarios'
     | '/_admin/admin/pontos'
@@ -238,16 +262,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAdminDashboardRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/_admin/admin/configuracoes': {
+      id: '/_admin/admin/configuracoes'
+      path: '/admin/configuracoes'
+      fullPath: '/admin/configuracoes'
+      preLoaderRoute: typeof AdminAdminConfiguracoesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/_admin/admin/abonos': {
+      id: '/_admin/admin/abonos'
+      path: '/admin/abonos'
+      fullPath: '/admin/abonos'
+      preLoaderRoute: typeof AdminAdminAbonosRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
 
 interface AdminRouteChildren {
+  AdminAdminAbonosRoute: typeof AdminAdminAbonosRoute
+  AdminAdminConfiguracoesRoute: typeof AdminAdminConfiguracoesRoute
   AdminAdminDashboardRoute: typeof AdminAdminDashboardRoute
   AdminAdminFuncionariosRoute: typeof AdminAdminFuncionariosRoute
   AdminAdminPontosRoute: typeof AdminAdminPontosRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminAdminAbonosRoute: AdminAdminAbonosRoute,
+  AdminAdminConfiguracoesRoute: AdminAdminConfiguracoesRoute,
   AdminAdminDashboardRoute: AdminAdminDashboardRoute,
   AdminAdminFuncionariosRoute: AdminAdminFuncionariosRoute,
   AdminAdminPontosRoute: AdminAdminPontosRoute,
