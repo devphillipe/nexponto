@@ -4,7 +4,7 @@ import { useProfile } from "@/lib/auth";
 import { LayoutDashboard, Users, Clock, LogOut, Bell, Search, Settings, FileText } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { CommandMenu } from "@/components/CommandMenu";
 import { memo } from "react";
 
 export const Route = createFileRoute("/_admin")({
@@ -114,13 +114,7 @@ function AdminLayout() {
 
       <div className="flex-1 flex flex-col min-w-0">
         <header className="h-20 border-b border-border/40 flex items-center justify-between px-6 md:px-10 bg-background/20 backdrop-blur-md sticky top-0 z-30">
-           <div className="relative w-full max-w-md hidden md:block">
-             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-             <Input 
-               placeholder="Pesquisar..." 
-               className="pl-10 bg-muted/30 border-none rounded-xl h-10 focus-visible:ring-primary/30"
-             />
-           </div>
+           <CommandMenu />
             <div className="flex items-center gap-4 ml-auto">
              <div className="h-8 w-[1px] bg-border/50 mx-2"></div>
              <div className="flex items-center gap-3">
