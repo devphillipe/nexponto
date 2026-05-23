@@ -152,7 +152,7 @@ function ConfiguracoesPage() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <Card className="glass-card border-border/40 shadow-sm rounded-[2.5rem] overflow-hidden transition-all hover:shadow-md">
+        <Card className="glass-card border-border/40 shadow-sm rounded-2xl md:rounded-[2.5rem] overflow-hidden transition-all hover:shadow-md">
           <CardHeader className="p-8 pb-4">
             <CardTitle className="text-xl flex items-center gap-2 text-primary">
               <ImageIcon className="h-5 w-5" />
@@ -160,7 +160,7 @@ function ConfiguracoesPage() {
             </CardTitle>
             <CardDescription>A logo aparecerá no seu perfil e nos relatórios gerados.</CardDescription>
           </CardHeader>
-          <CardContent className="p-8 pt-4 flex flex-col md:flex-row items-center gap-8">
+          <CardContent className="p-6 md:p-8 pt-4 flex flex-col md:flex-row items-center gap-6 md:gap-8">
              <div className="relative group">
                 <div className="h-32 w-32 rounded-3xl bg-muted border-2 border-dashed border-primary/20 flex items-center justify-center overflow-hidden transition-all group-hover:border-primary/50">
                    {formData.logo_url ? (
@@ -210,7 +210,7 @@ function ConfiguracoesPage() {
           </CardContent>
         </Card>
 
-        <Card className="glass-card border-border/40 shadow-sm rounded-[2.5rem] overflow-hidden transition-all hover:shadow-md">
+        <Card className="glass-card border-border/40 shadow-sm rounded-2xl md:rounded-[2.5rem] overflow-hidden transition-all hover:shadow-md">
           <CardHeader className="p-8 pb-4">
             <CardTitle className="text-xl flex items-center gap-2 text-primary">
               <Building2 className="h-5 w-5" />
@@ -218,7 +218,7 @@ function ConfiguracoesPage() {
             </CardTitle>
             <CardDescription>Dados básicos de identificação da sua empresa.</CardDescription>
           </CardHeader>
-          <CardContent className="p-8 pt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CardContent className="p-6 md:p-8 pt-4 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             <div className="space-y-2">
               <Label htmlFor="name">Nome da Empresa</Label>
               <div className="relative">
@@ -291,7 +291,7 @@ function ConfiguracoesPage() {
           </CardContent>
         </Card>
 
-        <Card className="glass-card border-border/40 shadow-sm rounded-[2.5rem] overflow-hidden transition-all hover:shadow-md">
+        <Card className="glass-card border-border/40 shadow-sm rounded-2xl md:rounded-[2.5rem] overflow-hidden transition-all hover:shadow-md">
           <CardHeader className="p-8 pb-4">
             <CardTitle className="text-xl flex items-center gap-2 text-primary">
               <Clock className="h-5 w-5" />
@@ -299,7 +299,7 @@ function ConfiguracoesPage() {
             </CardTitle>
             <CardDescription>Configure horários padrão e fuso horário.</CardDescription>
           </CardHeader>
-          <CardContent className="p-8 pt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CardContent className="p-6 md:p-8 pt-4 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             <div className="space-y-2">
               <Label htmlFor="timezone">Fuso Horário</Label>
               <div className="relative">
@@ -329,7 +329,7 @@ function ConfiguracoesPage() {
         </Card>
 
         <div className="flex justify-end gap-4">
-          <Button type="submit" size="lg" disabled={updateMutation.isPending} className="rounded-[1.5rem] px-16 h-16 text-lg font-black uppercase tracking-widest shadow-xl shadow-primary/20">
+          <Button type="submit" size="lg" disabled={updateMutation.isPending} className="rounded-xl md:rounded-[1.5rem] px-8 md:px-16 h-14 md:h-16 text-base md:text-lg font-black uppercase tracking-widest shadow-xl shadow-primary/20 w-full sm:w-auto">
             {updateMutation.isPending ? "Salvando..." : "Salvar Alterações"}
           </Button>
         </div>
