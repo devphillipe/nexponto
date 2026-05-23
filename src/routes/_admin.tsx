@@ -1,7 +1,7 @@
 import { createFileRoute, Link, Outlet, redirect, useNavigate, useLocation } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useProfile } from "@/lib/auth";
-import { LayoutDashboard, Users, Clock, LogOut, Bell, Search, Settings } from "lucide-react";
+import { LayoutDashboard, Users, Clock, LogOut, Bell, Search, Settings, FileText } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,6 +28,7 @@ const nav = [
   { to: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/admin/funcionarios", label: "Funcionários", icon: Users },
   { to: "/admin/pontos", label: "Pontos", icon: Clock },
+  { to: "/admin/abonos", label: "Abonos", icon: FileText },
 ] as const;
 
 function AdminLayout() {
@@ -91,9 +92,16 @@ function AdminLayout() {
         </nav>
 
         <div className="mt-auto space-y-4 pt-6 border-t border-border/40">
-           <button className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-muted-foreground hover:bg-sidebar-accent/50 hover:text-foreground transition-all">
+           <Link 
+             to="/admin/configuracoes"
+             className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all ${
+               loc.pathname.startsWith("/admin/configuracoes")
+                 ? "bg-primary/10 text-primary border border-primary/20"
+                 : "text-muted-foreground hover:bg-sidebar-accent/50 hover:text-foreground"
+             }`}
+           >
              <Settings className="h-4.5 w-4.5" /> Configurações
-           </button>
+           </Link>
            <button 
              onClick={logout}
              className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-destructive/80 hover:bg-destructive/10 hover:text-destructive transition-all"
