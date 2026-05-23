@@ -50,7 +50,7 @@ function RelatoriosPage() {
       
       const query = supabase
         .from("time_entries")
-        .select("*, employees(full_name, daily_hours)")
+        .select("id, entry_date, entry_at, entry_type, employee_id, employees(full_name, daily_hours)")
         .eq("tenant_id", profile!.tenant_id)
         .gte("entry_date", startDate.toISOString().split("T")[0])
         .lte("entry_date", endDate.toISOString().split("T")[0]);
@@ -64,7 +64,7 @@ function RelatoriosPage() {
 
       const { data: absences } = await supabase
         .from("absences")
-        .select("*")
+        .select("id, absence_date, reason, employee_id")
         .eq("tenant_id", profile!.tenant_id)
         .gte("absence_date", startDate.toISOString().split("T")[0])
         .lte("absence_date", endDate.toISOString().split("T")[0]);
