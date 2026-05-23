@@ -128,23 +128,27 @@ export const updateEmployee = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
 
     // Verify admin role and get admin's tenant
-    const { data: profile } = await supabase
+    const { data: profile, error: profErr } = await supabase
       .from("profiles")
       .select("tenant_id")
       .eq("id", userId)
       .single();
 
+    if (profErr || !profile?.tenant_id) {
+      throw new Error("Perfil ou escritório não encontrado.");
+    }
+
     const { data: roles } = await supabase
       .from("user_roles")
       .select("role")
       .eq("user_id", userId)
-      .eq("tenant_id", profile?.tenant_id);
+      .eq("tenant_id", profile.tenant_id);
     
     if (!roles?.some((r) => r.role === "admin")) {
       throw new Error("Apenas administradores podem editar funcionários.");
     }
 
-    const adminTenantId = profile?.tenant_id;
+    const adminTenantId = profile.tenant_id;
 
     // Get the employee and ensure they belong to the same tenant
     const { data: employee, error: empErr } = await supabase
