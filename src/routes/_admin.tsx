@@ -121,11 +121,7 @@ function AdminLayout() {
                className="pl-10 bg-muted/30 border-none rounded-xl h-10 focus-visible:ring-primary/30"
              />
            </div>
-           <div className="flex items-center gap-4 ml-auto">
-             <button className="relative p-2 rounded-xl hover:bg-muted/50 transition-colors">
-               <Bell className="h-5 w-5 text-muted-foreground" />
-               <span className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full border-2 border-background"></span>
-             </button>
+            <div className="flex items-center gap-4 ml-auto">
              <div className="h-8 w-[1px] bg-border/50 mx-2"></div>
              <div className="flex items-center gap-3">
                 <div className="text-right hidden sm:block">
