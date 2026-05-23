@@ -1,10 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { memo } from "react";
+import { memo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useProfile } from "@/lib/auth";
-import { Calendar, Clock, ChevronRight, History } from "lucide-react";
+import { Calendar, Clock, ChevronDown, History } from "lucide-react";
 
 export const Route = createFileRoute("/_func/funcionario/historico")({
   head: () => ({ meta: [{ title: "Meu Histórico — NexPonto" }] }),
