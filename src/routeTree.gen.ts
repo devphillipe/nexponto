@@ -9,6 +9,8 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermosRouteImport } from './routes/termos'
+import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as FuncRouteImport } from './routes/_func'
 import { Route as AdminRouteImport } from './routes/_admin'
 import { Route as IndexRouteImport } from './routes/index'
@@ -24,6 +26,16 @@ import { Route as AdminAdminDashboardRouteImport } from './routes/_admin.admin.d
 import { Route as AdminAdminConfiguracoesRouteImport } from './routes/_admin.admin.configuracoes'
 import { Route as AdminAdminAbonosRouteImport } from './routes/_admin.admin.abonos'
 
+const TermosRoute = TermosRouteImport.update({
+  id: '/termos',
+  path: '/termos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacidadeRoute = PrivacidadeRouteImport.update({
+  id: '/privacidade',
+  path: '/privacidade',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FuncRoute = FuncRouteImport.update({
   id: '/_func',
   getParentRoute: () => rootRouteImport,
@@ -96,6 +108,8 @@ const AdminAdminAbonosRoute = AdminAdminAbonosRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/privacidade': typeof PrivacidadeRoute
+  '/termos': typeof TermosRoute
   '/admin/cadastro': typeof AdminCadastroRoute
   '/admin/login': typeof AdminLoginRoute
   '/funcionario/login': typeof FuncionarioLoginRoute
@@ -110,6 +124,8 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/privacidade': typeof PrivacidadeRoute
+  '/termos': typeof TermosRoute
   '/admin/cadastro': typeof AdminCadastroRoute
   '/admin/login': typeof AdminLoginRoute
   '/funcionario/login': typeof FuncionarioLoginRoute
@@ -127,6 +143,8 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_admin': typeof AdminRouteWithChildren
   '/_func': typeof FuncRouteWithChildren
+  '/privacidade': typeof PrivacidadeRoute
+  '/termos': typeof TermosRoute
   '/admin/cadastro': typeof AdminCadastroRoute
   '/admin/login': typeof AdminLoginRoute
   '/funcionario/login': typeof FuncionarioLoginRoute
@@ -143,6 +161,8 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/privacidade'
+    | '/termos'
     | '/admin/cadastro'
     | '/admin/login'
     | '/funcionario/login'
@@ -157,6 +177,8 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/privacidade'
+    | '/termos'
     | '/admin/cadastro'
     | '/admin/login'
     | '/funcionario/login'
@@ -173,6 +195,8 @@ export interface FileRouteTypes {
     | '/'
     | '/_admin'
     | '/_func'
+    | '/privacidade'
+    | '/termos'
     | '/admin/cadastro'
     | '/admin/login'
     | '/funcionario/login'
@@ -190,6 +214,8 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
   FuncRoute: typeof FuncRouteWithChildren
+  PrivacidadeRoute: typeof PrivacidadeRoute
+  TermosRoute: typeof TermosRoute
   AdminCadastroRoute: typeof AdminCadastroRoute
   AdminLoginRoute: typeof AdminLoginRoute
   FuncionarioLoginRoute: typeof FuncionarioLoginRoute
@@ -197,6 +223,20 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/termos': {
+      id: '/termos'
+      path: '/termos'
+      fullPath: '/termos'
+      preLoaderRoute: typeof TermosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacidade': {
+      id: '/privacidade'
+      path: '/privacidade'
+      fullPath: '/privacidade'
+      preLoaderRoute: typeof PrivacidadeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_func': {
       id: '/_func'
       path: ''
@@ -334,6 +374,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
   FuncRoute: FuncRouteWithChildren,
+  PrivacidadeRoute: PrivacidadeRoute,
+  TermosRoute: TermosRoute,
   AdminCadastroRoute: AdminCadastroRoute,
   AdminLoginRoute: AdminLoginRoute,
   FuncionarioLoginRoute: FuncionarioLoginRoute,
