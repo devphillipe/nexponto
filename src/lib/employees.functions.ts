@@ -127,24 +127,36 @@ export const updateEmployee = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
 
-    // Verify admin role
+    // Verify admin role and get admin's tenant
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("tenant_id")
+      .eq("id", userId)
+      .single();
+
     const { data: roles } = await supabase
       .from("user_roles")
       .select("role")
-      .eq("user_id", userId);
+      .eq("user_id", userId)
+      .eq("tenant_id", profile?.tenant_id);
     
     if (!roles?.some((r) => r.role === "admin")) {
       throw new Error("Apenas administradores podem editar funcionários.");
     }
 
-    // Get the employee to find their user_id
+    const adminTenantId = profile?.tenant_id;
+
+    // Get the employee and ensure they belong to the same tenant
     const { data: employee, error: empErr } = await supabase
       .from("employees")
-      .select("user_id")
+      .select("user_id, tenant_id")
       .eq("id", data.id)
       .single();
     
     if (empErr || !employee) throw new Error("Funcionário não encontrado.");
+    if (employee.tenant_id !== adminTenantId) {
+      throw new Error("Acesso negado: o funcionário pertence a outro escritório.");
+    }
 
     const updateAuth: any = {
       email: data.email,
