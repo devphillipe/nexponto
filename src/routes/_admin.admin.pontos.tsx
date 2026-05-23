@@ -161,18 +161,18 @@ function PontosPage() {
     <div className="space-y-8 animate-in fade-in duration-500">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <h1 className="font-display text-4xl font-bold tracking-tight">Registros de Ponto</h1>
-          <p className="text-muted-foreground mt-2">Visualize, ajuste e audite todas as batidas.</p>
+          <h1 className="font-display text-5xl font-bold tracking-tight text-foreground">Registros de Ponto</h1>
+          <p className="text-muted-foreground mt-3 text-xl font-medium">Visualize, ajuste e audite todas as batidas em tempo real.</p>
         </div>
         
         <div className="flex items-center gap-3">
-          <div className="glass-card p-2 rounded-2xl flex items-center gap-3 h-12">
-            <Calendar className="h-4 w-4 text-primary ml-2" />
+          <div className="glass-card p-3 rounded-2xl flex items-center gap-4 h-14 border border-border/40 shadow-sm transition-all hover:border-primary/30">
+            <Calendar className="h-5 w-5 text-primary ml-3" />
             <Input 
               type="date" 
               value={date} 
               onChange={(e) => setDate(e.target.value)} 
-              className="bg-transparent border-none text-sm font-semibold focus-visible:ring-0 w-36"
+              className="bg-transparent border-none text-base font-bold focus-visible:ring-0 w-44 p-0 h-auto"
             />
           </div>
 
@@ -181,7 +181,7 @@ function PontosPage() {
             if (!open) setEditingEntry(null);
           }}>
             <DialogTrigger asChild>
-              <Button className="rounded-xl h-12 px-6 gap-2 font-bold shadow-lg shadow-primary/20">
+              <Button size="lg" className="rounded-2xl shadow-xl shadow-primary/20 font-black uppercase tracking-widest text-xs px-8 h-14">
                 <Plus className="h-5 w-5" /> Novo Registro
               </Button>
             </DialogTrigger>
