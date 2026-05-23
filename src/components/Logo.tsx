@@ -40,12 +40,12 @@ interface LogoProps2 extends LogoProps {
   wordmarkClassName?: string;
 }
 
-export const Logo = memo(function Logo({
+export const Logo = memo(({
   size = 28,
   className = "",
   showWordmark = true,
   wordmarkClassName = "",
-}: LogoProps2) {
+}: LogoProps2) => {
   return (
     <div className={`inline-flex items-center gap-3.5 ${className}`}>
       <span className="grid place-items-center rounded-2xl bg-primary text-primary-foreground p-2.5 shadow-lg shadow-primary/20 border border-primary/20 transition-transform hover:scale-105">
@@ -59,3 +59,5 @@ export const Logo = memo(function Logo({
     </div>
   );
 });
+
+Logo.displayName = "Logo";
