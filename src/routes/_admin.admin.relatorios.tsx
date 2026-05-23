@@ -146,45 +146,86 @@ function RelatoriosPage() {
         XLSX.writeFile(wb, `Relatorio_Ponto_${month}.xlsx`);
       } else {
         const doc = new jsPDF();
+        
+        // Get tenant info for header
+        const { data: tenant } = await supabase
+          .from("tenants")
+          .select("name, logo_url")
+          .eq("id", profile!.tenant_id)
+          .single();
+
+        const loadImage = (url: string): Promise<HTMLImageElement> => {
+          return new Promise((resolve) => {
+            const img = new Image();
+            img.crossOrigin = "Anonymous";
+            img.onload = () => resolve(img);
+            img.onerror = () => resolve(null as any);
+            img.src = url;
+          });
+        };
+
+        const logoImg = tenant?.logo_url ? await loadImage(tenant.logo_url) : null;
+
         reportData.forEach((rd, index) => {
           if (index > 0) doc.addPage();
           
+          // Header with Logo
+          if (logoImg) {
+            doc.addImage(logoImg, "PNG", 14, 10, 20, 20);
+          }
+          
           doc.setTextColor(33, 150, 243);
           doc.setFontSize(22);
-          doc.text("Relatório de Ponto", 14, 20);
+          doc.text("Relatório de Ponto", logoImg ? 40 : 14, 20);
           
           doc.setTextColor(100, 100, 100);
+          doc.setFontSize(10);
+          doc.text(tenant?.name || "NexPonto", logoImg ? 40 : 14, 28);
+          
+          doc.setDrawColor(230, 230, 230);
+          doc.line(14, 35, 196, 35);
+
+          doc.setTextColor(60, 60, 60);
           doc.setFontSize(12);
-          doc.text(`Colaborador: ${rd.employee}`, 14, 30);
-          doc.text(`Período: ${month}`, 14, 36);
+          doc.text(`Colaborador: ${rd.employee}`, 14, 45);
+          doc.text(`Período: ${month}`, 14, 51);
 
           doc.setFillColor(245, 247, 250);
-          doc.roundedRect(14, 42, 182, 25, 3, 3, "F");
+          doc.roundedRect(14, 58, 182, 25, 3, 3, "F");
           
           doc.setFontSize(10);
-          doc.text("Total Trabalhado", 20, 52);
+          doc.text("Total Trabalhado", 20, 68);
           doc.setFontSize(12);
-          doc.text(rd.totalWorked, 20, 60);
+          doc.text(rd.totalWorked, 20, 76);
 
           doc.setFontSize(10);
-          doc.text("Total Esperado", 80, 52);
+          doc.text("Total Esperado", 80, 68);
           doc.setFontSize(12);
-          doc.text(rd.totalExpected, 80, 60);
+          doc.text(rd.totalExpected, 80, 76);
 
           doc.setFontSize(10);
-          doc.text("Saldo de Horas", 140, 52);
+          doc.text("Saldo de Horas", 140, 68);
           doc.setFontSize(14);
           const diffValue = rd.balance.startsWith("+") ? 1 : -1;
           doc.setTextColor(diffValue >= 0 ? 76 : 244, diffValue >= 0 ? 175 : 67, diffValue >= 0 ? 80 : 54);
-          doc.text(rd.balance, 140, 60);
+          doc.text(rd.balance, 140, 76);
+
+          const tableBody = rd.dailyReports.map(d => {
+            const entryLines = d.entries.split(" | ");
+            return [d.date, d.weekday, entryLines.join("\n"), d.worked, d.status];
+          });
 
           autoTable(doc, {
-            startY: 75,
-            head: [["Data", "Dia", "Registros", "Total", "Status"]],
-            body: rd.dailyReports.map(d => [d.date, d.weekday, d.entries, d.worked, d.status]),
+            startY: 90,
+            head: [["Data", "Dia", "Registros de Ponto", "Total", "Status"]],
+            body: tableBody,
             theme: "grid",
-            headStyles: { fillColor: [33, 150, 243], fontSize: 10 },
-            styles: { fontSize: 8 },
+            headStyles: { fillColor: [33, 150, 243], fontSize: 10, halign: 'center' },
+            styles: { fontSize: 9, cellPadding: 4, valign: 'middle' },
+            columnStyles: {
+              2: { cellWidth: 40, halign: 'center' },
+              3: { halign: 'center' }
+            },
             didParseCell: (data) => {
               if (data.column.index === 4 && data.cell.text[0]?.includes("Abono")) {
                 data.cell.styles.textColor = [33, 150, 243];
