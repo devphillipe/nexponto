@@ -23,6 +23,8 @@ function AdminLogin() {
   const [showForgot, setShowForgot] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
   const [sendingReset, setSendingReset] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
+  const [resetError, setResetError] = useState<string>("");
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
