@@ -103,7 +103,7 @@ function MyClockPage() {
   });
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
       <div className="text-center md:text-left space-y-1">
         <h1 className="font-display text-2xl font-bold tracking-tight text-foreground">
           Olá, {profile?.full_name?.split(" ")[0]}!
