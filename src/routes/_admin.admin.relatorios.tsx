@@ -199,7 +199,8 @@ function RelatoriosPage() {
           
           if (logoDataUrl) {
             try {
-              doc.addImage(logoDataUrl, "PNG", 14, 10, 20, 20);
+              // Ajustando tamanho da logo para ficar mais visível e com folga
+              doc.addImage(logoDataUrl, "PNG", 14, 8, 25, 25);
             } catch (e) {
               console.error("Could not add image to PDF", e);
             }
@@ -207,11 +208,11 @@ function RelatoriosPage() {
           
           doc.setTextColor(33, 150, 243);
           doc.setFontSize(22);
-          doc.text("Relatório de Ponto", logoDataUrl ? 40 : 14, 20);
+          doc.text("Relatório de Ponto", logoDataUrl ? 45 : 14, 20);
           
           doc.setTextColor(100, 100, 100);
           doc.setFontSize(10);
-          doc.text(profile?.tenant_name || "NexPonto", logoDataUrl ? 40 : 14, 28);
+          doc.text(profile?.tenant_name || "NexPonto", logoDataUrl ? 45 : 14, 28);
           
           doc.setDrawColor(230, 230, 230);
           doc.line(14, 35, 196, 35);
@@ -280,13 +281,32 @@ function RelatoriosPage() {
           
           const signatureY = finalY > 250 ? 40 : finalY;
           
+          // Assinatura do Colaborador
           doc.line(14, signatureY, 90, signatureY);
-          doc.text(rd.employee, 14, signatureY + 5);
-          doc.text("Colaborador", 14, signatureY + 10);
+          const empText = rd.employee;
+          const empWidth = doc.getTextWidth(empText);
+          const empX = 14 + (76 - empWidth) / 2; // Center under 76pt line
+          doc.text(empText, empX, signatureY + 6);
           
+          const labelColab = "Colaborador";
+          const labelColabWidth = doc.getTextWidth(labelColab);
+          const labelColabX = 14 + (76 - labelColabWidth) / 2;
+          doc.setFontSize(8);
+          doc.text(labelColab, labelColabX, signatureY + 11);
+          
+          // Assinatura da Empresa
+          doc.setFontSize(10);
           doc.line(110, signatureY, 186, signatureY);
-          doc.text(profile?.tenant_name || "Empresa", 110, signatureY + 5);
-          doc.text("Representante Legal", 110, signatureY + 10);
+          const tenantText = profile?.tenant_name || "Empresa";
+          const tenantWidth = doc.getTextWidth(tenantText);
+          const tenantX = 110 + (76 - tenantWidth) / 2;
+          doc.text(tenantText, tenantX, signatureY + 6);
+          
+          const labelEmp = "Representante Legal";
+          const labelEmpWidth = doc.getTextWidth(labelEmp);
+          const labelEmpX = 110 + (76 - labelEmpWidth) / 2;
+          doc.setFontSize(8);
+          doc.text(labelEmp, labelEmpX, signatureY + 11);
         });
         doc.save(`Relatorio_Ponto_${month}.pdf`);
       }

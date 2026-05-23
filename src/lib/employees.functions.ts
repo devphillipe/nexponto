@@ -107,3 +107,78 @@ export const toggleEmployeeActive = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+export const updateEmployee = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) =>
+    z.object({
+      id: z.string().uuid(),
+      full_name: z.string().min(2).max(120),
+      email: z.string().email().max(180),
+      password: z.string().min(8).max(72).optional().nullable(),
+      cpf: z.string().max(20).optional().nullable(),
+      phone: z.string().max(30).optional().nullable(),
+      position: z.string().max(80).optional().nullable(),
+      department: z.string().max(80).optional().nullable(),
+      hire_date: z.string().optional().nullable(),
+      daily_hours: z.number().min(1).max(24).optional().nullable(),
+    }).parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+
+    // Verify admin role
+    const { data: roles } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId);
+    
+    if (!roles?.some((r) => r.role === "admin")) {
+      throw new Error("Apenas administradores podem editar funcionários.");
+    }
+
+    // Get the employee to find their user_id
+    const { data: employee, error: empErr } = await supabase
+      .from("employees")
+      .select("user_id")
+      .eq("id", data.id)
+      .single();
+    
+    if (empErr || !employee) throw new Error("Funcionário não encontrado.");
+
+    const updateAuth: any = {
+      email: data.email,
+    };
+    if (data.password) {
+      updateAuth.password = data.password;
+    }
+
+    // Update auth user
+    const { error: authErr } = await supabaseAdmin.auth.admin.updateUserById(
+      employee.user_id,
+      updateAuth
+    );
+    if (authErr) throw new Error(authErr.message);
+
+    // Update profile
+    await supabaseAdmin.from("profiles").update({
+      full_name: data.full_name,
+      email: data.email,
+    }).eq("id", employee.user_id);
+
+    // Update employee record
+    const { error: finalErr } = await supabaseAdmin.from("employees").update({
+      full_name: data.full_name,
+      email: data.email,
+      cpf: data.cpf,
+      phone: data.phone,
+      position: data.position,
+      department: data.department,
+      hire_date: data.hire_date || null,
+      daily_hours: data.daily_hours ?? null,
+    }).eq("id", data.id);
+
+    if (finalErr) throw new Error(finalErr.message);
+
+    return { ok: true };
+  });

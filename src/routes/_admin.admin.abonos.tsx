@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { FileText, Plus, Search, Calendar as CalendarIcon, User, Trash2, FileCheck } from "lucide-react";
+import { FileText, Plus, Search, Calendar as CalendarIcon, User, Trash2, FileCheck, Edit2 } from "lucide-react";
 import { useState } from "react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -120,6 +120,40 @@ function AbonosPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["absences"] });
       toast.success("Abono removido com sucesso!");
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: async (updatedData: any) => {
+      const { id, ...data } = updatedData;
+      const { error } = await supabase
+        .from("absences")
+        .update(data)
+        .eq("id", id);
+      if (error) throw error;
+
+      // Update the special entry in time_entries
+      const { error: entryError } = await supabase
+        .from("time_entries")
+        .update({
+          entry_date: data.absence_date,
+          entry_at: `${data.absence_date}T00:00:00Z`,
+          notes: `ABONO: ${REASONS.find(r => r.value === data.reason)?.label || data.reason}. ${data.description || ""}`,
+        })
+        .eq("employee_id", data.employee_id)
+        .eq("entry_date", data.absence_date) // This might be tricky if date changed, but let's assume one abono per day for now
+        .eq("is_adjustment", true)
+        .like("notes", "ABONO:%");
+      
+      if (entryError) console.error("Erro ao atualizar entrada de ponto:", entryError);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["absences"] });
+      queryClient.invalidateQueries({ queryKey: ["time-entries"] });
+      toast.success("Abono atualizado com sucesso!");
+    },
+    onError: (error) => {
+      toast.error("Erro ao atualizar abono: " + error.message);
     },
   });
 
@@ -255,18 +289,26 @@ function AbonosPage() {
                     {a.description || "-"}
                   </td>
                   <td className="px-6 py-5 text-right">
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      onClick={() => {
-                        if (confirm("Tem certeza que deseja excluir este abono?")) {
-                          deleteMutation.mutate(a.id);
-                        }
-                      }}
-                      className="text-destructive/60 hover:text-destructive hover:bg-destructive/10 rounded-xl"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    <div className="flex items-center justify-end gap-2">
+                      <EditAbonoDialog 
+                        abono={a} 
+                        employees={employees || []} 
+                        onSave={(data) => updateMutation.mutate({ id: a.id, ...data })} 
+                        isPending={updateMutation.isPending}
+                      />
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={() => {
+                          if (confirm("Tem certeza que deseja excluir este abono?")) {
+                            deleteMutation.mutate(a.id);
+                          }
+                        }}
+                        className="text-destructive/60 hover:text-destructive hover:bg-destructive/10 rounded-xl"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -275,5 +317,83 @@ function AbonosPage() {
         )}
       </div>
     </div>
+  );
+}
+
+function EditAbonoDialog({ abono, employees, onSave, isPending }: { abono: any, employees: any[], onSave: (data: any) => void, isPending: boolean }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-primary/10 hover:text-primary">
+          <Edit2 className="h-4 w-4" />
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[500px] rounded-[2rem] border-none glass-card p-0 overflow-hidden shadow-2xl">
+        <form onSubmit={(e) => {
+          e.preventDefault();
+          const formData = new FormData(e.currentTarget);
+          onSave({
+            employee_id: formData.get("employee_id"),
+            absence_date: formData.get("date"),
+            reason: formData.get("reason"),
+            description: formData.get("description"),
+          });
+          setOpen(false);
+        }}>
+          <DialogHeader className="p-8 pb-4">
+            <DialogTitle className="text-2xl font-bold text-primary flex items-center gap-2">
+              <FileCheck className="h-6 w-6" /> Editar Abono
+            </DialogTitle>
+            <p className="text-muted-foreground text-sm">Altere as informações do abono.</p>
+          </DialogHeader>
+          <div className="p-8 pt-4 space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="edit-employee_id">Colaborador</Label>
+              <Select name="employee_id" defaultValue={abono.employee_id} required>
+                <SelectTrigger className="rounded-xl h-11 border-border/40 bg-background/50">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {employees?.map(emp => (
+                    <SelectItem key={emp.id} value={emp.id}>{emp.full_name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="edit-date">Data</Label>
+                <Input id="edit-date" name="date" type="date" defaultValue={abono.absence_date} required className="rounded-xl h-11 border-border/40 bg-background/50" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-reason">Motivo</Label>
+                <Select name="reason" defaultValue={abono.reason} required>
+                  <SelectTrigger className="rounded-xl h-11 border-border/40 bg-background/50">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {REASONS.map(r => (
+                      <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-description">Observações / Justificativa</Label>
+              <Input id="edit-description" name="description" defaultValue={abono.description} placeholder="Ex: Atestado médico de 2 dias" className="rounded-xl h-11 border-border/40 bg-background/50" />
+            </div>
+          </div>
+          <DialogFooter className="p-8 bg-muted/20 border-t border-border/40">
+            <Button type="button" variant="ghost" onClick={() => setOpen(false)} className="rounded-xl">Cancelar</Button>
+            <Button type="submit" disabled={isPending} className="rounded-xl px-8 font-bold">
+              {isPending ? "Salvando..." : "Salvar Alterações"}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }

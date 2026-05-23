@@ -57,11 +57,11 @@ function AdminLayout() {
           </div>
         </div>
 
-        <div className="mb-8 p-4 glass-card rounded-2xl">
+        <div className="mb-8 p-4 glass-card rounded-2xl bg-primary/5">
            <div className="flex items-center gap-3">
              <div className="min-w-0">
-               <div className="truncate text-sm font-semibold">{profile?.tenant_name || "Escritório"}</div>
-               <div className="truncate text-[10px] text-muted-foreground uppercase font-medium">Conta Ativa</div>
+               <div className="truncate text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Conta Ativa</div>
+               <div className="truncate text-xs font-semibold text-primary">Painel do Administrador</div>
              </div>
            </div>
         </div>

@@ -5,7 +5,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { createEmployee, toggleEmployeeActive } from "@/lib/employees.functions";
+import { createEmployee, toggleEmployeeActive, updateEmployee } from "@/lib/employees.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,7 +17,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Plus, Mail, User, Briefcase, Calendar, ShieldCheck, Search } from "lucide-react";
+import { Plus, Mail, User, Briefcase, Calendar, ShieldCheck, Search, Edit2 } from "lucide-react";
 import { TableSkeleton } from "@/components/SkeletonLoader";
 
 export const Route = createFileRoute("/_admin/admin/funcionarios")({
@@ -117,7 +117,7 @@ function EmployeesPage() {
                 <th className="px-8 py-4">Nome & Contato</th>
                 <th className="px-6 py-4">Departamento / Cargo</th>
                 <th className="px-6 py-4">Jornada Diária</th>
-                <th className="px-6 py-4 text-right">Status de Acesso</th>
+                <th className="px-6 py-4 text-right">Ações</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border/20">
@@ -151,6 +151,11 @@ function EmployeesPage() {
                   </td>
                   <td className="px-8 py-5 text-right">
                     <div className="flex items-center justify-end gap-3">
+                       <EditEmployeeDialog 
+                         employee={e} 
+                         onDone={() => qc.invalidateQueries({ queryKey: ["employees"] })} 
+                       />
+                       <div className="h-6 w-[1px] bg-border/40 mx-1"></div>
                        <span className={`text-[10px] font-bold uppercase tracking-widest ${e.active ? "text-success" : "text-muted-foreground"}`}>
                           {e.active ? "Ativo" : "Inativo"}
                        </span>
@@ -266,5 +271,123 @@ function NewEmployeeForm({ onDone }: { onDone: () => void }) {
         {loading ? "Cadastrando..." : "Cadastrar funcionário"}
       </Button>
     </form>
+  );
+}
+
+function EditEmployeeDialog({ employee, onDone }: { employee: any, onDone: () => void }) {
+  const [open, setOpen] = useState(false);
+  const updateFn = useServerFn(updateEmployee);
+  const [loading, setLoading] = useState(false);
+  const [form, setForm] = useState({
+    full_name: employee.full_name || "",
+    email: employee.email || "",
+    password: "",
+    cpf: employee.cpf || "",
+    phone: employee.phone || "",
+    position: employee.position || "",
+    department: employee.department || "",
+    hire_date: employee.hire_date || "",
+    daily_hours: employee.daily_hours ? String(employee.daily_hours) : "",
+  });
+
+  function up<K extends keyof typeof form>(k: K, v: string) {
+    setForm((f) => ({ ...f, [k]: v }));
+  }
+
+  async function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await updateFn({
+        data: {
+          id: employee.id,
+          full_name: form.full_name,
+          email: form.email,
+          password: form.password || null,
+          cpf: form.cpf || null,
+          phone: form.phone || null,
+          position: form.position || null,
+          department: form.department || null,
+          hire_date: form.hire_date || null,
+          daily_hours: form.daily_hours ? Number(form.daily_hours) : null,
+        },
+      });
+      toast.success("Dados do funcionário atualizados!");
+      setOpen(false);
+      onDone();
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-primary/10 hover:text-primary">
+          <Edit2 className="h-4 w-4" />
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="max-w-2xl p-0 overflow-hidden bg-background border-primary/20 rounded-[2rem]">
+        <div className="bg-primary/5 p-8 border-b border-primary/10">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-display font-bold">Editar Colaborador</DialogTitle>
+            <p className="text-muted-foreground text-sm mt-1">Atualize os dados cadastrais e credenciais do funcionário.</p>
+          </DialogHeader>
+        </div>
+        <div className="p-8">
+          <form onSubmit={onSubmit} className="space-y-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="edit-fn">Nome completo *</Label>
+              <Input id="edit-fn" required value={form.full_name} onChange={(e) => up("full_name", e.target.value)} />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="edit-em">E-mail (login) *</Label>
+                <Input id="edit-em" type="email" required value={form.email} onChange={(e) => up("email", e.target.value)} />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="edit-pw">Nova Senha (deixe em branco para manter)</Label>
+                <Input id="edit-pw" type="text" minLength={8} value={form.password} onChange={(e) => up("password", e.target.value)} />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="edit-cpf">CPF</Label>
+                <Input id="edit-cpf" value={form.cpf} onChange={(e) => up("cpf", e.target.value)} />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="edit-phone">Telefone</Label>
+                <Input id="edit-phone" value={form.phone} onChange={(e) => up("phone", e.target.value)} />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="edit-pos">Cargo</Label>
+                <Input id="edit-pos" value={form.position} onChange={(e) => up("position", e.target.value)} />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="edit-dep">Departamento</Label>
+                <Input id="edit-dep" value={form.department} onChange={(e) => up("department", e.target.value)} />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="edit-hd">Admissão</Label>
+                <Input id="edit-hd" type="date" value={form.hire_date} onChange={(e) => up("hire_date", e.target.value)} />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="edit-dh">Jornada diária (h)</Label>
+                <Input id="edit-dh" type="number" step="0.5" min="1" max="24" placeholder="Padrão do escritório" value={form.daily_hours} onChange={(e) => up("daily_hours", e.target.value)} />
+              </div>
+            </div>
+            <Button type="submit" disabled={loading} className="w-full mt-4">
+              {loading ? "Salvando..." : "Salvar Alterações"}
+            </Button>
+          </form>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
