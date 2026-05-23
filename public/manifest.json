@@ -1,0 +1,17 @@
+{
+  "name": "NexPonto",
+  "short_name": "NexPonto",
+  "description": "Controle de Ponto Inteligente",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#020406",
+  "theme_color": "#00e5ff",
+  "icons": [
+    {
+      "src": "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/94a48ac5-0ee0-4fed-9617-69c211480ed0/id-preview-6212d833--1ddd49b7-dd66-45ec-835e-37eb4f3dce9c.lovable.app-1779330822556.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
