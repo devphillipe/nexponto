@@ -8,8 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Clock, Calendar, Plus, Search, Trash2, Edit2, History } from "lucide-react";
-import { useState } from "react";
+import { Clock, Calendar, Plus, Search, Trash2, Edit2, History, User } from "lucide-react";
+import { useState, useMemo } from "react";
 import { format } from "date-fns";
 
 export const Route = createFileRoute("/_admin/admin/pontos")({
