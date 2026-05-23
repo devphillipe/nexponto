@@ -120,21 +120,17 @@ function AdminLayout() {
         <header className="h-20 border-b border-border/40 flex items-center justify-between px-6 md:px-10 bg-background/20 backdrop-blur-md sticky top-0 z-30">
            <CommandMenu />
             <div className="flex items-center gap-4 ml-auto">
-             <div className="h-8 w-[1px] bg-border/50 mx-2"></div>
-             <div className="flex items-center gap-3">
-                <div className="text-right hidden sm:block">
-                  <div className="text-sm font-semibold leading-tight">{profile?.full_name?.split(" ")[0]}</div>
-                  <div className="text-[10px] text-muted-foreground uppercase font-medium">Administrador</div>
-                </div>
+              <div className="h-8 w-[1px] bg-border/50 mx-2"></div>
+              <div className="flex items-center gap-3">
                 <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/10 overflow-hidden grid place-items-center font-bold text-primary">
                    {profile?.tenant_logo_url ? (
                      <img src={profile.tenant_logo_url} alt="Logo" className="h-full w-full object-cover" />
                    ) : (
                      profile?.full_name?.charAt(0) || "A"
                    )}
-                 </div>
-             </div>
-           </div>
+                </div>
+              </div>
+            </div>
         </header>
         
         <main className="flex-1 p-6 md:p-10 max-w-[1600px] mx-auto w-full">
