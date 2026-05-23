@@ -60,6 +60,16 @@ function PontosPage() {
     },
   });
 
+  const groupedData = useMemo(() => {
+    if (!data) return {};
+    return data.reduce((acc: any, entry: any) => {
+      const name = entry.employees?.full_name || "Sem Nome";
+      if (!acc[name]) acc[name] = [];
+      acc[name].push(entry);
+      return acc;
+    }, {});
+  }, [data]);
+
   const addMutation = useMutation({
     mutationFn: async (newData: any) => {
       // Ensure we don't have double seconds if entry_time already includes them
