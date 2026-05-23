@@ -272,18 +272,22 @@ function PontosPage() {
             const isExpanded = expandedEmployees.has(employeeName);
             const totalItems = group.entries.length + group.absences.length;
             return (
-              <div key={employeeName} className="glass-card overflow-hidden rounded-[2rem] border border-border/40 bg-background/30 backdrop-blur-sm">
+              <div key={employeeName} className="glass-card overflow-hidden rounded-[2.5rem] border border-border/40 bg-background/20 backdrop-blur-xl shadow-sm transition-all duration-500 hover:shadow-md hover:border-primary/10">
                 <div 
-                  className="px-8 py-5 border-b border-border/40 bg-muted/10 flex items-center justify-between cursor-pointer hover:bg-muted/20"
+                  className="px-10 py-7 border-b border-border/20 bg-muted/5 flex items-center justify-between cursor-pointer group"
                   onClick={() => toggleEmployee(employeeName)}
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-                      {isExpanded ? <ChevronDown className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
+                  <div className="flex items-center gap-6">
+                    <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-primary transition-transform group-hover:scale-105">
+                      {isExpanded ? <ChevronDown className="h-6 w-6" /> : <ChevronRight className="h-6 w-6" />}
                     </div>
                     <div>
-                      <h3 className="font-bold text-lg">{employeeName}</h3>
-                      <p className="text-xs text-muted-foreground">{totalItems} registro(s) no dia</p>
+                      <h3 className="font-display text-2xl font-bold tracking-tight text-foreground">{employeeName}</h3>
+                      <div className="flex items-center gap-3 mt-1">
+                        <span className="text-xs font-black uppercase tracking-widest text-muted-foreground opacity-80">{totalItems} registro(s)</span>
+                        <div className="h-1 w-1 rounded-full bg-border"></div>
+                        <span className="text-xs font-bold text-primary">Visualizar Detalhes</span>
+                      </div>
                     </div>
                   </div>
                 </div>
