@@ -5,7 +5,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { createEmployee, toggleEmployeeActive } from "@/lib/employees.functions";
+import { createEmployee, toggleEmployeeActive, updateEmployee } from "@/lib/employees.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,7 +17,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Plus, Mail, User, Briefcase, Calendar, ShieldCheck, Search } from "lucide-react";
+import { Plus, Mail, User, Briefcase, Calendar, ShieldCheck, Search, Edit2 } from "lucide-react";
 import { TableSkeleton } from "@/components/SkeletonLoader";
 
 export const Route = createFileRoute("/_admin/admin/funcionarios")({
@@ -117,7 +117,7 @@ function EmployeesPage() {
                 <th className="px-8 py-4">Nome & Contato</th>
                 <th className="px-6 py-4">Departamento / Cargo</th>
                 <th className="px-6 py-4">Jornada Diária</th>
-                <th className="px-6 py-4 text-right">Status de Acesso</th>
+                <th className="px-6 py-4 text-right">Ações</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border/20">
@@ -151,6 +151,11 @@ function EmployeesPage() {
                   </td>
                   <td className="px-8 py-5 text-right">
                     <div className="flex items-center justify-end gap-3">
+                       <EditEmployeeDialog 
+                         employee={e} 
+                         onDone={() => qc.invalidateQueries({ queryKey: ["employees"] })} 
+                       />
+                       <div className="h-6 w-[1px] bg-border/40 mx-1"></div>
                        <span className={`text-[10px] font-bold uppercase tracking-widest ${e.active ? "text-success" : "text-muted-foreground"}`}>
                           {e.active ? "Ativo" : "Inativo"}
                        </span>
