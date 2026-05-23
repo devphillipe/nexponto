@@ -62,7 +62,10 @@ function PontosPage() {
 
   const addMutation = useMutation({
     mutationFn: async (newData: any) => {
-      const entry_at = `${newData.entry_date}T${newData.entry_time}:00`;
+      // Ensure we don't have double seconds if entry_time already includes them
+      const timePart = newData.entry_time.split(':').length === 2 ? `${newData.entry_time}:00` : newData.entry_time;
+      const entry_at = `${newData.entry_date}T${timePart}`;
+      
       const payload = {
         employee_id: newData.employee_id,
         tenant_id: profile!.tenant_id,
