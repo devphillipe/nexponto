@@ -1,13 +1,14 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Building2, ArrowLeft, ShieldCheck, Mail, KeyRound } from "lucide-react";
+import { Building2, ArrowLeft, ShieldCheck, Mail, KeyRound, CheckCircle2, AlertCircle } from "lucide-react";
 import { NextFlowBackground } from "@/components/NextFlowBackground";
 import { Logo } from "@/components/Logo";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { translateAuthError } from "@/lib/auth-errors";
 
 export const Route = createFileRoute("/admin/login")({
   head: () => ({ meta: [{ title: "Entrar — NexPonto Admin" }] }),
@@ -22,6 +23,8 @@ function AdminLogin() {
   const [showForgot, setShowForgot] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
   const [sendingReset, setSendingReset] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
+  const [resetError, setResetError] = useState<string>("");
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -30,7 +33,7 @@ function AdminLogin() {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error || !data.user) {
         setLoading(false);
-        toast.error(error?.message ?? "Falha no login");
+        toast.error(translateAuthError(error, "Falha no login. Verifique seus dados."));
         return;
       }
 
@@ -41,7 +44,7 @@ function AdminLogin() {
 
       if (roleError) {
         setLoading(false);
-        toast.error("Erro ao verificar permissões.");
+        toast.error("Erro ao verificar permissões. Tente novamente.");
         return;
       }
 
@@ -55,25 +58,32 @@ function AdminLogin() {
       navigate({ to: "/admin/dashboard" });
     } catch (err) {
       setLoading(false);
-      toast.error("Ocorreu um erro inesperado.");
+      toast.error(translateAuthError(err));
     }
   }
 
   async function handleResetPassword(e: React.FormEvent) {
     e.preventDefault();
+    setResetError("");
+
+    const trimmed = resetEmail.trim();
+    if (!trimmed || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+      setResetError("Informe um e-mail válido.");
+      return;
+    }
+
     setSendingReset(true);
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+      const { error } = await supabase.auth.resetPasswordForEmail(trimmed, {
         redirectTo: `${window.location.origin}/auth/reset-password`,
       });
       if (error) {
-        toast.error(error.message);
+        setResetError(translateAuthError(error, "Não foi possível enviar o e-mail de recuperação."));
       } else {
-        toast.success("E-mail de recuperação enviado! Verifique sua caixa de entrada.");
-        setShowForgot(false);
+        setResetSent(true);
       }
     } catch (err) {
-      toast.error("Erro ao enviar e-mail de recuperação.");
+      setResetError(translateAuthError(err, "Erro ao enviar e-mail de recuperação."));
     } finally {
       setSendingReset(false);
     }
@@ -142,6 +152,40 @@ function AdminLogin() {
                 {loading ? "Autenticando..." : "Acessar Painel"}
               </Button>
             </form>
+          ) : resetSent ? (
+            <div className="space-y-6 animate-in fade-in zoom-in-95 duration-500 text-center">
+              <div className="mx-auto h-16 w-16 rounded-2xl bg-emerald-500/10 text-emerald-500 grid place-items-center">
+                <CheckCircle2 className="h-8 w-8" />
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-2xl font-black tracking-tight">E-mail enviado!</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Enviamos um link de recuperação para{" "}
+                  <span className="font-bold text-foreground break-all">{resetEmail}</span>.
+                  Verifique sua caixa de entrada e a pasta de spam.
+                </p>
+                <p className="text-xs text-muted-foreground/80 pt-2">
+                  O link expira em 1 hora. Se não receber em alguns minutos, tente novamente.
+                </p>
+              </div>
+              <div className="space-y-3 pt-2">
+                <Button
+                  type="button"
+                  onClick={() => { setResetSent(false); setShowForgot(false); setResetEmail(""); }}
+                  className="premium-button w-full h-14 rounded-2xl font-bold uppercase tracking-widest"
+                >
+                  Voltar para o Login
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => { setResetSent(false); }}
+                  className="w-full font-bold text-sm"
+                >
+                  Reenviar para outro e-mail
+                </Button>
+              </div>
+            </div>
           ) : (
             <form onSubmit={handleResetPassword} className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
               <div className="space-y-6">
@@ -163,18 +207,25 @@ function AdminLogin() {
                       placeholder="seu@email.com"
                       required 
                       value={resetEmail} 
-                      onChange={(e) => setResetEmail(e.target.value)}
+                      onChange={(e) => { setResetEmail(e.target.value); if (resetError) setResetError(""); }}
                       className="bg-muted/20 border-border/40 rounded-2xl h-14 pl-12 pr-4 focus-visible:ring-primary/20 focus-visible:border-primary/30 transition-all font-medium"
                     />
                   </div>
                 </div>
+
+                {resetError && (
+                  <div className="flex items-start gap-2 rounded-2xl border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive animate-in fade-in slide-in-from-top-1 duration-300">
+                    <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+                    <span className="leading-relaxed">{resetError}</span>
+                  </div>
+                )}
               </div>
               
               <div className="space-y-4">
                 <Button type="submit" disabled={sendingReset} className="premium-button w-full h-16 rounded-2xl text-lg font-black uppercase tracking-widest">
                   {sendingReset ? "Enviando..." : "Enviar Link"}
                 </Button>
-                <Button type="button" variant="ghost" onClick={() => setShowForgot(false)} className="w-full font-bold text-sm">
+                <Button type="button" variant="ghost" onClick={() => { setShowForgot(false); setResetError(""); }} className="w-full font-bold text-sm">
                   Voltar para o Login
                 </Button>
               </div>

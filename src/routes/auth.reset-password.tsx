@@ -1,20 +1,21 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { KeyRound, ShieldCheck, Lock, AlertCircle } from "lucide-react";
+import { KeyRound, ShieldCheck, Lock, AlertCircle, CheckCircle2 } from "lucide-react";
 import { NextFlowBackground } from "@/components/NextFlowBackground";
 import { Logo } from "@/components/Logo";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { translateAuthError } from "@/lib/auth-errors";
 
 export const Route = createFileRoute("/auth/reset-password")({
   head: () => ({ meta: [{ title: "Nova Senha — NexPonto" }] }),
   component: ResetPassword,
 });
 
-type Status = "validating" | "ready" | "invalid";
+type Status = "validating" | "ready" | "invalid" | "success";
 
 function ResetPassword() {
   const navigate = useNavigate();
@@ -23,6 +24,7 @@ function ResetPassword() {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<Status>("validating");
   const [errorMsg, setErrorMsg] = useState<string>("");
+  const [formError, setFormError] = useState<string>("");
 
   useEffect(() => {
     let isMounted = true;
@@ -98,16 +100,17 @@ function ResetPassword() {
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setFormError("");
 
     if (status !== "ready") return;
 
     if (password.length < 8) {
-      toast.error("A senha deve ter pelo menos 8 caracteres.");
+      setFormError("A senha deve ter pelo menos 8 caracteres.");
       return;
     }
 
     if (password !== confirmPassword) {
-      toast.error("As senhas não coincidem.");
+      setFormError("As senhas não coincidem. Verifique e tente novamente.");
       return;
     }
 
@@ -124,16 +127,16 @@ function ResetPassword() {
 
       const { error } = await supabase.auth.updateUser({ password });
       if (error) {
-        toast.error(error.message);
+        setFormError(translateAuthError(error, "Não foi possível atualizar a senha. Tente novamente."));
         return;
       }
 
       // Sign out so the user must log in with the new password.
       await supabase.auth.signOut();
-      toast.success("Senha atualizada com sucesso! Faça login com a nova senha.");
-      navigate({ to: "/admin/login" });
-    } catch {
-      toast.error("Ocorreu um erro inesperado.");
+      setStatus("success");
+      toast.success("Senha atualizada com sucesso!");
+    } catch (err) {
+      setFormError(translateAuthError(err));
     } finally {
       setLoading(false);
     }
@@ -161,6 +164,32 @@ function ResetPassword() {
           </div>
           <Button asChild className="w-full h-12 rounded-2xl font-bold">
             <Link to="/admin/login">Voltar para o login</Link>
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (status === "success") {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden">
+        <NextFlowBackground />
+        <div className="absolute top-0 left-0 w-full h-full -z-10 opacity-30 pointer-events-none">
+          <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-emerald-500/20 blur-[120px] rounded-full"></div>
+          <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-primary/20 blur-[120px] rounded-full"></div>
+        </div>
+        <div className="w-full max-w-md glass-card rounded-3xl p-10 border border-emerald-500/20 shadow-2xl bg-background/40 backdrop-blur-2xl text-center space-y-6 relative z-10 animate-in fade-in zoom-in-95 duration-700">
+          <div className="mx-auto h-16 w-16 rounded-2xl bg-emerald-500/10 text-emerald-500 grid place-items-center">
+            <CheckCircle2 className="h-8 w-8" />
+          </div>
+          <div className="space-y-2">
+            <h1 className="text-3xl font-black tracking-tight">Senha alterada!</h1>
+            <p className="text-muted-foreground text-sm leading-relaxed">
+              Sua nova senha foi configurada com sucesso. Agora você já pode fazer login com a nova senha.
+            </p>
+          </div>
+          <Button asChild className="premium-button w-full h-14 rounded-2xl font-bold uppercase tracking-widest">
+            <Link to="/admin/login">Ir para o Login</Link>
           </Button>
         </div>
       </div>
@@ -225,6 +254,13 @@ function ResetPassword() {
                 </div>
               </div>
             </div>
+
+            {formError && (
+              <div className="flex items-start gap-2 rounded-2xl border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive animate-in fade-in slide-in-from-top-1 duration-300">
+                <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+                <span className="leading-relaxed">{formError}</span>
+              </div>
+            )}
 
             <Button type="submit" disabled={loading} className="premium-button w-full h-16 rounded-2xl text-lg font-black uppercase tracking-widest shadow-xl shadow-primary/20 hover:shadow-2xl hover:shadow-primary/30 active:scale-[0.98] transition-all">
               {loading ? "Atualizando..." : "Alterar Senha"}
