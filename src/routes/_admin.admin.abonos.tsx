@@ -163,16 +163,16 @@ function AbonosPage() {
   );
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+    <div className="space-y-6 md:space-y-8 animate-in fade-in duration-500">
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
         <div>
-          <h1 className="font-display text-5xl font-bold tracking-tight text-foreground">Gestão de Abonos</h1>
-          <p className="text-muted-foreground mt-3 text-xl font-medium">Registre e gerencie atestados, folgas e licenças.</p>
+          <h1 className="font-display text-3xl md:text-5xl font-bold tracking-tight text-foreground">Gestão de Abonos</h1>
+          <p className="text-muted-foreground mt-2 md:mt-3 text-base md:text-xl font-medium">Registre e gerencie atestados, folgas e licenças.</p>
         </div>
         
         <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
           <DialogTrigger asChild>
-            <Button size="lg" className="rounded-2xl shadow-xl shadow-primary/20 font-black uppercase tracking-widest text-xs px-8 h-14">
+            <Button size="lg" className="rounded-xl md:rounded-2xl shadow-xl shadow-primary/20 font-black uppercase tracking-widest text-[10px] md:text-xs px-6 md:px-8 h-12 md:h-14 w-full lg:w-auto">
               <Plus className="h-5 w-5" /> Novo Abono
             </Button>
           </DialogTrigger>
@@ -252,7 +252,7 @@ function AbonosPage() {
         />
       </div>
 
-      <div className="glass-card overflow-hidden rounded-[2.5rem] border border-border/40 shadow-sm transition-all hover:shadow-md">
+      <div className="glass-card overflow-hidden rounded-2xl md:rounded-[2.5rem] border border-border/40 shadow-sm transition-all duration-500 hover:shadow-md">
         {isLoading ? (
           <div className="p-16 text-center text-sm text-muted-foreground animate-pulse">Carregando registros...</div>
         ) : !filteredAbsences?.length ? (
@@ -263,7 +263,8 @@ function AbonosPage() {
              <p className="text-muted-foreground">Nenhum abono encontrado.</p>
           </div>
         ) : (
-          <table className="w-full text-sm">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm min-w-[700px]">
             <thead className="border-b border-border/40 bg-muted/20 text-left text-[11px] uppercase font-bold tracking-widest text-muted-foreground">
               <tr>
                 <th className="px-8 py-4">Data</th>
@@ -313,7 +314,8 @@ function AbonosPage() {
                 </tr>
               ))}
             </tbody>
-          </table>
+            </table>
+          </div>
         )}
       </div>
     </div>
