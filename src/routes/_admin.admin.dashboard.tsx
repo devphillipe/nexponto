@@ -3,7 +3,7 @@ import { memo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useProfile } from "@/lib/auth";
-import { Users, Clock, CheckCircle2, AlertCircle, ArrowUpRight, TrendingUp } from "lucide-react";
+import { Users, Clock, CheckCircle2, AlertCircle, ArrowUpRight, TrendingUp, CheckCircle } from "lucide-react";
 import { CardSkeleton } from "@/components/SkeletonLoader";
 import { useNavigate } from "@tanstack/react-router";
 
