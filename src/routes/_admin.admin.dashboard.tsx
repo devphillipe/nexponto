@@ -70,14 +70,14 @@ function Dashboard() {
 
   return (
     <div className="space-y-12 animate-in fade-in slide-in-from-bottom-6 duration-1000">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-        <div>
-          <h1 className="font-display text-5xl font-bold tracking-tight text-foreground">
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+        <div className="text-left">
+          <h1 className="font-display text-3xl md:text-5xl font-bold tracking-tight text-foreground">
             Olá, {profile?.full_name?.split(" ")[0]}!
           </h1>
-          <p className="text-muted-foreground mt-3 text-xl font-medium">Aqui está o resumo do seu escritório hoje.</p>
+          <p className="text-muted-foreground mt-2 md:mt-3 text-base md:text-xl font-medium">Aqui está o resumo do seu escritório hoje.</p>
         </div>
-        <div className="flex items-center gap-3 px-5 py-2.5 bg-primary/10 rounded-2xl border border-primary/20 text-primary text-sm font-bold shadow-sm shadow-primary/5">
+        <div className="flex items-center self-start gap-3 px-5 py-2.5 bg-primary/10 rounded-2xl border border-primary/20 text-primary text-sm font-bold shadow-sm shadow-primary/5">
            <TrendingUp className="h-4 w-4" />
            Produtividade em alta
         </div>
@@ -86,7 +86,7 @@ function Dashboard() {
       {isLoading ? (
         <CardSkeleton />
       ) : (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
           {cards.map((c, i) => (
             <div key={c.label} className="glass-card rounded-[2.5rem] p-8 group hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500 border border-border/40 hover:border-primary/20">
               <div className="mb-6 flex items-center justify-between">
