@@ -1,13 +1,14 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Building2, ArrowLeft, ShieldCheck, Mail, KeyRound } from "lucide-react";
+import { Building2, ArrowLeft, ShieldCheck, Mail, KeyRound, CheckCircle2, AlertCircle } from "lucide-react";
 import { NextFlowBackground } from "@/components/NextFlowBackground";
 import { Logo } from "@/components/Logo";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { translateAuthError } from "@/lib/auth-errors";
 
 export const Route = createFileRoute("/admin/login")({
   head: () => ({ meta: [{ title: "Entrar — NexPonto Admin" }] }),
