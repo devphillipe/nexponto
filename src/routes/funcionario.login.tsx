@@ -98,7 +98,6 @@ function FuncLogin() {
               <div className="space-y-2">
                 <div className="flex justify-between items-center px-1">
                   <Label htmlFor="password" title="Senha" className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Sua Senha</Label>
-                  <a href="#" className="text-[11px] font-bold text-primary hover:underline">Esqueceu?</a>
                 </div>
                 <Input 
                   id="password" 

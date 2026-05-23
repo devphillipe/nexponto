@@ -15,6 +15,7 @@ import { Route as FuncRouteImport } from './routes/_func'
 import { Route as AdminRouteImport } from './routes/_admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as FuncionarioLoginRouteImport } from './routes/funcionario.login'
+import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-password'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AdminCadastroRouteImport } from './routes/admin.cadastro'
 import { Route as FuncFuncionarioMeuPontoRouteImport } from './routes/_func.funcionario.meu-ponto'
@@ -52,6 +53,11 @@ const IndexRoute = IndexRouteImport.update({
 const FuncionarioLoginRoute = FuncionarioLoginRouteImport.update({
   id: '/funcionario/login',
   path: '/funcionario/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
+  id: '/auth/reset-password',
+  path: '/auth/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
@@ -112,6 +118,7 @@ export interface FileRoutesByFullPath {
   '/termos': typeof TermosRoute
   '/admin/cadastro': typeof AdminCadastroRoute
   '/admin/login': typeof AdminLoginRoute
+  '/auth/reset-password': typeof AuthResetPasswordRoute
   '/funcionario/login': typeof FuncionarioLoginRoute
   '/admin/abonos': typeof AdminAdminAbonosRoute
   '/admin/configuracoes': typeof AdminAdminConfiguracoesRoute
@@ -128,6 +135,7 @@ export interface FileRoutesByTo {
   '/termos': typeof TermosRoute
   '/admin/cadastro': typeof AdminCadastroRoute
   '/admin/login': typeof AdminLoginRoute
+  '/auth/reset-password': typeof AuthResetPasswordRoute
   '/funcionario/login': typeof FuncionarioLoginRoute
   '/admin/abonos': typeof AdminAdminAbonosRoute
   '/admin/configuracoes': typeof AdminAdminConfiguracoesRoute
@@ -147,6 +155,7 @@ export interface FileRoutesById {
   '/termos': typeof TermosRoute
   '/admin/cadastro': typeof AdminCadastroRoute
   '/admin/login': typeof AdminLoginRoute
+  '/auth/reset-password': typeof AuthResetPasswordRoute
   '/funcionario/login': typeof FuncionarioLoginRoute
   '/_admin/admin/abonos': typeof AdminAdminAbonosRoute
   '/_admin/admin/configuracoes': typeof AdminAdminConfiguracoesRoute
@@ -165,6 +174,7 @@ export interface FileRouteTypes {
     | '/termos'
     | '/admin/cadastro'
     | '/admin/login'
+    | '/auth/reset-password'
     | '/funcionario/login'
     | '/admin/abonos'
     | '/admin/configuracoes'
@@ -181,6 +191,7 @@ export interface FileRouteTypes {
     | '/termos'
     | '/admin/cadastro'
     | '/admin/login'
+    | '/auth/reset-password'
     | '/funcionario/login'
     | '/admin/abonos'
     | '/admin/configuracoes'
@@ -199,6 +210,7 @@ export interface FileRouteTypes {
     | '/termos'
     | '/admin/cadastro'
     | '/admin/login'
+    | '/auth/reset-password'
     | '/funcionario/login'
     | '/_admin/admin/abonos'
     | '/_admin/admin/configuracoes'
@@ -218,6 +230,7 @@ export interface RootRouteChildren {
   TermosRoute: typeof TermosRoute
   AdminCadastroRoute: typeof AdminCadastroRoute
   AdminLoginRoute: typeof AdminLoginRoute
+  AuthResetPasswordRoute: typeof AuthResetPasswordRoute
   FuncionarioLoginRoute: typeof FuncionarioLoginRoute
 }
 
@@ -263,6 +276,13 @@ declare module '@tanstack/react-router' {
       path: '/funcionario/login'
       fullPath: '/funcionario/login'
       preLoaderRoute: typeof FuncionarioLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/reset-password': {
+      id: '/auth/reset-password'
+      path: '/auth/reset-password'
+      fullPath: '/auth/reset-password'
+      preLoaderRoute: typeof AuthResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/login': {
@@ -378,6 +398,7 @@ const rootRouteChildren: RootRouteChildren = {
   TermosRoute: TermosRoute,
   AdminCadastroRoute: AdminCadastroRoute,
   AdminLoginRoute: AdminLoginRoute,
+  AuthResetPasswordRoute: AuthResetPasswordRoute,
   FuncionarioLoginRoute: FuncionarioLoginRoute,
 }
 export const routeTree = rootRouteImport
