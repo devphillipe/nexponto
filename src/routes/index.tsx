@@ -46,10 +46,10 @@ function Landing() {
         </div>
       </header>
 
-      <section className="flex flex-1 flex-col items-center justify-center py-20 text-center relative">
+      <section className="flex flex-1 flex-col items-center justify-center py-12 sm:py-16 text-center relative">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full -z-10 overflow-hidden pointer-events-none">
-          <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary/10 rounded-full blur-[100px] animate-pulse-slow"></div>
-          <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-primary/10 rounded-full blur-[100px] animate-pulse-slow delay-1000"></div>
+          <div className="absolute top-1/4 left-1/4 w-48 h-48 sm:w-64 sm:h-64 bg-primary/10 rounded-full blur-[80px] sm:blur-[100px] animate-pulse-slow"></div>
+          <div className="absolute bottom-1/4 right-1/4 w-48 h-48 sm:w-64 sm:h-64 bg-primary/10 rounded-full blur-[80px] sm:blur-[100px] animate-pulse-slow delay-1000"></div>
         </div>
 
         <div className="mb-6 animate-fade-in inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-xs font-medium text-primary shadow-[0_0_15px_rgba(var(--color-primary),0.1)]">
@@ -57,7 +57,7 @@ function Landing() {
           Multitenant · Isolamento total de dados
         </div>
         
-        <h1 className="font-display text-4xl sm:text-6xl md:text-8xl lg:text-[10rem] font-black leading-[1.05] tracking-tighter max-w-5xl mb-6 sm:mb-10 drop-shadow-sm">
+        <h1 className="font-display text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black leading-[1.1] tracking-tighter max-w-4xl mb-6 sm:mb-8 drop-shadow-sm">
           Controle de ponto <br />
           <span className="text-gradient relative">
             inteligente.
@@ -65,14 +65,14 @@ function Landing() {
           </span>
         </h1>
         
-        <p className="mt-4 max-w-3xl text-base sm:text-xl md:text-2xl text-balance text-muted-foreground leading-relaxed font-medium opacity-90">
+        <p className="mt-2 max-w-2xl text-base sm:text-lg md:text-xl text-balance text-muted-foreground leading-relaxed font-medium opacity-90">
           A solução definitiva para escritórios modernos e equipes dinâmicas.
         </p>
 
-        <div className="mt-12 sm:mt-20 grid w-full max-w-5xl gap-6 sm:gap-10 grid-cols-1 sm:grid-cols-2 px-4 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-300">
+        <div className="mt-10 sm:mt-12 grid w-full max-w-4xl gap-6 sm:gap-8 grid-cols-1 sm:grid-cols-2 px-4 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-300">
           <Link
             to="/admin/cadastro"
-            className="glass-card group flex flex-col items-start gap-4 sm:gap-6 rounded-2xl sm:rounded-[3rem] p-8 sm:p-12 text-left transition-all duration-500 hover:-translate-y-3 hover:shadow-2xl hover:shadow-primary/10 border-border/40 hover:border-primary/30"
+            className="glass-card group flex flex-col items-start gap-4 sm:gap-5 rounded-2xl sm:rounded-[2.5rem] p-6 sm:p-10 text-left transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary/10 border-border/40 hover:border-primary/30"
           >
             <div className="grid h-12 w-12 sm:h-16 sm:w-16 place-items-center rounded-xl sm:rounded-2xl bg-gradient-to-br from-primary to-primary/80 text-primary-foreground transition-all duration-500 group-hover:scale-110 shadow-lg shadow-primary/20">
               <Building2 className="h-6 w-6 sm:h-8 sm:w-8" />
@@ -90,7 +90,7 @@ function Landing() {
 
           <Link
             to="/funcionario/login"
-            className="glass-card group flex flex-col items-start gap-4 sm:gap-6 rounded-2xl sm:rounded-[3rem] p-8 sm:p-12 text-left transition-all duration-500 hover:-translate-y-3 hover:shadow-2xl hover:shadow-primary/10 border-border/40 hover:border-primary/30"
+            className="glass-card group flex flex-col items-start gap-4 sm:gap-5 rounded-2xl sm:rounded-[2.5rem] p-6 sm:p-10 text-left transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary/10 border-border/40 hover:border-primary/30"
           >
             <div className="grid h-12 w-12 sm:h-16 sm:w-16 place-items-center rounded-xl sm:rounded-2xl bg-gradient-to-br from-primary to-primary/80 text-primary-foreground transition-all duration-500 group-hover:scale-110 shadow-lg shadow-primary/20">
               <Users className="h-6 w-6 sm:h-8 sm:w-8" />
@@ -107,15 +107,15 @@ function Landing() {
           </Link>
         </div>
 
-        <div className="mt-20 flex flex-wrap justify-center gap-8 md:gap-16 opacity-50 grayscale transition-all hover:opacity-100 hover:grayscale-0">
-          <div className="flex items-center gap-2 font-display font-semibold">
-            <CheckCircle2 className="h-5 w-5 text-success" /> Seguro & Criptografado
+        <div className="mt-12 sm:mt-16 flex flex-wrap justify-center gap-6 md:gap-12 opacity-50 grayscale transition-all hover:opacity-100 hover:grayscale-0">
+          <div className="flex items-center gap-2 font-display font-semibold text-xs sm:text-sm">
+            <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-success" /> Seguro & Criptografado
           </div>
-          <div className="flex items-center gap-2 font-display font-semibold">
-            <CheckCircle2 className="h-5 w-5 text-success" /> 99.9% Disponibilidade
+          <div className="flex items-center gap-2 font-display font-semibold text-xs sm:text-sm">
+            <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-success" /> 99.9% Disponibilidade
           </div>
-          <div className="flex items-center gap-2 font-display font-semibold">
-            <CheckCircle2 className="h-5 w-5 text-success" /> Suporte Premium
+          <div className="flex items-center gap-2 font-display font-semibold text-xs sm:text-sm">
+            <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-success" /> Suporte Premium
           </div>
         </div>
       </section>
@@ -129,8 +129,8 @@ function Landing() {
           © {new Date().getFullYear()} NexPonto — Todos os direitos reservados.
         </div>
         <div className="flex gap-6 text-[13px] font-medium text-muted-foreground">
-          <a href="#" className="hover:text-primary transition-colors">Privacidade</a>
-          <a href="#" className="hover:text-primary transition-colors">Termos</a>
+          <Link to="/privacidade" className="hover:text-primary transition-colors">Privacidade</Link>
+          <Link to="/termos" className="hover:text-primary transition-colors">Termos</Link>
         </div>
       </footer>
     </main>
