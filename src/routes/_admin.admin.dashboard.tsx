@@ -12,30 +12,49 @@ export const Route = createFileRoute("/_admin/admin/dashboard")({
 });
 
 import { useMemo } from "react";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
+
+const TYPE_LABEL: Record<string, string> = {
+  entrada: "Entrada",
+  saida_almoco: "Saída Almoço",
+  retorno_almoco: "Retorno Almoço",
+  saida: "Saída Final",
+};
 
 function Dashboard() {
   const { data: profile } = useProfile();
 
   const { data: stats, isLoading } = useQuery({
-    queryKey: ["admin-dashboard"],
+    queryKey: ["admin-dashboard", profile?.tenant_id],
+    enabled: !!profile?.tenant_id,
     staleTime: 1000 * 60 * 5, // 5 minutes
     queryFn: async () => {
       const today = new Date().toISOString().slice(0, 10);
-      const [emps, actives, todayEntries] = await Promise.all([
-        supabase.from("employees").select("id", { count: "exact", head: true }),
+      const [emps, actives, todayEntries, recentActivities] = await Promise.all([
+        supabase.from("employees").select("id", { count: "exact", head: true }).eq("tenant_id", profile!.tenant_id),
         supabase
           .from("employees")
           .select("id", { count: "exact", head: true })
+          .eq("tenant_id", profile!.tenant_id)
           .eq("active", true),
         supabase
           .from("time_entries")
           .select("employee_id", { count: "exact", head: true })
+          .eq("tenant_id", profile!.tenant_id)
           .eq("entry_date", today),
+        supabase
+          .from("time_entries")
+          .select("id, entry_at, entry_type, employees(full_name)")
+          .eq("tenant_id", profile!.tenant_id)
+          .order("entry_at", { ascending: false })
+          .limit(5),
       ]);
       return {
         total: emps.count ?? 0,
         active: actives.count ?? 0,
         todayPunches: todayEntries.count ?? 0,
+        recentActivities: recentActivities.data ?? [],
       };
     },
   });
@@ -95,20 +114,26 @@ function Dashboard() {
            </div>
            
            <div className="space-y-6">
-              {[1, 2, 3].map((item) => (
-                <div key={item} className="flex items-center gap-4 p-4 rounded-2xl bg-muted/20 border border-border/40 hover:bg-muted/30 transition-colors cursor-default">
-                   <div className="h-12 w-12 rounded-xl bg-primary/10 grid place-items-center font-bold text-primary">
-                      {item === 1 ? "JD" : item === 2 ? "MA" : "RS"}
-                   </div>
-                   <div className="flex-1 min-w-0">
-                      <div className="font-bold text-sm">Registro de Ponto - {item === 1 ? "João Silva" : item === 2 ? "Maria Santos" : "Ricardo Oliveira"}</div>
-                      <div className="text-xs text-muted-foreground">Entrada registrada às 08:0{item} AM</div>
-                   </div>
-                   <div className="text-xs font-bold text-success bg-success/10 px-3 py-1 rounded-full">
+              {!stats?.recentActivities?.length ? (
+                <div className="text-center py-10 text-muted-foreground">Nenhuma atividade recente.</div>
+              ) : (
+                stats.recentActivities.map((item: any) => (
+                  <div key={item.id} className="flex items-center gap-4 p-4 rounded-2xl bg-muted/20 border border-border/40 hover:bg-muted/30 transition-colors cursor-default">
+                    <div className="h-12 w-12 rounded-xl bg-primary/10 grid place-items-center font-bold text-primary">
+                      {item.employees?.full_name?.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2)}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-bold text-sm">Registro de Ponto - {item.employees?.full_name}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {TYPE_LABEL[item.entry_type]} registrado às {format(new Date(item.entry_at), "HH:mm 'de' dd/MM", { locale: ptBR })}
+                      </div>
+                    </div>
+                    <div className="text-xs font-bold text-success bg-success/10 px-3 py-1 rounded-full">
                       Sincronizado
-                   </div>
-                </div>
-              ))}
+                    </div>
+                  </div>
+                ))
+              )}
            </div>
         </div>
 
