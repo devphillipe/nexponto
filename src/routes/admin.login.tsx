@@ -64,19 +64,26 @@ function AdminLogin() {
 
   async function handleResetPassword(e: React.FormEvent) {
     e.preventDefault();
+    setResetError("");
+
+    const trimmed = resetEmail.trim();
+    if (!trimmed || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+      setResetError("Informe um e-mail válido.");
+      return;
+    }
+
     setSendingReset(true);
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+      const { error } = await supabase.auth.resetPasswordForEmail(trimmed, {
         redirectTo: `${window.location.origin}/auth/reset-password`,
       });
       if (error) {
-        toast.error(error.message);
+        setResetError(translateAuthError(error, "Não foi possível enviar o e-mail de recuperação."));
       } else {
-        toast.success("E-mail de recuperação enviado! Verifique sua caixa de entrada.");
-        setShowForgot(false);
+        setResetSent(true);
       }
     } catch (err) {
-      toast.error("Erro ao enviar e-mail de recuperação.");
+      setResetError(translateAuthError(err, "Erro ao enviar e-mail de recuperação."));
     } finally {
       setSendingReset(false);
     }
