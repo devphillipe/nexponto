@@ -152,8 +152,8 @@ function Dashboard() {
             </p>
             <ul className="space-y-4">
               <li className="flex items-start gap-3 group">
-                <div className="mt-1 h-5 w-5 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center shrink-0 group-hover:bg-primary transition-colors">
-                  <div className="h-1.5 w-1.5 rounded-full bg-primary group-hover:bg-primary-foreground"></div>
+                <div className="mt-1 h-5 w-5 rounded-full bg-success/20 border border-success/40 flex items-center justify-center shrink-0 group-hover:bg-success transition-colors">
+                  <CheckCircle className="h-3 w-3 text-success group-hover:text-success-foreground" />
                 </div>
                 <div>
                   <strong className="text-sm block">Gerenciar Equipe</strong>
@@ -161,8 +161,8 @@ function Dashboard() {
                 </div>
               </li>
               <li className="flex items-start gap-3 group">
-                <div className="mt-1 h-5 w-5 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center shrink-0 group-hover:bg-primary transition-colors">
-                   <div className="h-1.5 w-1.5 rounded-full bg-primary group-hover:bg-primary-foreground"></div>
+                <div className="mt-1 h-5 w-5 rounded-full bg-success/20 border border-success/40 flex items-center justify-center shrink-0 group-hover:bg-success transition-colors">
+                   <CheckCircle className="h-3 w-3 text-success group-hover:text-success-foreground" />
                 </div>
                 <div>
                   <strong className="text-sm block">Auditoria de Pontos</strong>
@@ -170,8 +170,8 @@ function Dashboard() {
                 </div>
               </li>
               <li className="flex items-start gap-3 group">
-                <div className="mt-1 h-5 w-5 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center shrink-0 group-hover:bg-primary transition-colors">
-                   <div className="h-1.5 w-1.5 rounded-full bg-primary group-hover:bg-primary-foreground"></div>
+                <div className="mt-1 h-5 w-5 rounded-full bg-success/20 border border-success/40 flex items-center justify-center shrink-0 group-hover:bg-success transition-colors">
+                   <CheckCircle className="h-3 w-3 text-success group-hover:text-success-foreground" />
                 </div>
                 <div>
                   <strong className="text-sm block">Configurações de Jornada</strong>
@@ -181,13 +181,6 @@ function Dashboard() {
             </ul>
           </div>
           
-          <div className="mt-10 p-6 rounded-[2rem] bg-gradient-to-br from-primary/10 to-accent/10 border border-primary/20">
-             <div className="font-bold text-sm mb-2 text-primary">Sistema NexPonto</div>
-             <p className="text-xs text-muted-foreground leading-relaxed">
-               Todas as funcionalidades estão liberadas durante o período de implantação. 
-               Aproveite para configurar sua equipe e gerenciar os pontos com total controle.
-             </p>
-          </div>
         </div>
       </div>
     </div>
