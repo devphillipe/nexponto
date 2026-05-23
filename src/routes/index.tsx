@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Building2, ArrowRight, Users, CheckCircle2, Zap } from "lucide-react";
 import { memo } from "react";
 import { Logo, LogoMark } from "@/components/Logo";
+import { NextFlowBackground } from "@/components/NextFlowBackground";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -16,6 +17,7 @@ export const Route = createFileRoute("/")({
 function Landing() {
   return (
     <main className="relative mx-auto flex min-h-screen max-w-7xl flex-col px-8 py-12">
+      <NextFlowBackground />
       <header className="flex items-center justify-between mb-20 animate-in fade-in slide-in-from-top-4 duration-1000">
         <Logo size={28} wordmarkClassName="text-2xl" />
 
@@ -57,7 +59,10 @@ function Landing() {
         
         <h1 className="font-display text-7xl font-black leading-[1.05] tracking-tighter md:text-8xl lg:text-[10rem] max-w-5xl mb-10 drop-shadow-sm">
           Controle de ponto <br />
-          <span className="text-gradient">inteligente.</span>
+          <span className="text-gradient relative">
+            inteligente.
+            <div className="absolute -inset-x-12 -inset-y-8 bg-primary/10 blur-[60px] -z-10 rounded-full"></div>
+          </span>
         </h1>
         
         <p className="mt-4 max-w-3xl text-xl md:text-2xl text-balance text-muted-foreground leading-relaxed font-medium opacity-90">

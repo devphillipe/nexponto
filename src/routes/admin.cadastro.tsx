@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Building2, ArrowLeft, ShieldCheck, CheckCircle2 } from "lucide-react";
+import { NextFlowBackground } from "@/components/NextFlowBackground";
 import { Logo } from "@/components/Logo";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -73,6 +74,7 @@ function AdminSignup() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden">
+      <NextFlowBackground />
       <div className="absolute top-0 left-0 w-full h-full -z-10 opacity-30 pointer-events-none">
         <div className="absolute top-[-15%] right-[-15%] w-[60%] h-[60%] bg-primary/20 blur-[140px] rounded-full"></div>
         <div className="absolute bottom-[-15%] left-[-15%] w-[60%] h-[60%] bg-accent/20 blur-[140px] rounded-full"></div>
