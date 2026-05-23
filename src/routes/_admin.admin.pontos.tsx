@@ -304,71 +304,16 @@ function PontosPage() {
                       </thead>
                       <tbody className="divide-y divide-border/20">
                         {group.absences.map((a: any) => (
-                          <tr key={a.id} className="bg-primary/5 hover:bg-primary/10 transition-colors">
-                            <td className="px-8 py-5">
-                              <span className="px-3 py-1 rounded-lg text-xs font-bold bg-primary text-primary-foreground uppercase">
-                                ABONO: {a.reason}
-                              </span>
-                            </td>
-                            <td className="px-6 py-5 text-muted-foreground italic">
-                              {a.description || "Sem justificativa"}
-                            </td>
-                            <td className="px-6 py-5">
-                              <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-primary/10 text-primary">
-                                Admin
-                              </span>
-                            </td>
-                            <td className="px-6 py-5 text-right">
-                              <span className="text-xs text-muted-foreground">Gerenciado em Abonos</span>
-                            </td>
-                          </tr>
+                          <AbsenceEntryRow key={a.id} a={a} />
                         ))}
                         {group.entries.sort((a: any, b: any) => new Date(a.entry_at).getTime() - new Date(b.entry_at).getTime()).map((e: any) => (
-                          <tr key={e.id} className="hover:bg-muted/10 transition-colors">
-                            <td className="px-8 py-5 font-mono font-bold text-primary flex items-center gap-2">
-                              {new Date(e.entry_at).toLocaleTimeString("pt-BR", {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                                second: "2-digit",
-                              })}
-                              {e.is_adjustment && (
-                                <span title="Registro Ajustado">
-                                  <History className="h-3 w-3 text-warning" />
-                                </span>
-                              )}
-                            </td>
-                            <td className="px-6 py-5 text-muted-foreground font-medium">
-                              <span className={`px-3 py-1 rounded-lg text-xs font-bold ${
-                                e.entry_type === 'entrada' ? 'bg-success/10 text-success' :
-                                e.entry_type === 'saida' ? 'bg-destructive/10 text-destructive' :
-                                'bg-primary/10 text-primary'
-                              }`}>
-                                {TYPE_LABEL[e.entry_type]}
-                              </span>
-                            </td>
-                            <td className="px-6 py-5">
-                              <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${e.source === "manual_admin" ? "bg-warning/10 text-warning" : "bg-success/10 text-success"}`}>
-                                {e.source === "manual_admin" ? "Admin" : "App"}
-                              </span>
-                            </td>
-                            <td className="px-6 py-5 text-right space-x-2">
-                              <Button variant="ghost" size="icon" onClick={() => handleEdit(e)} className="h-8 w-8 rounded-lg text-primary/60 hover:text-primary hover:bg-primary/10">
-                                <Edit2 className="h-3.5 w-3.5" />
-                              </Button>
-                              <Button 
-                                variant="ghost" 
-                                size="icon" 
-                                onClick={() => {
-                                  if (confirm("Excluir este registro permanentemente?")) {
-                                    deleteMutation.mutate(e.id);
-                                  }
-                                }}
-                                className="h-8 w-8 rounded-lg text-destructive/60 hover:text-destructive hover:bg-destructive/10"
-                              >
-                                <Trash2 className="h-3.5 w-3.5" />
-                              </Button>
-                            </td>
-                          </tr>
+                          <PointEntryRow 
+                            key={e.id} 
+                            e={e} 
+                            TYPE_LABEL={TYPE_LABEL} 
+                            handleEdit={handleEdit} 
+                            deleteMutation={deleteMutation} 
+                          />
                         ))}
                       </tbody>
                     </table>
@@ -382,3 +327,76 @@ function PontosPage() {
     </div>
   );
 }
+
+const PointEntryRow = memo(({ e, TYPE_LABEL, handleEdit, deleteMutation }: any) => (
+  <tr className="hover:bg-muted/10 transition-colors group">
+    <td className="px-8 py-5 font-mono font-bold text-primary flex items-center gap-2">
+      {new Date(e.entry_at).toLocaleTimeString("pt-BR", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      })}
+      {e.is_adjustment && (
+        <span title="Registro Ajustado">
+          <History className="h-3 w-3 text-warning" />
+        </span>
+      )}
+    </td>
+    <td className="px-6 py-5 text-muted-foreground font-medium">
+      <span className={`px-3 py-1 rounded-lg text-xs font-bold ${
+        e.entry_type === 'entrada' ? 'bg-success/10 text-success' :
+        e.entry_type === 'saida' ? 'bg-destructive/10 text-destructive' :
+        'bg-primary/10 text-primary'
+      }`}>
+        {TYPE_LABEL[e.entry_type]}
+      </span>
+    </td>
+    <td className="px-6 py-5">
+      <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${e.source === "manual_admin" ? "bg-warning/10 text-warning" : "bg-success/10 text-success"}`}>
+        {e.source === "manual_admin" ? "Admin" : "App"}
+      </span>
+    </td>
+    <td className="px-6 py-5 text-right space-x-2 whitespace-nowrap">
+      <Button variant="ghost" size="icon" onClick={() => handleEdit(e)} className="h-8 w-8 rounded-lg text-primary/60 hover:text-primary hover:bg-primary/10">
+        <Edit2 className="h-3.5 w-3.5" />
+      </Button>
+      <Button 
+        variant="ghost" 
+        size="icon" 
+        onClick={() => {
+          if (confirm("Excluir este registro permanentemente?")) {
+            deleteMutation.mutate(e.id);
+          }
+        }}
+        className="h-8 w-8 rounded-lg text-destructive/60 hover:text-destructive hover:bg-destructive/10"
+      >
+        <Trash2 className="h-3.5 w-3.5" />
+      </Button>
+    </td>
+  </tr>
+));
+
+PointEntryRow.displayName = "PointEntryRow";
+
+const AbsenceEntryRow = memo(({ a }: any) => (
+  <tr className="bg-primary/5 hover:bg-primary/10 transition-colors group">
+    <td className="px-8 py-5">
+      <span className="px-3 py-1 rounded-lg text-xs font-bold bg-primary text-primary-foreground uppercase whitespace-nowrap">
+        ABONO: {a.reason}
+      </span>
+    </td>
+    <td className="px-6 py-5 text-muted-foreground italic">
+      {a.description || "Sem justificativa"}
+    </td>
+    <td className="px-6 py-5">
+      <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-primary/10 text-primary">
+        Admin
+      </span>
+    </td>
+    <td className="px-6 py-5 text-right">
+      <span className="text-xs text-muted-foreground whitespace-nowrap">Gerenciado em Abonos</span>
+    </td>
+  </tr>
+));
+
+AbsenceEntryRow.displayName = "AbsenceEntryRow";

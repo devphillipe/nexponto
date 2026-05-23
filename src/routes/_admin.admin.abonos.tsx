@@ -276,42 +276,14 @@ function AbonosPage() {
             </thead>
             <tbody className="divide-y divide-border/20">
               {filteredAbsences.map((a: any) => (
-                <tr key={a.id} className="hover:bg-muted/10 transition-colors">
-                  <td className="px-8 py-5 font-bold text-primary">
-                    {format(new Date(a.absence_date + "T12:00:00"), "dd/MM/yyyy", { locale: ptBR })}
-                  </td>
-                  <td className="px-6 py-5 font-semibold text-foreground">{a.employees?.full_name}</td>
-                  <td className="px-6 py-5">
-                    <span className="px-3 py-1 rounded-full bg-accent/10 text-accent text-xs font-bold uppercase tracking-wider">
-                      {REASONS.find(r => r.value === a.reason)?.label || a.reason}
-                    </span>
-                  </td>
-                  <td className="px-6 py-5 text-muted-foreground italic">
-                    {a.description || "-"}
-                  </td>
-                  <td className="px-6 py-5 text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <EditAbonoDialog 
-                        abono={a} 
-                        employees={employees || []} 
-                        onSave={(data) => updateMutation.mutate({ id: a.id, ...data })} 
-                        isPending={updateMutation.isPending}
-                      />
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        onClick={() => {
-                          if (confirm("Tem certeza que deseja excluir este abono?")) {
-                            deleteMutation.mutate(a.id);
-                          }
-                        }}
-                        className="text-destructive/60 hover:text-destructive hover:bg-destructive/10 rounded-xl"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </td>
-                </tr>
+                <AbonoTableRow 
+                  key={a.id} 
+                  a={a} 
+                  REASONS={REASONS} 
+                  employees={employees} 
+                  updateMutation={updateMutation} 
+                  deleteMutation={deleteMutation} 
+                />
               ))}
             </tbody>
             </table>
@@ -399,3 +371,44 @@ function EditAbonoDialog({ abono, employees, onSave, isPending }: { abono: any, 
     </Dialog>
   );
 }
+
+const AbonoTableRow = memo(({ a, REASONS, employees, updateMutation, deleteMutation }: any) => (
+  <tr className="hover:bg-muted/10 transition-colors group">
+    <td className="px-8 py-5 font-bold text-primary">
+      {format(new Date(a.absence_date + "T12:00:00"), "dd/MM/yyyy", { locale: ptBR })}
+    </td>
+    <td className="px-6 py-5 font-semibold text-foreground">{a.employees?.full_name}</td>
+    <td className="px-6 py-5">
+      <span className="px-3 py-1 rounded-full bg-accent/10 text-accent text-xs font-bold uppercase tracking-wider">
+        {REASONS.find((r: any) => r.value === a.reason)?.label || a.reason}
+      </span>
+    </td>
+    <td className="px-6 py-5 text-muted-foreground italic truncate max-w-[200px]">
+      {a.description || "-"}
+    </td>
+    <td className="px-6 py-5 text-right">
+      <div className="flex items-center justify-end gap-2">
+        <EditAbonoDialog 
+          abono={a} 
+          employees={employees || []} 
+          onSave={(data: any) => updateMutation.mutate({ id: a.id, ...data })} 
+          isPending={updateMutation.isPending}
+        />
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={() => {
+            if (confirm("Tem certeza que deseja excluir este abono?")) {
+              deleteMutation.mutate(a.id);
+            }
+          }}
+          className="text-destructive/60 hover:text-destructive hover:bg-destructive/10 rounded-xl"
+        >
+          <Trash2 className="h-4 w-4" />
+        </Button>
+      </div>
+    </td>
+  </tr>
+));
+
+AbonoTableRow.displayName = "AbonoTableRow";
