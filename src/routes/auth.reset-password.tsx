@@ -100,16 +100,17 @@ function ResetPassword() {
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setFormError("");
 
     if (status !== "ready") return;
 
     if (password.length < 8) {
-      toast.error("A senha deve ter pelo menos 8 caracteres.");
+      setFormError("A senha deve ter pelo menos 8 caracteres.");
       return;
     }
 
     if (password !== confirmPassword) {
-      toast.error("As senhas não coincidem.");
+      setFormError("As senhas não coincidem. Verifique e tente novamente.");
       return;
     }
 
@@ -126,16 +127,16 @@ function ResetPassword() {
 
       const { error } = await supabase.auth.updateUser({ password });
       if (error) {
-        toast.error(error.message);
+        setFormError(translateAuthError(error, "Não foi possível atualizar a senha. Tente novamente."));
         return;
       }
 
       // Sign out so the user must log in with the new password.
       await supabase.auth.signOut();
-      toast.success("Senha atualizada com sucesso! Faça login com a nova senha.");
-      navigate({ to: "/admin/login" });
-    } catch {
-      toast.error("Ocorreu um erro inesperado.");
+      setStatus("success");
+      toast.success("Senha atualizada com sucesso!");
+    } catch (err) {
+      setFormError(translateAuthError(err));
     } finally {
       setLoading(false);
     }
