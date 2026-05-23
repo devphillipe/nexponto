@@ -69,13 +69,15 @@ function Dashboard() {
   ], [stats]);
 
   return (
-    <div className="space-y-10 animate-fade-in">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+    <div className="space-y-12 animate-in fade-in slide-in-from-bottom-6 duration-1000">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <h1 className="font-display text-4xl font-bold tracking-tight">Bem-vindo, {profile?.full_name?.split(" ")[0]}!</h1>
-          <p className="text-muted-foreground mt-1 text-lg">Aqui está o resumo do seu escritório hoje.</p>
+          <h1 className="font-display text-5xl font-bold tracking-tight text-foreground">
+            Olá, {profile?.full_name?.split(" ")[0]}!
+          </h1>
+          <p className="text-muted-foreground mt-3 text-xl font-medium">Aqui está o resumo do seu escritório hoje.</p>
         </div>
-        <div className="flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-xl border border-primary/20 text-primary text-sm font-semibold">
+        <div className="flex items-center gap-3 px-5 py-2.5 bg-primary/10 rounded-2xl border border-primary/20 text-primary text-sm font-bold shadow-sm shadow-primary/5">
            <TrendingUp className="h-4 w-4" />
            Produtividade em alta
         </div>
@@ -86,18 +88,18 @@ function Dashboard() {
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {cards.map((c, i) => (
-            <div key={c.label} className="glass-card rounded-3xl p-6 group hover:-translate-y-1 transition-all duration-300">
-              <div className="mb-4 flex items-center justify-between">
-                <div className={`p-3 rounded-2xl bg-muted/50 ${c.color} group-hover:scale-110 transition-transform`}>
-                  <c.icon className="h-6 w-6" />
+            <div key={c.label} className="glass-card rounded-[2.5rem] p-8 group hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500 border border-border/40 hover:border-primary/20">
+              <div className="mb-6 flex items-center justify-between">
+                <div className={`p-4 rounded-2xl bg-gradient-to-br from-muted to-transparent ${c.color} group-hover:scale-110 group-hover:bg-primary/5 transition-all duration-500`}>
+                  <c.icon className="h-7 w-7" />
                 </div>
-                <ArrowUpRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                <ArrowUpRight className="h-5 w-5 text-muted-foreground opacity-0 group-hover:opacity-100 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all duration-500" />
               </div>
-              <div className="space-y-1">
-                <span className="text-sm font-medium text-muted-foreground">
+              <div className="space-y-2">
+                <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground opacity-80">
                   {c.label}
                 </span>
-                <div className="font-display text-4xl font-bold tracking-tight">{c.value}</div>
+                <div className="font-display text-5xl font-black tracking-tighter text-foreground">{c.value}</div>
               </div>
               <div className="mt-4 flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
                  <div className="h-1.5 w-1.5 rounded-full bg-success"></div>
@@ -109,14 +111,14 @@ function Dashboard() {
       )}
 
       <div className="grid gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2 glass-card rounded-3xl p-8">
-           <div className="flex items-center justify-between mb-8">
-              <h2 className="font-display text-2xl font-bold">Resumo de Atividades</h2>
+        <div className="lg:col-span-2 glass-card rounded-[2.5rem] p-10 border border-border/40 shadow-sm">
+           <div className="flex items-center justify-between mb-10">
+              <h2 className="font-display text-3xl font-bold tracking-tight">Resumo de Atividades</h2>
               <button 
                 onClick={() => navigate({ to: "/admin/pontos" })}
-                className="text-sm font-bold text-primary hover:underline"
+                className="text-sm font-black uppercase tracking-widest text-primary hover:text-primary/80 transition-colors group flex items-center gap-2"
               >
-                Ver relatório completo
+                Ver relatório completo <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
               </button>
            </div>
            
@@ -125,17 +127,17 @@ function Dashboard() {
                 <div className="text-center py-10 text-muted-foreground">Nenhuma atividade recente.</div>
               ) : (
                 stats.recentActivities.map((item: any) => (
-                  <div key={item.id} className="flex items-center gap-4 p-4 rounded-2xl bg-muted/20 border border-border/40 hover:bg-muted/30 transition-colors cursor-default">
-                    <div className="h-12 w-12 rounded-xl bg-primary/10 grid place-items-center font-bold text-primary">
+                  <div key={item.id} className="flex items-center gap-6 p-6 rounded-[2rem] bg-muted/10 border border-border/20 hover:bg-muted/20 hover:border-primary/10 transition-all duration-300 group">
+                    <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 grid place-items-center font-black text-primary group-hover:scale-105 transition-transform">
                       {item.employees?.full_name?.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2)}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="font-bold text-sm">Registro de Ponto - {item.employees?.full_name}</div>
-                      <div className="text-xs text-muted-foreground">
+                      <div className="font-bold text-base text-foreground mb-0.5 group-hover:text-primary transition-colors">Registro de Ponto - {item.employees?.full_name}</div>
+                      <div className="text-sm text-muted-foreground font-medium">
                         {TYPE_LABEL[item.entry_type]} registrado às {format(new Date(item.entry_at), "HH:mm 'de' dd/MM", { locale: ptBR })}
                       </div>
                     </div>
-                    <div className="text-xs font-bold text-success bg-success/10 px-3 py-1 rounded-full">
+                    <div className="text-[10px] font-black uppercase tracking-widest text-success bg-success/10 px-4 py-1.5 rounded-full border border-success/20">
                       Sincronizado
                     </div>
                   </div>
@@ -144,13 +146,13 @@ function Dashboard() {
            </div>
         </div>
 
-        <div className="glass-card rounded-3xl p-8 flex flex-col justify-between">
+        <div className="glass-card rounded-[2.5rem] p-10 flex flex-col justify-between border border-border/40 shadow-sm bg-gradient-to-br from-primary/[0.02] to-transparent">
           <div>
-            <h2 className="mb-6 font-display text-2xl font-bold">Configuração</h2>
-            <p className="text-muted-foreground text-sm leading-relaxed mb-8">
+            <h2 className="mb-8 font-display text-3xl font-bold tracking-tight">Configuração</h2>
+            <p className="text-muted-foreground text-base leading-relaxed mb-10 font-medium">
               Seu escritório está configurado corretamente. Veja o que você pode fazer agora:
             </p>
-            <ul className="space-y-4">
+            <ul className="space-y-6">
               <li className="flex items-start gap-3 group">
                 <div className="mt-1 h-5 w-5 rounded-full bg-success/20 border border-success/40 flex items-center justify-center shrink-0 group-hover:bg-success transition-colors">
                   <CheckCircle className="h-3 w-3 text-success group-hover:text-success-foreground" />
