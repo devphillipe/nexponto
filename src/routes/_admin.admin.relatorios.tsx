@@ -272,6 +272,21 @@ function RelatoriosPage() {
               }
             }
           });
+          doc.setTextColor(60, 60, 60);
+          doc.setFontSize(10);
+          const finalY = (doc as any).lastAutoTable.finalY + 20;
+          
+          if (finalY > 250) doc.addPage();
+          
+          const signatureY = finalY > 250 ? 40 : finalY;
+          
+          doc.line(14, signatureY, 90, signatureY);
+          doc.text(rd.employee, 14, signatureY + 5);
+          doc.text("Colaborador", 14, signatureY + 10);
+          
+          doc.line(110, signatureY, 186, signatureY);
+          doc.text(profile?.tenant_name || "Empresa", 110, signatureY + 5);
+          doc.text("Representante Legal", 110, signatureY + 10);
         });
         doc.save(`Relatorio_Ponto_${month}.pdf`);
       }

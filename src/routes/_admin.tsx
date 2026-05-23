@@ -59,13 +59,6 @@ function AdminLayout() {
 
         <div className="mb-8 p-4 glass-card rounded-2xl">
            <div className="flex items-center gap-3">
-             <div className="h-10 w-10 rounded-full bg-primary/20 border border-primary/20 overflow-hidden grid place-items-center text-primary font-bold">
-               {profile?.tenant_logo_url ? (
-                 <img src={profile.tenant_logo_url} alt="Logo" className="h-full w-full object-cover" />
-               ) : (
-                 profile?.tenant_name?.charAt(0) || "E"
-               )}
-             </div>
              <div className="min-w-0">
                <div className="truncate text-sm font-semibold">{profile?.tenant_name || "Escritório"}</div>
                <div className="truncate text-[10px] text-muted-foreground uppercase font-medium">Conta Ativa</div>
@@ -122,13 +115,7 @@ function AdminLayout() {
             <div className="flex items-center gap-4 ml-auto">
               <div className="h-8 w-[1px] bg-border/50 mx-2"></div>
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/10 overflow-hidden grid place-items-center font-bold text-primary">
-                   {profile?.tenant_logo_url ? (
-                     <img src={profile.tenant_logo_url} alt="Logo" className="h-full w-full object-cover" />
-                   ) : (
-                     profile?.full_name?.charAt(0) || "A"
-                   )}
-                </div>
+                <span className="text-sm font-medium text-muted-foreground">{profile?.full_name}</span>
               </div>
             </div>
         </header>
