@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { memo, useMemo, useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useProfile } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { Clock, Calendar, Plus, Trash2, Edit2, History, User, ChevronDown, ChevronRight } from "lucide-react";
-import { useState, useMemo } from "react";
+import { useState, useMemo, memo } from "react";
 import { format } from "date-fns";
 
 export const Route = createFileRoute("/_admin/admin/pontos")({
