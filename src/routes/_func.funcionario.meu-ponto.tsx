@@ -104,19 +104,19 @@ function MyClockPage() {
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="text-center md:text-left">
-        <h1 className="font-display text-4xl font-bold tracking-tight">
+      <div className="text-center md:text-left space-y-2">
+        <h1 className="font-display text-5xl font-bold tracking-tight text-foreground">
           Olá, {profile?.full_name?.split(" ")[0]}!
         </h1>
-        <p className="text-muted-foreground mt-1 text-lg capitalize">{dateStr}</p>
+        <p className="text-muted-foreground text-xl font-medium capitalize opacity-80">{dateStr}</p>
       </div>
 
-      <div className="glass-card rounded-[2.5rem] p-10 text-center relative overflow-hidden group">
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-50"></div>
+      <div className="glass-card rounded-[3rem] p-12 text-center relative overflow-hidden group border border-border/40 shadow-2xl shadow-primary/5">
+        <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-transparent via-primary to-transparent opacity-60"></div>
         
         <div className="mb-8 space-y-2">
-           <div className="font-mono text-7xl font-bold tracking-tighter text-primary animate-pulse-slow">
-             {now.toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' })}<span className="text-4xl opacity-50">:{now.toLocaleTimeString("pt-BR", { second: '2-digit' })}</span>
+           <div className="font-mono text-8xl font-black tracking-tighter text-primary drop-shadow-sm select-none">
+             {now.toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' })}<span className="text-5xl opacity-30">:{now.toLocaleTimeString("pt-BR", { second: '2-digit' })}</span>
            </div>
            <div className="flex items-center justify-center gap-2 text-xs font-bold text-muted-foreground uppercase tracking-widest">
               <MapPin className="h-3 w-3" /> Localização: Escritório Central
@@ -148,10 +148,10 @@ function MyClockPage() {
               size="lg"
               onClick={punch}
               disabled={punching}
-              className="premium-button h-20 w-full rounded-3xl text-xl font-bold gap-3"
+              className="premium-button h-24 w-full rounded-[2rem] text-2xl font-black uppercase tracking-widest gap-4 shadow-2xl shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
             >
-              <Smartphone className="h-6 w-6" />
-              {punching ? "Registrando..." : "Registrar Agora"}
+              <Smartphone className="h-7 w-7" />
+              {punching ? "Sincronizando..." : "Registrar Agora"}
             </Button>
             
             <p className="text-xs text-muted-foreground">
