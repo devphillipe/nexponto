@@ -131,14 +131,14 @@ function MyClockPage() {
           </div>
         ) : nextType ? (
           <div className="max-w-md mx-auto space-y-8">
-            <div className="p-6 rounded-3xl bg-muted/30 border border-border/40 relative">
-               <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-background border border-border text-[10px] uppercase font-bold tracking-widest text-muted-foreground">
+            <div className="p-8 rounded-[2rem] bg-muted/20 border border-border/20 relative shadow-inner">
+               <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-5 py-1.5 rounded-full bg-background border border-border text-[9px] font-black uppercase tracking-[0.2em] text-primary shadow-sm">
                  Próximo Registro
                </span>
-               <div className={`text-2xl font-bold flex items-center justify-center gap-3 ${META[nextType].tone}`}>
+               <div className={`text-3xl font-black uppercase tracking-tighter flex items-center justify-center gap-4 ${META[nextType].tone}`}>
                   {(() => {
                     const Icon = META[nextType].icon;
-                    return <Icon className="h-7 w-7" />;
+                    return <Icon className="h-8 w-8" />;
                   })()}
                   {META[nextType].label}
                </div>
@@ -209,33 +209,33 @@ function MyClockPage() {
           </div>
         </div>
 
-        <div className="glass-card rounded-[2rem] p-8 flex flex-col">
-          <h2 className="mb-6 font-display text-xl font-bold">Resumo da Jornada</h2>
+        <div className="glass-card rounded-[2.5rem] p-10 flex flex-col border border-border/40 shadow-sm transition-all hover:shadow-md">
+          <h2 className="mb-8 font-display text-2xl font-bold tracking-tight text-foreground">Resumo da Jornada</h2>
           
-          <div className="space-y-8 flex-1">
-             <div className="flex items-center justify-between p-6 rounded-3xl bg-muted/20 border border-border/20">
+          <div className="space-y-6 flex-1">
+             <div className="flex items-center justify-between p-7 rounded-[2rem] bg-muted/10 border border-border/20 group hover:bg-muted/20 transition-all">
                 <div>
-                   <div className="text-xs uppercase font-bold tracking-widest text-muted-foreground mb-1">Total Trabalhado</div>
-                   <div className="font-mono text-3xl font-bold">{formatDur(totalWorkedMs)}</div>
+                   <div className="text-[10px] uppercase font-black tracking-[0.2em] text-muted-foreground opacity-70 mb-2">Tempo Trabalhado</div>
+                   <div className="font-mono text-4xl font-black text-foreground">{formatDur(totalWorkedMs)}</div>
                 </div>
-                <div className="h-12 w-12 rounded-2xl bg-primary/10 grid place-items-center text-primary">
-                   <Clock className="h-6 w-6" />
+                <div className="h-14 w-14 rounded-2xl bg-primary/10 grid place-items-center text-primary group-hover:scale-110 transition-transform">
+                   <Clock className="h-7 w-7" />
                 </div>
              </div>
 
-             <div className="flex items-center justify-between p-6 rounded-3xl bg-muted/20 border border-border/20">
+             <div className="flex items-center justify-between p-7 rounded-[2rem] bg-muted/10 border border-border/20 group hover:bg-muted/20 transition-all">
                 <div>
-                   <div className="text-xs uppercase font-bold tracking-widest text-muted-foreground mb-1">Saldo do Dia</div>
+                   <div className="text-[10px] uppercase font-black tracking-[0.2em] text-muted-foreground opacity-70 mb-2">Saldo do Dia</div>
                    <div
-                    className={`font-mono text-3xl font-bold ${
+                    className={`font-mono text-4xl font-black ${
                       balance >= 0 ? "text-success" : "text-warning"
                     }`}
                    >
                     {balance >= 0 ? "+" : "-"}{formatDur(Math.abs(balance))}
                    </div>
                 </div>
-                <div className={`h-12 w-12 rounded-2xl grid place-items-center ${balance >= 0 ? "bg-success/10 text-success" : "bg-warning/10 text-warning"}`}>
-                   <CheckCircle2 className="h-6 w-6" />
+                <div className={`h-14 w-14 rounded-2xl grid place-items-center group-hover:scale-110 transition-transform ${balance >= 0 ? "bg-success/10 text-success" : "bg-warning/10 text-warning"}`}>
+                   <CheckCircle2 className="h-7 w-7" />
                 </div>
              </div>
           </div>
