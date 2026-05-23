@@ -166,13 +166,13 @@ function AbonosPage() {
     <div className="space-y-8 animate-in fade-in duration-500">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <h1 className="font-display text-4xl font-bold tracking-tight">Gestão de Abonos</h1>
-          <p className="text-muted-foreground mt-2">Registre e gerencie atestados, folgas e licenças.</p>
+          <h1 className="font-display text-5xl font-bold tracking-tight text-foreground">Gestão de Abonos</h1>
+          <p className="text-muted-foreground mt-3 text-xl font-medium">Registre e gerencie atestados, folgas e licenças.</p>
         </div>
         
         <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
           <DialogTrigger asChild>
-            <Button className="rounded-xl h-12 px-6 gap-2 font-bold shadow-lg shadow-primary/20">
+            <Button size="lg" className="rounded-2xl shadow-xl shadow-primary/20 font-black uppercase tracking-widest text-xs px-8 h-14">
               <Plus className="h-5 w-5" /> Novo Abono
             </Button>
           </DialogTrigger>
@@ -242,8 +242,8 @@ function AbonosPage() {
         </Dialog>
       </div>
 
-      <div className="glass-card p-4 rounded-2xl flex items-center gap-4 border border-border/40">
-        <Search className="h-5 w-5 text-muted-foreground ml-2" />
+      <div className="glass-card p-5 rounded-[2rem] flex items-center gap-5 border border-border/40 shadow-sm transition-all hover:border-primary/20">
+        <Search className="h-6 w-6 text-primary ml-3" />
         <Input 
           placeholder="Pesquisar por colaborador ou motivo..." 
           value={search}
@@ -252,7 +252,7 @@ function AbonosPage() {
         />
       </div>
 
-      <div className="glass-card overflow-hidden rounded-[2rem] border border-border/40">
+      <div className="glass-card overflow-hidden rounded-[2.5rem] border border-border/40 shadow-sm transition-all hover:shadow-md">
         {isLoading ? (
           <div className="p-16 text-center text-sm text-muted-foreground animate-pulse">Carregando registros...</div>
         ) : !filteredAbsences?.length ? (
