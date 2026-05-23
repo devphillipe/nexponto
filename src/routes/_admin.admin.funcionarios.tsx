@@ -273,3 +273,121 @@ function NewEmployeeForm({ onDone }: { onDone: () => void }) {
     </form>
   );
 }
+
+function EditEmployeeDialog({ employee, onDone }: { employee: any, onDone: () => void }) {
+  const [open, setOpen] = useState(false);
+  const updateFn = useServerFn(updateEmployee);
+  const [loading, setLoading] = useState(false);
+  const [form, setForm] = useState({
+    full_name: employee.full_name || "",
+    email: employee.email || "",
+    password: "",
+    cpf: employee.cpf || "",
+    phone: employee.phone || "",
+    position: employee.position || "",
+    department: employee.department || "",
+    hire_date: employee.hire_date || "",
+    daily_hours: employee.daily_hours ? String(employee.daily_hours) : "",
+  });
+
+  function up<K extends keyof typeof form>(k: K, v: string) {
+    setForm((f) => ({ ...f, [k]: v }));
+  }
+
+  async function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await updateFn({
+        data: {
+          id: employee.id,
+          full_name: form.full_name,
+          email: form.email,
+          password: form.password || null,
+          cpf: form.cpf || null,
+          phone: form.phone || null,
+          position: form.position || null,
+          department: form.department || null,
+          hire_date: form.hire_date || null,
+          daily_hours: form.daily_hours ? Number(form.daily_hours) : null,
+        },
+      });
+      toast.success("Dados do funcionário atualizados!");
+      setOpen(false);
+      onDone();
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-primary/10 hover:text-primary">
+          <Edit2 className="h-4 w-4" />
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="max-w-2xl p-0 overflow-hidden bg-background border-primary/20 rounded-[2rem]">
+        <div className="bg-primary/5 p-8 border-b border-primary/10">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-display font-bold">Editar Colaborador</DialogTitle>
+            <p className="text-muted-foreground text-sm mt-1">Atualize os dados cadastrais e credenciais do funcionário.</p>
+          </DialogHeader>
+        </div>
+        <div className="p-8">
+          <form onSubmit={onSubmit} className="space-y-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="edit-fn">Nome completo *</Label>
+              <Input id="edit-fn" required value={form.full_name} onChange={(e) => up("full_name", e.target.value)} />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="edit-em">E-mail (login) *</Label>
+                <Input id="edit-em" type="email" required value={form.email} onChange={(e) => up("email", e.target.value)} />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="edit-pw">Nova Senha (deixe em branco para manter)</Label>
+                <Input id="edit-pw" type="text" minLength={8} value={form.password} onChange={(e) => up("password", e.target.value)} />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="edit-cpf">CPF</Label>
+                <Input id="edit-cpf" value={form.cpf} onChange={(e) => up("cpf", e.target.value)} />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="edit-phone">Telefone</Label>
+                <Input id="edit-phone" value={form.phone} onChange={(e) => up("phone", e.target.value)} />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="edit-pos">Cargo</Label>
+                <Input id="edit-pos" value={form.position} onChange={(e) => up("position", e.target.value)} />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="edit-dep">Departamento</Label>
+                <Input id="edit-dep" value={form.department} onChange={(e) => up("department", e.target.value)} />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="edit-hd">Admissão</Label>
+                <Input id="edit-hd" type="date" value={form.hire_date} onChange={(e) => up("hire_date", e.target.value)} />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="edit-dh">Jornada diária (h)</Label>
+                <Input id="edit-dh" type="number" step="0.5" min="1" max="24" placeholder="Padrão do escritório" value={form.daily_hours} onChange={(e) => up("daily_hours", e.target.value)} />
+              </div>
+            </div>
+            <Button type="submit" disabled={loading} className="w-full mt-4">
+              {loading ? "Salvando..." : "Salvar Alterações"}
+            </Button>
+          </form>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
