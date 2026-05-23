@@ -114,20 +114,26 @@ function Dashboard() {
            </div>
            
            <div className="space-y-6">
-              {[1, 2, 3].map((item) => (
-                <div key={item} className="flex items-center gap-4 p-4 rounded-2xl bg-muted/20 border border-border/40 hover:bg-muted/30 transition-colors cursor-default">
-                   <div className="h-12 w-12 rounded-xl bg-primary/10 grid place-items-center font-bold text-primary">
-                      {item === 1 ? "JD" : item === 2 ? "MA" : "RS"}
-                   </div>
-                   <div className="flex-1 min-w-0">
-                      <div className="font-bold text-sm">Registro de Ponto - {item === 1 ? "João Silva" : item === 2 ? "Maria Santos" : "Ricardo Oliveira"}</div>
-                      <div className="text-xs text-muted-foreground">Entrada registrada às 08:0{item} AM</div>
-                   </div>
-                   <div className="text-xs font-bold text-success bg-success/10 px-3 py-1 rounded-full">
+              {!stats?.recentActivities?.length ? (
+                <div className="text-center py-10 text-muted-foreground">Nenhuma atividade recente.</div>
+              ) : (
+                stats.recentActivities.map((item: any) => (
+                  <div key={item.id} className="flex items-center gap-4 p-4 rounded-2xl bg-muted/20 border border-border/40 hover:bg-muted/30 transition-colors cursor-default">
+                    <div className="h-12 w-12 rounded-xl bg-primary/10 grid place-items-center font-bold text-primary">
+                      {item.employees?.full_name?.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2)}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-bold text-sm">Registro de Ponto - {item.employees?.full_name}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {TYPE_LABEL[item.entry_type]} registrado às {format(new Date(item.entry_at), "HH:mm 'de' dd/MM", { locale: ptBR })}
+                      </div>
+                    </div>
+                    <div className="text-xs font-bold text-success bg-success/10 px-3 py-1 rounded-full">
                       Sincronizado
-                   </div>
-                </div>
-              ))}
+                    </div>
+                  </div>
+                ))
+              )}
            </div>
         </div>
 
