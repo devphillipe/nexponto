@@ -122,51 +122,12 @@ function EmployeesPage() {
             </thead>
             <tbody className="divide-y divide-border/20">
               {filtered.map((e: any) => (
-                <tr key={e.id} className="hover:bg-muted/10 transition-colors group">
-                  <td className="px-8 py-5">
-                    <div className="flex items-center gap-4">
-                       <div className="h-10 w-10 rounded-xl bg-primary/10 border border-primary/10 grid place-items-center font-bold text-primary group-hover:scale-110 transition-transform">
-                          {e.full_name.charAt(0)}
-                       </div>
-                       <div>
-                          <div className="font-bold text-sm leading-tight">{e.full_name}</div>
-                          <div className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1.5 font-medium">
-                             <Mail className="h-3 w-3" /> {e.email}
-                          </div>
-                       </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-5">
-                    <div className="space-y-0.5">
-                       <div className="font-semibold text-xs flex items-center gap-1.5">
-                          <Briefcase className="h-3 w-3 text-muted-foreground" /> {e.position || "Sem Cargo"}
-                       </div>
-                       <div className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">{e.department || "Geral"}</div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-5">
-                     <span className="px-3 py-1 bg-muted/50 rounded-lg text-xs font-bold border border-border/20">
-                        {e.daily_hours ? `${e.daily_hours} horas` : "Padrão (8h)"}
-                     </span>
-                  </td>
-                  <td className="px-8 py-5 text-right">
-                    <div className="flex items-center justify-end gap-3">
-                       <EditEmployeeDialog 
-                         employee={e} 
-                         onDone={() => qc.invalidateQueries({ queryKey: ["employees"] })} 
-                       />
-                       <div className="h-6 w-[1px] bg-border/40 mx-1"></div>
-                       <span className={`text-[10px] font-bold uppercase tracking-widest ${e.active ? "text-success" : "text-muted-foreground"}`}>
-                          {e.active ? "Ativo" : "Inativo"}
-                       </span>
-                       <Switch
-                         checked={e.active}
-                         onCheckedChange={(v) => handleToggle(e.id, v)}
-                         className="data-[state=checked]:bg-success"
-                       />
-                    </div>
-                  </td>
-                </tr>
+                <EmployeeTableRow 
+                  key={e.id} 
+                  e={e} 
+                  handleToggle={handleToggle} 
+                  qc={qc} 
+                />
               ))}
             </tbody>
             </table>

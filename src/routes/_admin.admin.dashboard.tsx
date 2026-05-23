@@ -42,7 +42,7 @@ function Dashboard() {
           .eq("active", true),
         supabase
           .from("time_entries")
-          .select("employee_id", { count: "exact", head: true })
+          .select("id", { count: "exact", head: true })
           .eq("tenant_id", profile!.tenant_id)
           .eq("entry_date", today),
         supabase
@@ -50,7 +50,7 @@ function Dashboard() {
           .select("id, entry_at, entry_type, employees(full_name)")
           .eq("tenant_id", profile!.tenant_id)
           .order("entry_at", { ascending: false })
-          .limit(5),
+          .limit(10),
       ]);
       return {
         total: emps.count ?? 0,
