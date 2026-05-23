@@ -14,6 +14,7 @@ import { ptBR } from "date-fns/locale";
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_admin/admin/relatorios")({
   head: () => ({ meta: [{ title: "Relatórios — NexPonto Admin" }] }),
@@ -85,7 +86,7 @@ function RelatoriosPage() {
           const dayEntries = empEntries.filter(e => e.entry_date === dateStr)
             .sort((a, b) => new Date(a.entry_at).getTime() - new Date(b.entry_at).getTime());
           
-          const absence = empAbsences.find(a => a.absence_date === dateStr);
+          const absence = absences?.filter(a => a.employee_id === emp.id).find(a => a.absence_date === dateStr);
           
           let workedMinutes = 0;
           if (dayEntries.length >= 2) {
@@ -102,10 +103,21 @@ function RelatoriosPage() {
           totalWorkedMinutes += workedMinutes;
           totalExpectedMinutes += expectedMinutes;
 
+          // Split entries into 4 categories
+          const entrada = dayEntries.find(e => e.entry_type === 'entrada')?.entry_at;
+          const saidaAlmoco = dayEntries.find(e => e.entry_type === 'saida_almoco')?.entry_at;
+          const retornoAlmoco = dayEntries.find(e => e.entry_type === 'retorno_almoco')?.entry_at;
+          const saidaFinal = dayEntries.find(e => e.entry_type === 'saida')?.entry_at;
+
+          const formatTime = (iso: string | undefined) => iso ? format(new Date(iso), "HH:mm") : "-";
+
           return {
             date: format(day, "dd/MM/yyyy"),
             weekday: format(day, "EEEE", { locale: ptBR }),
-            entries: dayEntries.map(e => format(new Date(e.entry_at), "HH:mm")).join(" | "),
+            entrada: formatTime(entrada),
+            saidaAlmoco: formatTime(saidaAlmoco),
+            retornoAlmoco: formatTime(retornoAlmoco),
+            saidaFinal: formatTime(saidaFinal),
             worked: Math.floor(workedMinutes / 60) + ":" + String(Math.floor(workedMinutes % 60)).padStart(2, "0"),
             status: absence ? `Abono: ${absence.reason}` : (workedMinutes > 0 ? "Presente" : (isWeekend ? "Fim de Semana" : "Falta")),
           };
@@ -128,8 +140,11 @@ function RelatoriosPage() {
           const ws = XLSX.utils.json_to_sheet(rd.dailyReports.map(d => ({
             "Data": d.date,
             "Dia": d.weekday,
-            "Registros": d.entries,
-            "Horas Trabalhadas": d.worked,
+            "Entrada": d.entrada,
+            "Saída Almoço": d.saidaAlmoco,
+            "Retorno Almoço": d.retornoAlmoco,
+            "Saída Final": d.saidaFinal,
+            "Total": d.worked,
             "Status": d.status
           })));
           
@@ -147,40 +162,56 @@ function RelatoriosPage() {
       } else {
         const doc = new jsPDF();
         
-        // Get tenant info for header
-        const { data: tenant } = await supabase
-          .from("tenants")
-          .select("name, logo_url")
-          .eq("id", profile!.tenant_id)
-          .single();
-
-        const loadImage = (url: string): Promise<HTMLImageElement> => {
+        const loadImage = (url: string): Promise<string | null> => {
           return new Promise((resolve) => {
             const img = new Image();
-            img.crossOrigin = "Anonymous";
-            img.onload = () => resolve(img);
-            img.onerror = () => resolve(null as any);
+            img.crossOrigin = "anonymous";
+            img.onload = () => {
+              const canvas = document.createElement("canvas");
+              canvas.width = img.width;
+              canvas.height = img.height;
+              const ctx = canvas.getContext("2d");
+              if (!ctx) {
+                resolve(null);
+                return;
+              }
+              ctx.drawImage(img, 0, 0);
+              try {
+                const dataURL = canvas.toDataURL("image/png");
+                resolve(dataURL);
+              } catch (e) {
+                console.error("Error converting image to data URL", e);
+                resolve(null);
+              }
+            };
+            img.onerror = (e) => {
+              console.error("Error loading image for PDF", e);
+              resolve(null);
+            };
             img.src = url;
           });
         };
 
-        const logoImg = tenant?.logo_url ? await loadImage(tenant.logo_url) : null;
+        const logoDataUrl = profile?.tenant_logo_url ? await loadImage(profile.tenant_logo_url) : null;
 
         reportData.forEach((rd, index) => {
           if (index > 0) doc.addPage();
           
-          // Header with Logo
-          if (logoImg) {
-            doc.addImage(logoImg, "PNG", 14, 10, 20, 20);
+          if (logoDataUrl) {
+            try {
+              doc.addImage(logoDataUrl, "PNG", 14, 10, 20, 20);
+            } catch (e) {
+              console.error("Could not add image to PDF", e);
+            }
           }
           
           doc.setTextColor(33, 150, 243);
           doc.setFontSize(22);
-          doc.text("Relatório de Ponto", logoImg ? 40 : 14, 20);
+          doc.text("Relatório de Ponto", logoDataUrl ? 40 : 14, 20);
           
           doc.setTextColor(100, 100, 100);
           doc.setFontSize(10);
-          doc.text(tenant?.name || "NexPonto", logoImg ? 40 : 14, 28);
+          doc.text(profile?.tenant_name || "NexPonto", logoDataUrl ? 40 : 14, 28);
           
           doc.setDrawColor(230, 230, 230);
           doc.line(14, 35, 196, 35);
@@ -206,32 +237,37 @@ function RelatoriosPage() {
           doc.setFontSize(10);
           doc.text("Saldo de Horas", 140, 68);
           doc.setFontSize(14);
-          const diffValue = rd.balance.startsWith("+") ? 1 : -1;
-          doc.setTextColor(diffValue >= 0 ? 76 : 244, diffValue >= 0 ? 175 : 67, diffValue >= 0 ? 80 : 54);
+          const isNegative = rd.balance.startsWith("-");
+          doc.setTextColor(isNegative ? 244 : 76, isNegative ? 67 : 175, isNegative ? 54 : 80);
           doc.text(rd.balance, 140, 76);
 
-          const tableBody = rd.dailyReports.map(d => {
-            const entryLines = d.entries.split(" | ");
-            return [d.date, d.weekday, entryLines.join("\n"), d.worked, d.status];
-          });
+          const tableBody = rd.dailyReports.map(d => [
+            d.date, 
+            d.entrada, 
+            d.saidaAlmoco, 
+            d.retornoAlmoco, 
+            d.saidaFinal, 
+            d.worked, 
+            d.status
+          ]);
 
           autoTable(doc, {
             startY: 90,
-            head: [["Data", "Dia", "Registros de Ponto", "Total", "Status"]],
+            head: [["Data", "Entrada", "Almoço (S)", "Almoço (R)", "Saída", "Total", "Status"]],
             body: tableBody,
             theme: "grid",
-            headStyles: { fillColor: [33, 150, 243], fontSize: 10, halign: 'center' },
-            styles: { fontSize: 9, cellPadding: 4, valign: 'middle' },
+            headStyles: { fillColor: [33, 150, 243], fontSize: 9, halign: 'center' },
+            styles: { fontSize: 8, cellPadding: 2, valign: 'middle', halign: 'center' },
             columnStyles: {
-              2: { cellWidth: 40, halign: 'center' },
-              3: { halign: 'center' }
+              0: { cellWidth: 20 },
+              6: { cellWidth: 40, halign: 'left' }
             },
             didParseCell: (data) => {
-              if (data.column.index === 4 && data.cell.text[0]?.includes("Abono")) {
+              if (data.column.index === 6 && data.cell.text[0]?.includes("Abono")) {
                 data.cell.styles.textColor = [33, 150, 243];
                 data.cell.styles.fontStyle = "bold";
               }
-              if (data.column.index === 4 && data.cell.text[0] === "Falta") {
+              if (data.column.index === 6 && data.cell.text[0] === "Falta") {
                 data.cell.styles.textColor = [244, 67, 54];
               }
             }
@@ -239,8 +275,10 @@ function RelatoriosPage() {
         });
         doc.save(`Relatorio_Ponto_${month}.pdf`);
       }
-    } catch (err) {
+      toast.success("Relatório gerado com sucesso!");
+    } catch (err: any) {
       console.error(err);
+      toast.error("Erro ao gerar relatório: " + err.message);
     } finally {
       setLoading(false);
     }
@@ -316,15 +354,15 @@ function RelatoriosPage() {
              <ul className="text-sm text-muted-foreground space-y-3">
                <li className="flex items-start gap-2">
                  <div className="h-5 w-5 rounded-full bg-primary/20 flex items-center justify-center text-primary text-[10px] font-bold shrink-0">1</div>
-                 Relatórios em PDF incluem cores indicativas para saldo positivo (verde) e negativo (vermelho).
+                 Os relatórios agora separam Entrada, Saída de Almoço, Retorno de Almoço e Saída Final em colunas distintas.
                </li>
                <li className="flex items-start gap-2">
                  <div className="h-5 w-5 rounded-full bg-primary/20 flex items-center justify-center text-primary text-[10px] font-bold shrink-0">2</div>
-                 Abonos registrados no sistema são descontados automaticamente da carga horária esperada.
+                 Se o colaborador possuir menos ou mais registros, o sistema tentará encaixar os horários nos campos correspondentes por tipo.
                </li>
                <li className="flex items-start gap-2">
                  <div className="h-5 w-5 rounded-full bg-primary/20 flex items-center justify-center text-primary text-[10px] font-bold shrink-0">3</div>
-                 O arquivo Excel contém abas separadas para cada colaborador selecionado.
+                 O logo do seu escritório (definido no perfil) será exibido automaticamente no cabeçalho do PDF.
                </li>
              </ul>
           </div>

@@ -61,6 +61,8 @@ export function CommandMenu() {
     command();
   };
 
+  const isMac = typeof window !== 'undefined' && /Mac|iPod|iPhone|iPad/.test(window.navigator.platform);
+
   return (
     <>
       <button
@@ -70,7 +72,7 @@ export function CommandMenu() {
         <Search className="h-4 w-4" />
         <span>Pesquisar...</span>
         <kbd className="pointer-events-none absolute right-3 hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
-          <span className="text-xs">⌘</span>K
+          <span className="text-xs">{isMac ? '⌘' : 'Ctrl'}</span>K
         </kbd>
       </button>
 
