@@ -1,0 +1,252 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useProfile } from "@/lib/auth";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { toast } from "sonner";
+import { FileText, Plus, Search, Calendar as CalendarIcon, User, Trash2, FileCheck } from "lucide-react";
+import { useState } from "react";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
+
+export const Route = createFileRoute("/_admin/admin/abonos")({
+  head: () => ({ meta: [{ title: "Abonos — NexPonto Admin" }] }),
+  component: AbonosPage,
+});
+
+const REASONS = [
+  { value: "atestado", label: "Atestado Médico" },
+  { value: "folga", label: "Folga" },
+  { value: "feriado", label: "Feriado" },
+  { value: "licenca", label: "Licença" },
+  { value: "falta_justificada", label: "Falta Justificada" },
+  { value: "outro", label: "Outro" },
+];
+
+function AbonosPage() {
+  const { data: profile } = useProfile();
+  const queryClient = useQueryClient();
+  const [isAddOpen, setIsAddOpen] = useState(false);
+  const [search, setSearch] = useState("");
+
+  const { data: employees } = useQuery({
+    queryKey: ["employees"],
+    enabled: !!profile?.tenant_id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("employees")
+        .select("id, full_name")
+        .eq("tenant_id", profile!.tenant_id)
+        .eq("active", true);
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const { data: absences, isLoading } = useQuery({
+    queryKey: ["absences", profile?.tenant_id],
+    enabled: !!profile?.tenant_id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("absences")
+        .select("*, employees(full_name)")
+        .eq("tenant_id", profile!.tenant_id)
+        .order("absence_date", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const addMutation = useMutation({
+    mutationFn: async (newData: any) => {
+      const { error } = await supabase
+        .from("absences")
+        .insert([{
+          ...newData,
+          tenant_id: profile!.tenant_id,
+          approved_by: profile!.id
+        }]);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["absences"] });
+      setIsAddOpen(false);
+      toast.success("Abono registrado com sucesso!");
+    },
+    onError: (error) => {
+      toast.error("Erro ao registrar abono: " + error.message);
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from("absences")
+        .delete()
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["absences"] });
+      toast.success("Abono removido com sucesso!");
+    },
+  });
+
+  const filteredAbsences = absences?.filter(a => 
+    a.employees?.full_name?.toLowerCase().includes(search.toLowerCase()) ||
+    a.reason.toLowerCase().includes(search.toLowerCase())
+  );
+
+  return (
+    <div className="space-y-8 animate-in fade-in duration-500">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div>
+          <h1 className="font-display text-4xl font-bold tracking-tight">Gestão de Abonos</h1>
+          <p className="text-muted-foreground mt-2">Registre e gerencie atestados, folgas e licenças.</p>
+        </div>
+        
+        <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
+          <DialogTrigger asChild>
+            <Button className="rounded-xl h-12 px-6 gap-2 font-bold shadow-lg shadow-primary/20">
+              <Plus className="h-5 w-5" /> Novo Abono
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[500px] rounded-[2rem] border-none glass-card p-0 overflow-hidden shadow-2xl">
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              const formData = new FormData(e.currentTarget);
+              addMutation.mutate({
+                employee_id: formData.get("employee_id"),
+                absence_date: formData.get("date"),
+                reason: formData.get("reason"),
+                description: formData.get("description"),
+              });
+            }}>
+              <DialogHeader className="p-8 pb-4">
+                <DialogTitle className="text-2xl font-bold text-primary flex items-center gap-2">
+                  <FileCheck className="h-6 w-6" /> Registrar Abono
+                </DialogTitle>
+                <DialogDescription>Preencha os dados da falta justificada ou abono.</DialogDescription>
+              </DialogHeader>
+              <div className="p-8 pt-4 space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="employee_id">Colaborador</Label>
+                  <Select name="employee_id" required>
+                    <SelectTrigger className="rounded-xl h-11 border-border/40 bg-background/50">
+                      <SelectValue placeholder="Selecione o funcionário" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {employees?.map(emp => (
+                        <SelectItem key={emp.id} value={emp.id}>{emp.full_name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="date">Data</Label>
+                    <Input id="date" name="date" type="date" required className="rounded-xl h-11 border-border/40 bg-background/50" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="reason">Motivo</Label>
+                    <Select name="reason" defaultValue="atestado" required>
+                      <SelectTrigger className="rounded-xl h-11 border-border/40 bg-background/50">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {REASONS.map(r => (
+                          <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="description">Observações / Justificativa</Label>
+                  <Input id="description" name="description" placeholder="Ex: Atestado médico de 2 dias" className="rounded-xl h-11 border-border/40 bg-background/50" />
+                </div>
+              </div>
+              <DialogFooter className="p-8 bg-muted/20 border-t border-border/40">
+                <Button type="button" variant="ghost" onClick={() => setIsAddOpen(false)} className="rounded-xl">Cancelar</Button>
+                <Button type="submit" disabled={addMutation.isPending} className="rounded-xl px-8 font-bold">
+                  {addMutation.isPending ? "Salvando..." : "Salvar Abono"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      <div className="glass-card p-4 rounded-2xl flex items-center gap-4 border border-border/40">
+        <Search className="h-5 w-5 text-muted-foreground ml-2" />
+        <Input 
+          placeholder="Pesquisar por colaborador ou motivo..." 
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          className="bg-transparent border-none text-base focus-visible:ring-0"
+        />
+      </div>
+
+      <div className="glass-card overflow-hidden rounded-[2rem] border border-border/40">
+        {isLoading ? (
+          <div className="p-16 text-center text-sm text-muted-foreground animate-pulse">Carregando registros...</div>
+        ) : !filteredAbsences?.length ? (
+          <div className="p-20 text-center space-y-4">
+             <div className="h-16 w-16 bg-muted/30 rounded-full grid place-items-center mx-auto">
+                <FileText className="h-8 w-8 text-muted-foreground" />
+             </div>
+             <p className="text-muted-foreground">Nenhum abono encontrado.</p>
+          </div>
+        ) : (
+          <table className="w-full text-sm">
+            <thead className="border-b border-border/40 bg-muted/20 text-left text-[11px] uppercase font-bold tracking-widest text-muted-foreground">
+              <tr>
+                <th className="px-8 py-4">Data</th>
+                <th className="px-6 py-4">Colaborador</th>
+                <th className="px-6 py-4">Motivo</th>
+                <th className="px-6 py-4">Observação</th>
+                <th className="px-6 py-4 text-right">Ações</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border/20">
+              {filteredAbsences.map((a: any) => (
+                <tr key={a.id} className="hover:bg-muted/10 transition-colors">
+                  <td className="px-8 py-5 font-bold text-primary">
+                    {format(new Date(a.absence_date + "T12:00:00"), "dd/MM/yyyy", { locale: ptBR })}
+                  </td>
+                  <td className="px-6 py-5 font-semibold text-foreground">{a.employees?.full_name}</td>
+                  <td className="px-6 py-5">
+                    <span className="px-3 py-1 rounded-full bg-accent/10 text-accent text-xs font-bold uppercase tracking-wider">
+                      {REASONS.find(r => r.value === a.reason)?.label || a.reason}
+                    </span>
+                  </td>
+                  <td className="px-6 py-5 text-muted-foreground italic">
+                    {a.description || "-"}
+                  </td>
+                  <td className="px-6 py-5 text-right">
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      onClick={() => {
+                        if (confirm("Tem certeza que deseja excluir este abono?")) {
+                          deleteMutation.mutate(a.id);
+                        }
+                      }}
+                      className="text-destructive/60 hover:text-destructive hover:bg-destructive/10 rounded-xl"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </div>
+  );
+}
