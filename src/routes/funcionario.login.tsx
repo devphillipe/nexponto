@@ -64,16 +64,16 @@ function FuncLogin() {
         <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-accent/20 blur-[120px] rounded-full"></div>
       </div>
 
-      <div className="w-full max-w-lg space-y-12 animate-in fade-in zoom-in-95 duration-1000 slide-in-from-bottom-8">
-        <div className="text-center space-y-4">
-           <Link to="/" className="inline-flex mx-auto mb-6 hover:scale-105 transition-transform duration-500">
-              <Logo size={32} wordmarkClassName="text-3xl" />
+      <div className="w-full max-w-lg space-y-8 sm:space-y-12 animate-in fade-in zoom-in-95 duration-1000 slide-in-from-bottom-8 relative z-10">
+        <div className="text-center space-y-3 sm:space-y-4 px-4">
+           <Link to="/" className="inline-flex mx-auto mb-4 sm:mb-6 hover:scale-105 transition-transform duration-500">
+              <Logo size={28} wordmarkClassName="text-2xl sm:text-3xl" />
            </Link>
-           <h1 className="text-5xl font-black tracking-tighter text-foreground drop-shadow-sm">Portal do Funcionário</h1>
-           <p className="text-muted-foreground text-lg font-medium opacity-80">Bem-vindo de volta! Acesse para registrar seu ponto.</p>
+           <h1 className="text-3xl sm:text-5xl font-black tracking-tighter text-foreground drop-shadow-sm">Portal do Funcionário</h1>
+           <p className="text-muted-foreground text-base sm:text-lg font-medium opacity-80">Acesse para registrar seu ponto.</p>
         </div>
 
-        <div className="glass-card rounded-[3rem] p-12 border border-primary/10 shadow-2xl relative bg-background/40 backdrop-blur-2xl">
+        <div className="glass-card rounded-3xl sm:rounded-[3rem] p-8 sm:p-12 border border-primary/10 shadow-2xl relative bg-background/40 backdrop-blur-2xl mx-4 sm:mx-0">
           <div className="absolute -top-7 left-1/2 -translate-x-1/2 h-14 w-14 rounded-2xl bg-primary text-primary-foreground border border-primary shadow-xl shadow-primary/20 grid place-items-center">
              <Fingerprint className="h-7 w-7" />
           </div>
