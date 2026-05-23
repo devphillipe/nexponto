@@ -61,25 +61,25 @@ function EmployeesPage() {
   }, [employees, searchTerm]);
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+    <div className="space-y-6 md:space-y-8 animate-in fade-in duration-500">
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
         <div>
-          <h1 className="font-display text-5xl font-bold tracking-tight text-foreground">Equipe</h1>
-          <p className="text-muted-foreground mt-3 text-xl font-medium">Gerencie todos os colaboradores do seu escritório.</p>
+          <h1 className="font-display text-3xl md:text-5xl font-bold tracking-tight text-foreground">Equipe</h1>
+          <p className="text-muted-foreground mt-2 md:mt-3 text-base md:text-xl font-medium">Gerencie os colaboradores do seu escritório.</p>
         </div>
-        <div className="flex gap-4">
-          <div className="relative hidden sm:block">
+        <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
+          <div className="relative w-full sm:w-auto">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-primary" />
             <Input 
-              placeholder="Buscar por nome ou e-mail..." 
+              placeholder="Buscar colaborador..." 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-12 h-14 w-80 bg-muted/10 border-border/40 rounded-2xl transition-all hover:border-primary/20 focus:w-96 font-medium"
+              className="pl-12 h-12 md:h-14 w-full sm:w-64 md:w-80 bg-muted/10 border-border/40 rounded-xl md:rounded-2xl transition-all hover:border-primary/20 focus:sm:w-80 md:focus:w-96 font-medium"
             />
           </div>
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-              <Button size="lg" className="rounded-2xl shadow-xl shadow-primary/20 font-black uppercase tracking-widest text-xs px-8 h-14">
+              <Button size="lg" className="rounded-xl md:rounded-2xl shadow-xl shadow-primary/20 font-black uppercase tracking-widest text-[10px] md:text-xs px-6 md:px-8 h-12 md:h-14 w-full sm:w-auto">
                 <Plus className="mr-2 h-5 w-5" /> Novo Colaborador
               </Button>
             </DialogTrigger>
@@ -111,7 +111,8 @@ function EmployeesPage() {
              </p>
           </div>
         ) : (
-          <table className="w-full text-sm">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm min-w-[800px]">
             <thead className="border-b border-border/40 bg-muted/20 text-left text-[11px] uppercase font-bold tracking-widest text-muted-foreground">
               <tr>
                 <th className="px-8 py-4">Nome & Contato</th>
@@ -169,7 +170,8 @@ function EmployeesPage() {
                 </tr>
               ))}
             </tbody>
-          </table>
+            </table>
+          </div>
         )}
       </div>
     </div>

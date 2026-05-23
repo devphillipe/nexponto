@@ -1,11 +1,12 @@
 import { createFileRoute, Link, Outlet, redirect, useNavigate, useLocation } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useProfile } from "@/lib/auth";
-import { LayoutDashboard, Users, Clock, LogOut, Bell, Search, Settings, FileText } from "lucide-react";
+import { LayoutDashboard, Users, Clock, LogOut, Bell, Search, Settings, FileText, Menu, X } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import { CommandMenu } from "@/components/CommandMenu";
-import { memo } from "react";
+import { memo, useState } from "react";
+import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 
 export const Route = createFileRoute("/_admin")({
   beforeLoad: async () => {
@@ -36,6 +37,7 @@ function AdminLayout() {
   const { data: profile } = useProfile();
   const navigate = useNavigate();
   const loc = useLocation();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   async function logout() {
     await supabase.auth.signOut();
@@ -43,8 +45,9 @@ function AdminLayout() {
   }
 
   return (
-    <div className="flex min-h-screen bg-background/50">
-      <aside className="hidden w-72 shrink-0 flex-col border-r border-border/40 bg-background/40 backdrop-blur-2xl p-8 md:flex sticky top-0 h-screen transition-all duration-300">
+    <div className="flex min-h-screen bg-background/50 overflow-x-hidden">
+      {/* Sidebar Desktop */}
+      <aside className="hidden w-72 shrink-0 flex-col border-r border-border/40 bg-background/40 backdrop-blur-2xl p-8 lg:flex sticky top-0 h-screen transition-all duration-300">
         <div className="mb-10 flex items-center gap-3 px-1">
           <Logo size={24} showWordmark={false} />
           <div className="min-w-0">
@@ -109,24 +112,94 @@ function AdminLayout() {
         </div>
       </aside>
 
-      <div className="flex-1 flex flex-col min-w-0">
-        <header className="h-24 border-b border-border/40 flex items-center justify-between px-8 md:px-12 bg-background/60 backdrop-blur-2xl sticky top-0 z-30 transition-all duration-300">
-           <CommandMenu />
-            <div className="flex items-center gap-6 ml-auto">
-              <div className="h-10 w-[1px] bg-border mx-2"></div>
-              <div className="flex items-center gap-4">
+      <div className="flex-1 flex flex-col min-w-0 max-w-full">
+        <header className="h-20 md:h-24 border-b border-border/40 flex items-center justify-between px-4 md:px-8 lg:px-12 bg-background/60 backdrop-blur-2xl sticky top-0 z-30 transition-all duration-300">
+           <div className="flex items-center gap-4 lg:hidden">
+             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+               <SheetTrigger asChild>
+                 <Button variant="ghost" size="icon" className="h-10 w-10">
+                   <Menu className="h-6 w-6" />
+                 </Button>
+               </SheetTrigger>
+               <SheetContent side="left" className="p-0 w-80 border-r border-border/40 bg-background/95 backdrop-blur-2xl">
+                 <div className="flex flex-col h-full p-6">
+                    <SheetHeader className="mb-10 text-left px-2">
+                      <div className="flex items-center gap-3">
+                        <Logo size={24} showWordmark={false} />
+                        <SheetTitle className="text-xl font-bold tracking-tight">NexPonto</SheetTitle>
+                      </div>
+                    </SheetHeader>
+
+                    <nav className="flex flex-1 flex-col gap-2">
+                      {nav.map((item) => {
+                        const active = loc.pathname.startsWith(item.to);
+                        return (
+                          <Link
+                            key={item.to}
+                            to={item.to}
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className={`group flex items-center gap-3 rounded-2xl px-5 py-3.5 text-sm font-semibold transition-all duration-300 ${
+                              active
+                                ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-[1.02] border border-primary/20"
+                                : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                            }`}
+                          >
+                            <item.icon className={`h-4.5 w-4.5 transition-colors duration-300 ${active ? "text-primary-foreground" : "group-hover:text-primary"}`} />
+                            {item.label}
+                          </Link>
+                        );
+                      })}
+                    </nav>
+
+                    <div className="mt-auto space-y-4 pt-6 border-t border-border/40">
+                      <Link 
+                        to="/admin/configuracoes"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className={`flex w-full items-center gap-3 rounded-2xl px-5 py-3.5 text-sm font-semibold transition-all duration-300 ${
+                          loc.pathname.startsWith("/admin/configuracoes")
+                            ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
+                            : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                        }`}
+                      >
+                        <Settings className="h-4.5 w-4.5" /> Configurações
+                      </Link>
+                      <button 
+                        onClick={() => { setIsMobileMenuOpen(false); logout(); }}
+                        className="flex w-full items-center gap-3 rounded-2xl px-5 py-3.5 text-sm font-semibold text-destructive/80 hover:bg-destructive/10 hover:text-destructive transition-all duration-300"
+                      >
+                        <LogOut className="h-4.5 w-4.5" /> Sair
+                      </button>
+                    </div>
+                 </div>
+               </SheetContent>
+             </Sheet>
+             <div className="md:hidden">
+                <Logo size={20} showWordmark={false} />
+             </div>
+           </div>
+
+           <div className="hidden md:block flex-1 max-w-xl">
+             <CommandMenu />
+           </div>
+           
+            <div className="flex items-center gap-2 md:gap-6 ml-auto">
+              <div className="md:hidden">
+                 <CommandMenu />
+              </div>
+              <div className="h-8 w-[1px] bg-border mx-1 md:mx-2 hidden sm:block"></div>
+              <div className="flex items-center gap-2 md:gap-4">
                 <div className="text-right hidden sm:block">
-                  <div className="text-sm font-bold text-foreground leading-none mb-1">{profile?.full_name}</div>
-                  <div className="text-[10px] font-black uppercase tracking-widest text-primary/70">Administrador</div>
+                  <div className="text-xs md:text-sm font-bold text-foreground leading-none mb-1">{profile?.full_name?.split(' ')[0]}</div>
+                  <div className="text-[8px] md:text-[10px] font-black uppercase tracking-widest text-primary/70">Admin</div>
                 </div>
-                <div className="h-11 w-11 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 flex items-center justify-center font-bold text-primary shadow-sm">
+                <div className="h-9 w-9 md:h-11 md:w-11 rounded-xl md:rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 flex items-center justify-center font-bold text-primary shadow-sm text-xs md:text-base">
                   {profile?.full_name?.charAt(0)}
                 </div>
               </div>
             </div>
         </header>
         
-        <main className="flex-1 p-8 md:p-12 max-w-[1600px] mx-auto w-full animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <main className="flex-1 p-4 md:p-8 lg:p-12 max-w-[1600px] mx-auto w-full animate-in fade-in slide-in-from-bottom-4 duration-700 overflow-x-hidden">
           <Outlet />
         </main>
       </div>

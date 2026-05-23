@@ -158,21 +158,21 @@ function PontosPage() {
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+    <div className="space-y-6 md:space-y-8 animate-in fade-in duration-500">
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
         <div>
-          <h1 className="font-display text-5xl font-bold tracking-tight text-foreground">Registros de Ponto</h1>
-          <p className="text-muted-foreground mt-3 text-xl font-medium">Visualize, ajuste e audite todas as batidas em tempo real.</p>
+          <h1 className="font-display text-3xl md:text-5xl font-bold tracking-tight text-foreground">Registros de Ponto</h1>
+          <p className="text-muted-foreground mt-2 md:mt-3 text-base md:text-xl font-medium">Visualize e audite todas as batidas em tempo real.</p>
         </div>
         
-        <div className="flex items-center gap-3">
-          <div className="glass-card p-3 rounded-2xl flex items-center gap-4 h-14 border border-border/40 shadow-sm transition-all hover:border-primary/30">
-            <Calendar className="h-5 w-5 text-primary ml-3" />
+        <div className="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
+          <div className="glass-card p-2 md:p-3 rounded-xl md:rounded-2xl flex items-center gap-4 h-12 md:h-14 border border-border/40 shadow-sm transition-all hover:border-primary/30 w-full sm:w-auto">
+            <Calendar className="h-4 md:h-5 w-4 md:w-5 text-primary ml-2 md:ml-3" />
             <Input 
               type="date" 
               value={date} 
               onChange={(e) => setDate(e.target.value)} 
-              className="bg-transparent border-none text-base font-bold focus-visible:ring-0 w-44 p-0 h-auto"
+              className="bg-transparent border-none text-sm md:text-base font-bold focus-visible:ring-0 w-full sm:w-40 md:w-44 p-0 h-auto"
             />
           </div>
 
@@ -181,7 +181,7 @@ function PontosPage() {
             if (!open) setEditingEntry(null);
           }}>
             <DialogTrigger asChild>
-              <Button size="lg" className="rounded-2xl shadow-xl shadow-primary/20 font-black uppercase tracking-widest text-xs px-8 h-14">
+              <Button size="lg" className="rounded-xl md:rounded-2xl shadow-xl shadow-primary/20 font-black uppercase tracking-widest text-[10px] md:text-xs px-6 md:px-8 h-12 md:h-14 w-full sm:w-auto">
                 <Plus className="h-5 w-5" /> Novo Registro
               </Button>
             </DialogTrigger>
@@ -272,28 +272,28 @@ function PontosPage() {
             const isExpanded = expandedEmployees.has(employeeName);
             const totalItems = group.entries.length + group.absences.length;
             return (
-              <div key={employeeName} className="glass-card overflow-hidden rounded-[2.5rem] border border-border/40 bg-background/20 backdrop-blur-xl shadow-sm transition-all duration-500 hover:shadow-md hover:border-primary/10">
+              <div key={employeeName} className="glass-card overflow-hidden rounded-2xl md:rounded-[2.5rem] border border-border/40 bg-background/20 backdrop-blur-xl shadow-sm transition-all duration-500 hover:shadow-md hover:border-primary/10">
                 <div 
-                  className="px-10 py-7 border-b border-border/20 bg-muted/5 flex items-center justify-between cursor-pointer group"
+                  className="px-6 md:px-10 py-5 md:py-7 border-b border-border/20 bg-muted/5 flex items-center justify-between cursor-pointer group"
                   onClick={() => toggleEmployee(employeeName)}
                 >
-                  <div className="flex items-center gap-6">
-                    <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-primary transition-transform group-hover:scale-105">
-                      {isExpanded ? <ChevronDown className="h-6 w-6" /> : <ChevronRight className="h-6 w-6" />}
+                  <div className="flex items-center gap-4 md:gap-6">
+                    <div className="h-10 md:h-14 w-10 md:w-14 rounded-xl md:rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-primary transition-transform group-hover:scale-105">
+                      {isExpanded ? <ChevronDown className="h-5 md:h-6 w-5 md:w-6" /> : <ChevronRight className="h-5 md:h-6 w-5 md:w-6" />}
                     </div>
                     <div>
-                      <h3 className="font-display text-2xl font-bold tracking-tight text-foreground">{employeeName}</h3>
-                      <div className="flex items-center gap-3 mt-1">
-                        <span className="text-xs font-black uppercase tracking-widest text-muted-foreground opacity-80">{totalItems} registro(s)</span>
+                      <h3 className="font-display text-lg md:text-2xl font-bold tracking-tight text-foreground">{employeeName}</h3>
+                      <div className="flex items-center gap-2 md:gap-3 mt-0.5 md:mt-1">
+                        <span className="text-[9px] md:text-xs font-black uppercase tracking-widest text-muted-foreground opacity-80">{totalItems} registro(s)</span>
                         <div className="h-1 w-1 rounded-full bg-border"></div>
-                        <span className="text-xs font-bold text-primary">Visualizar Detalhes</span>
+                        <span className="text-[9px] md:text-xs font-bold text-primary">Visualizar</span>
                       </div>
                     </div>
                   </div>
                 </div>
                 {isExpanded && (
                   <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
+                    <table className="w-full text-sm min-w-[600px]">
                       <thead className="bg-muted/5 text-left text-[10px] uppercase font-bold tracking-widest text-muted-foreground">
                         <tr>
                           <th className="px-8 py-4">Horário / Tipo</th>

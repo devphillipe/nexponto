@@ -320,23 +320,23 @@ function RelatoriosPage() {
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
-      <div className="mb-10">
-        <h1 className="font-display text-5xl font-bold tracking-tight text-foreground">Relatórios</h1>
-        <p className="text-muted-foreground mt-3 text-xl font-medium">Gere e exporte relatórios de ponto detalhados com um clique.</p>
+    <div className="space-y-6 md:space-y-8 animate-in fade-in duration-500">
+      <div className="mb-6 md:mb-10">
+        <h1 className="font-display text-3xl md:text-5xl font-bold tracking-tight text-foreground">Relatórios</h1>
+        <p className="text-muted-foreground mt-2 md:mt-3 text-base md:text-xl font-medium">Gere e exporte relatórios de ponto detalhados.</p>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card className="glass-card border-border/40 rounded-[2.5rem] overflow-hidden shadow-sm">
-          <CardHeader className="p-10 pb-6 border-b border-border/20">
+      <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
+        <Card className="glass-card border-border/40 rounded-2xl md:rounded-[2.5rem] overflow-hidden shadow-sm">
+          <CardHeader className="p-6 md:p-10 pb-4 md:pb-6 border-b border-border/20">
             <CardTitle className="text-2xl font-bold flex items-center gap-2">
               <FileDown className="h-6 w-6 text-primary" />
               Configurar Relatório
             </CardTitle>
             <CardDescription>Selecione o período e os colaboradores para exportação.</CardDescription>
           </CardHeader>
-          <CardContent className="p-10 space-y-8">
-            <div className="space-y-3">
+          <CardContent className="p-6 md:p-10 space-y-6 md:space-y-8">
+            <div className="space-y-2 md:space-y-3">
               <Label>Mês de Referência</Label>
               <Input 
                 type="month" 
@@ -361,7 +361,7 @@ function RelatoriosPage() {
               </Select>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 pt-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
               <Button 
                 onClick={() => generateReport("xlsx")} 
                 disabled={loading}
@@ -384,9 +384,9 @@ function RelatoriosPage() {
         </Card>
 
         <div className="space-y-6">
-          <div className="glass-card p-10 rounded-[2.5rem] border border-border/40 bg-gradient-to-br from-primary/5 to-transparent">
-             <h3 className="font-display text-xl font-bold mb-4 tracking-tight">Informações Importantes</h3>
-             <ul className="text-sm text-muted-foreground space-y-5">
+          <div className="glass-card p-6 md:p-10 rounded-2xl md:rounded-[2.5rem] border border-border/40 bg-gradient-to-br from-primary/5 to-transparent">
+             <h3 className="font-display text-lg md:text-xl font-bold mb-4 tracking-tight">Informações Importantes</h3>
+             <ul className="text-xs md:text-sm text-muted-foreground space-y-4 md:space-y-5">
                <li className="flex items-start gap-2">
                  <div className="h-5 w-5 rounded-full bg-primary/20 flex items-center justify-center text-primary text-[10px] font-bold shrink-0">1</div>
                  Os relatórios agora separam Entrada, Saída de Almoço, Retorno de Almoço e Saída Final em colunas distintas.

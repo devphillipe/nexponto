@@ -80,16 +80,16 @@ function AdminSignup() {
         <div className="absolute bottom-[-15%] left-[-15%] w-[60%] h-[60%] bg-accent/20 blur-[140px] rounded-full"></div>
       </div>
 
-      <div className="w-full max-w-3xl space-y-12 animate-in fade-in zoom-in-95 duration-1000 slide-in-from-bottom-8">
-        <div className="text-center space-y-4">
-           <Link to="/" className="inline-flex mx-auto mb-6 hover:scale-105 transition-transform duration-500">
-              <Logo size={32} wordmarkClassName="text-3xl" />
+      <div className="w-full max-w-3xl space-y-8 sm:space-y-12 animate-in fade-in zoom-in-95 duration-1000 slide-in-from-bottom-8 relative z-10">
+        <div className="text-center space-y-3 sm:space-y-4 px-4">
+           <Link to="/" className="inline-flex mx-auto mb-4 sm:mb-6 hover:scale-105 transition-transform duration-500">
+              <Logo size={28} wordmarkClassName="text-2xl sm:text-3xl" />
            </Link>
-           <h1 className="text-5xl font-black tracking-tighter text-foreground drop-shadow-sm">Comece sua gestão hoje</h1>
-           <p className="text-muted-foreground text-xl font-medium opacity-80">Cadastre seu escritório e revolucione o controle de ponto da sua equipe.</p>
+           <h1 className="text-3xl sm:text-5xl font-black tracking-tighter text-foreground drop-shadow-sm">Comece sua gestão hoje</h1>
+           <p className="text-muted-foreground text-base sm:text-xl font-medium opacity-80">Revolucione o controle de ponto da sua equipe.</p>
         </div>
 
-        <div className="glass-card rounded-[3rem] p-12 border border-primary/10 shadow-2xl relative bg-background/40 backdrop-blur-2xl">
+        <div className="glass-card rounded-3xl sm:rounded-[3rem] p-6 sm:p-12 border border-primary/10 shadow-2xl relative bg-background/40 backdrop-blur-2xl mx-4 sm:mx-0">
           <form onSubmit={onSubmit} className="space-y-8">
             <div className="space-y-6">
               <div className="grid md:grid-cols-2 gap-6">
