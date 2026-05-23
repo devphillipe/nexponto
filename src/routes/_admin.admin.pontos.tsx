@@ -268,8 +268,9 @@ function PontosPage() {
              <p className="text-muted-foreground">Nenhum ponto registrado nesta data.</p>
           </div>
         ) : (
-          Object.entries(groupedData).map(([employeeName, entries]: [string, any]) => {
+          Object.entries(groupedData).map(([employeeName, group]: [string, any]) => {
             const isExpanded = expandedEmployees.has(employeeName);
+            const totalItems = group.entries.length + group.absences.length;
             return (
               <div key={employeeName} className="glass-card overflow-hidden rounded-[2rem] border border-border/40 bg-background/30 backdrop-blur-sm">
                 <div 
@@ -282,7 +283,7 @@ function PontosPage() {
                     </div>
                     <div>
                       <h3 className="font-bold text-lg">{employeeName}</h3>
-                      <p className="text-xs text-muted-foreground">{entries.length} registro(s) no dia</p>
+                      <p className="text-xs text-muted-foreground">{totalItems} registro(s) no dia</p>
                     </div>
                   </div>
                 </div>
@@ -291,14 +292,34 @@ function PontosPage() {
                     <table className="w-full text-sm">
                       <thead className="bg-muted/5 text-left text-[10px] uppercase font-bold tracking-widest text-muted-foreground">
                         <tr>
-                          <th className="px-8 py-4">Horário</th>
-                          <th className="px-6 py-4">Tipo de Registro</th>
+                          <th className="px-8 py-4">Horário / Tipo</th>
+                          <th className="px-6 py-4">Detalhes</th>
                           <th className="px-6 py-4">Origem</th>
                           <th className="px-6 py-4 text-right">Ações</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-border/20">
-                        {entries.sort((a: any, b: any) => new Date(a.entry_at).getTime() - new Date(b.entry_at).getTime()).map((e: any) => (
+                        {group.absences.map((a: any) => (
+                          <tr key={a.id} className="bg-primary/5 hover:bg-primary/10 transition-colors">
+                            <td className="px-8 py-5">
+                              <span className="px-3 py-1 rounded-lg text-xs font-bold bg-primary text-primary-foreground uppercase">
+                                ABONO: {a.reason}
+                              </span>
+                            </td>
+                            <td className="px-6 py-5 text-muted-foreground italic">
+                              {a.description || "Sem justificativa"}
+                            </td>
+                            <td className="px-6 py-5">
+                              <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-primary/10 text-primary">
+                                Admin
+                              </span>
+                            </td>
+                            <td className="px-6 py-5 text-right">
+                              <span className="text-xs text-muted-foreground">Gerenciado em Abonos</span>
+                            </td>
+                          </tr>
+                        ))}
+                        {group.entries.sort((a: any, b: any) => new Date(a.entry_at).getTime() - new Date(b.entry_at).getTime()).map((e: any) => (
                           <tr key={e.id} className="hover:bg-muted/10 transition-colors">
                             <td className="px-8 py-5 font-mono font-bold text-primary flex items-center gap-2">
                               {new Date(e.entry_at).toLocaleTimeString("pt-BR", {
