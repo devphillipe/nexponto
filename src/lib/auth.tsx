@@ -36,6 +36,7 @@ export type ProfileInfo = {
   full_name: string;
   email: string;
   tenant_name: string;
+  tenant_logo_url: string | null;
   role: "admin" | "employee" | null;
 };
 
@@ -49,7 +50,7 @@ export function useProfile() {
       if (!user) return null;
       const { data: profile } = await supabase
         .from("profiles")
-        .select("id, tenant_id, full_name, email, tenants(name)")
+        .select("id, tenant_id, full_name, email, tenants(name, logo_url)")
         .eq("id", user.id)
         .maybeSingle();
       if (!profile) return null;
@@ -67,6 +68,7 @@ export function useProfile() {
         full_name: profile.full_name,
         email: profile.email,
         tenant_name: (profile as any).tenants?.name ?? "",
+        tenant_logo_url: (profile as any).tenants?.logo_url ?? null,
         role: role as "admin" | "employee" | null,
       };
     },

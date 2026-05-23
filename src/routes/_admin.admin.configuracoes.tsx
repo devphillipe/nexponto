@@ -7,8 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Building2, Mail, Phone, MapPin, Clock, Globe } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Building2, Mail, Phone, MapPin, Clock, Globe, Upload, Loader2, Image as ImageIcon } from "lucide-react";
+import { useEffect, useState, useRef } from "react";
 
 export const Route = createFileRoute("/_admin/admin/configuracoes")({
   head: () => ({ meta: [{ title: "Configurações — NexPonto Admin" }] }),
@@ -18,6 +18,8 @@ export const Route = createFileRoute("/_admin/admin/configuracoes")({
 function ConfiguracoesPage() {
   const { data: profile } = useProfile();
   const queryClient = useQueryClient();
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState({
     name: "",
     document: "",
@@ -26,6 +28,7 @@ function ConfiguracoesPage() {
     address: "",
     timezone: "America/Sao_Paulo",
     default_daily_hours: 8,
+    logo_url: "",
   });
 
   const { data: tenant, isLoading } = useQuery({
@@ -52,6 +55,7 @@ function ConfiguracoesPage() {
         address: (tenant as any).address || "",
         timezone: (tenant as any).timezone || "America/Sao_Paulo",
         default_daily_hours: tenant.default_daily_hours || 8,
+        logo_url: tenant.logo_url || "",
       });
     }
   }, [tenant]);
@@ -82,6 +86,40 @@ function ConfiguracoesPage() {
     },
   });
 
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !profile?.tenant_id) return;
+
+    setUploading(true);
+    try {
+      const fileExt = file.name.split(".").pop();
+      const filePath = `${profile.tenant_id}/${Math.random()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("logos")
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from("logos")
+        .getPublicUrl(filePath);
+
+      await supabase
+        .from("tenants")
+        .update({ logo_url: publicUrl } as any)
+        .eq("id", profile.tenant_id);
+
+      setFormData(prev => ({ ...prev, logo_url: publicUrl }));
+      queryClient.invalidateQueries({ queryKey: ["tenant"] });
+      toast.success("Logo atualizada com sucesso!");
+    } catch (error: any) {
+      toast.error("Erro ao fazer upload: " + error.message);
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     updateMutation.mutate(formData);
@@ -97,6 +135,64 @@ function ConfiguracoesPage() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
+        <Card className="glass-card border-none shadow-xl rounded-[2rem] overflow-hidden">
+          <CardHeader className="p-8 pb-4">
+            <CardTitle className="text-xl flex items-center gap-2 text-primary">
+              <ImageIcon className="h-5 w-5" />
+              Logo do Escritório
+            </CardTitle>
+            <CardDescription>A logo aparecerá no seu perfil e nos relatórios gerados.</CardDescription>
+          </CardHeader>
+          <CardContent className="p-8 pt-4 flex flex-col md:flex-row items-center gap-8">
+             <div className="relative group">
+                <div className="h-32 w-32 rounded-3xl bg-muted border-2 border-dashed border-primary/20 flex items-center justify-center overflow-hidden transition-all group-hover:border-primary/50">
+                   {formData.logo_url ? (
+                     <img src={formData.logo_url} alt="Logo" className="h-full w-full object-contain" />
+                   ) : (
+                     <Building2 className="h-12 w-12 text-muted-foreground/30" />
+                   )}
+                   {uploading && (
+                     <div className="absolute inset-0 bg-background/60 backdrop-blur-sm flex items-center justify-center">
+                        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                     </div>
+                   )}
+                </div>
+                <Button 
+                  type="button"
+                  variant="secondary"
+                  size="icon"
+                  className="absolute -bottom-2 -right-2 rounded-xl shadow-lg border border-border"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                >
+                  <Upload className="h-4 w-4" />
+                </Button>
+                <input 
+                  type="file" 
+                  ref={fileInputRef} 
+                  className="hidden" 
+                  accept="image/*" 
+                  onChange={handleLogoUpload}
+                />
+             </div>
+             <div className="flex-1 space-y-2 text-center md:text-left">
+                <h4 className="font-bold">Personalize sua marca</h4>
+                <p className="text-sm text-muted-foreground max-w-sm">
+                   Recomendamos uma imagem quadrada com fundo transparente (PNG) para melhores resultados nos relatórios.
+                </p>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  size="sm" 
+                  className="mt-2"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  Selecionar arquivo
+                </Button>
+             </div>
+          </CardContent>
+        </Card>
+
         <Card className="glass-card border-none shadow-xl rounded-[2rem] overflow-hidden">
           <CardHeader className="p-8 pb-4">
             <CardTitle className="text-xl flex items-center gap-2 text-primary">
