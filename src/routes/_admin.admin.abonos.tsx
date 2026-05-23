@@ -85,7 +85,7 @@ function AbonosPage() {
           tenant_id: profile!.tenant_id,
           entry_date: newData.absence_date,
           entry_at: `${newData.absence_date}T00:00:00Z`,
-          entry_type: "abono", // Assuming we might want to handle this type
+          entry_type: "entrada", // Use entrada as fallback since abono isn't in types yet, but notes will explain it
           notes: `ABONO: ${REASONS.find(r => r.value === newData.reason)?.label || newData.reason}. ${newData.description || ""}`,
           source: "manual_admin",
           is_adjustment: true,

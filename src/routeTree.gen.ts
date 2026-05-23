@@ -17,6 +17,7 @@ import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AdminCadastroRouteImport } from './routes/admin.cadastro'
 import { Route as FuncFuncionarioMeuPontoRouteImport } from './routes/_func.funcionario.meu-ponto'
 import { Route as FuncFuncionarioHistoricoRouteImport } from './routes/_func.funcionario.historico'
+import { Route as AdminAdminRelatoriosRouteImport } from './routes/_admin.admin.relatorios'
 import { Route as AdminAdminPontosRouteImport } from './routes/_admin.admin.pontos'
 import { Route as AdminAdminFuncionariosRouteImport } from './routes/_admin.admin.funcionarios'
 import { Route as AdminAdminDashboardRouteImport } from './routes/_admin.admin.dashboard'
@@ -62,6 +63,11 @@ const FuncFuncionarioHistoricoRoute =
     path: '/funcionario/historico',
     getParentRoute: () => FuncRoute,
   } as any)
+const AdminAdminRelatoriosRoute = AdminAdminRelatoriosRouteImport.update({
+  id: '/admin/relatorios',
+  path: '/admin/relatorios',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminAdminPontosRoute = AdminAdminPontosRouteImport.update({
   id: '/admin/pontos',
   path: '/admin/pontos',
@@ -98,6 +104,7 @@ export interface FileRoutesByFullPath {
   '/admin/dashboard': typeof AdminAdminDashboardRoute
   '/admin/funcionarios': typeof AdminAdminFuncionariosRoute
   '/admin/pontos': typeof AdminAdminPontosRoute
+  '/admin/relatorios': typeof AdminAdminRelatoriosRoute
   '/funcionario/historico': typeof FuncFuncionarioHistoricoRoute
   '/funcionario/meu-ponto': typeof FuncFuncionarioMeuPontoRoute
 }
@@ -111,6 +118,7 @@ export interface FileRoutesByTo {
   '/admin/dashboard': typeof AdminAdminDashboardRoute
   '/admin/funcionarios': typeof AdminAdminFuncionariosRoute
   '/admin/pontos': typeof AdminAdminPontosRoute
+  '/admin/relatorios': typeof AdminAdminRelatoriosRoute
   '/funcionario/historico': typeof FuncFuncionarioHistoricoRoute
   '/funcionario/meu-ponto': typeof FuncFuncionarioMeuPontoRoute
 }
@@ -127,6 +135,7 @@ export interface FileRoutesById {
   '/_admin/admin/dashboard': typeof AdminAdminDashboardRoute
   '/_admin/admin/funcionarios': typeof AdminAdminFuncionariosRoute
   '/_admin/admin/pontos': typeof AdminAdminPontosRoute
+  '/_admin/admin/relatorios': typeof AdminAdminRelatoriosRoute
   '/_func/funcionario/historico': typeof FuncFuncionarioHistoricoRoute
   '/_func/funcionario/meu-ponto': typeof FuncFuncionarioMeuPontoRoute
 }
@@ -142,6 +151,7 @@ export interface FileRouteTypes {
     | '/admin/dashboard'
     | '/admin/funcionarios'
     | '/admin/pontos'
+    | '/admin/relatorios'
     | '/funcionario/historico'
     | '/funcionario/meu-ponto'
   fileRoutesByTo: FileRoutesByTo
@@ -155,6 +165,7 @@ export interface FileRouteTypes {
     | '/admin/dashboard'
     | '/admin/funcionarios'
     | '/admin/pontos'
+    | '/admin/relatorios'
     | '/funcionario/historico'
     | '/funcionario/meu-ponto'
   id:
@@ -170,6 +181,7 @@ export interface FileRouteTypes {
     | '/_admin/admin/dashboard'
     | '/_admin/admin/funcionarios'
     | '/_admin/admin/pontos'
+    | '/_admin/admin/relatorios'
     | '/_func/funcionario/historico'
     | '/_func/funcionario/meu-ponto'
   fileRoutesById: FileRoutesById
@@ -241,6 +253,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FuncFuncionarioHistoricoRouteImport
       parentRoute: typeof FuncRoute
     }
+    '/_admin/admin/relatorios': {
+      id: '/_admin/admin/relatorios'
+      path: '/admin/relatorios'
+      fullPath: '/admin/relatorios'
+      preLoaderRoute: typeof AdminAdminRelatoriosRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/_admin/admin/pontos': {
       id: '/_admin/admin/pontos'
       path: '/admin/pontos'
@@ -285,6 +304,7 @@ interface AdminRouteChildren {
   AdminAdminDashboardRoute: typeof AdminAdminDashboardRoute
   AdminAdminFuncionariosRoute: typeof AdminAdminFuncionariosRoute
   AdminAdminPontosRoute: typeof AdminAdminPontosRoute
+  AdminAdminRelatoriosRoute: typeof AdminAdminRelatoriosRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
@@ -293,6 +313,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminAdminDashboardRoute: AdminAdminDashboardRoute,
   AdminAdminFuncionariosRoute: AdminAdminFuncionariosRoute,
   AdminAdminPontosRoute: AdminAdminPontosRoute,
+  AdminAdminRelatoriosRoute: AdminAdminRelatoriosRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)

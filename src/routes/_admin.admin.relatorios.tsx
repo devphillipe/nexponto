@@ -6,9 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { FileDown, Loader2, FileSpreadsheet, File as FilePdf } from "lucide-react";
 import { useState } from "react";
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay } from "date-fns";
+import { format, startOfMonth, endOfMonth, eachDayOfInterval } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
@@ -39,7 +40,7 @@ function RelatoriosPage() {
     },
   });
 
-  const generateReport = async (format: "xlsx" | "pdf") => {
+  const generateReport = async (reportFormat: "xlsx" | "pdf") => {
     setLoading(true);
     try {
       const startDate = startOfMonth(new Date(month + "-01T12:00:00"));
@@ -88,8 +89,6 @@ function RelatoriosPage() {
           
           let workedMinutes = 0;
           if (dayEntries.length >= 2) {
-             // Basic calculation: first in to last out, minus lunch if exists
-             // Improved: pairs
              for(let i=0; i < dayEntries.length - 1; i += 2) {
                 const inTime = new Date(dayEntries[i].entry_at);
                 const outTime = new Date(dayEntries[i+1].entry_at);
@@ -123,7 +122,7 @@ function RelatoriosPage() {
         };
       });
 
-      if (format === "xlsx") {
+      if (reportFormat === "xlsx") {
         const wb = XLSX.utils.book_new();
         reportData.forEach(rd => {
           const ws = XLSX.utils.json_to_sheet(rd.dailyReports.map(d => ({
@@ -150,7 +149,7 @@ function RelatoriosPage() {
         reportData.forEach((rd, index) => {
           if (index > 0) doc.addPage();
           
-          doc.setTextColor(33, 150, 243); // Primary color
+          doc.setTextColor(33, 150, 243);
           doc.setFontSize(22);
           doc.text("Relatório de Ponto", 14, 20);
           
@@ -159,7 +158,6 @@ function RelatoriosPage() {
           doc.text(`Colaborador: ${rd.employee}`, 14, 30);
           doc.text(`Período: ${month}`, 14, 36);
 
-          // Summary box
           doc.setFillColor(245, 247, 250);
           doc.roundedRect(14, 42, 182, 25, 3, 3, "F");
           
@@ -176,7 +174,7 @@ function RelatoriosPage() {
           doc.setFontSize(10);
           doc.text("Saldo de Horas", 140, 52);
           doc.setFontSize(14);
-          const diffValue = parseFloat(rd.balance.replace(":", "."));
+          const diffValue = rd.balance.startsWith("+") ? 1 : -1;
           doc.setTextColor(diffValue >= 0 ? 76 : 244, diffValue >= 0 ? 175 : 67, diffValue >= 0 ? 80 : 54);
           doc.text(rd.balance, 140, 60);
 
@@ -200,8 +198,8 @@ function RelatoriosPage() {
         });
         doc.save(`Relatorio_Ponto_${month}.pdf`);
       }
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -229,7 +227,7 @@ function RelatoriosPage() {
               <Input 
                 type="month" 
                 value={month} 
-                onChange={(e) => setMonth(e.target.value)} 
+                onChange={(ev) => setMonth(ev.target.value)} 
                 className="rounded-xl h-12 bg-muted/20 border-border/40"
               />
             </div>
