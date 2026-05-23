@@ -17,25 +17,35 @@ function Dashboard() {
   const { data: profile } = useProfile();
 
   const { data: stats, isLoading } = useQuery({
-    queryKey: ["admin-dashboard"],
+    queryKey: ["admin-dashboard", profile?.tenant_id],
+    enabled: !!profile?.tenant_id,
     staleTime: 1000 * 60 * 5, // 5 minutes
     queryFn: async () => {
       const today = new Date().toISOString().slice(0, 10);
-      const [emps, actives, todayEntries] = await Promise.all([
-        supabase.from("employees").select("id", { count: "exact", head: true }),
+      const [emps, actives, todayEntries, recentActivities] = await Promise.all([
+        supabase.from("employees").select("id", { count: "exact", head: true }).eq("tenant_id", profile!.tenant_id),
         supabase
           .from("employees")
           .select("id", { count: "exact", head: true })
+          .eq("tenant_id", profile!.tenant_id)
           .eq("active", true),
         supabase
           .from("time_entries")
           .select("employee_id", { count: "exact", head: true })
+          .eq("tenant_id", profile!.tenant_id)
           .eq("entry_date", today),
+        supabase
+          .from("time_entries")
+          .select("id, entry_at, entry_type, employees(full_name)")
+          .eq("tenant_id", profile!.tenant_id)
+          .order("entry_at", { ascending: false })
+          .limit(5),
       ]);
       return {
         total: emps.count ?? 0,
         active: actives.count ?? 0,
         todayPunches: todayEntries.count ?? 0,
+        recentActivities: recentActivities.data ?? [],
       };
     },
   });
