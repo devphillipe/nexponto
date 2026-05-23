@@ -78,16 +78,16 @@ function AdminSignup() {
         <div className="absolute bottom-[-15%] left-[-15%] w-[60%] h-[60%] bg-accent/20 blur-[140px] rounded-full"></div>
       </div>
 
-      <div className="w-full max-w-xl space-y-8 animate-in fade-in zoom-in-95 duration-500">
-        <div className="text-center space-y-2">
-           <Link to="/" className="inline-flex mx-auto mb-4">
-              <Logo size={26} wordmarkClassName="text-2xl" />
+      <div className="w-full max-w-3xl space-y-12 animate-in fade-in zoom-in-95 duration-1000 slide-in-from-bottom-8">
+        <div className="text-center space-y-4">
+           <Link to="/" className="inline-flex mx-auto mb-6 hover:scale-105 transition-transform duration-500">
+              <Logo size={32} wordmarkClassName="text-3xl" />
            </Link>
-           <h1 className="text-3xl font-bold tracking-tight">Comece sua gestão hoje</h1>
-           <p className="text-muted-foreground">Cadastre seu escritório e revolucione o controle de ponto.</p>
+           <h1 className="text-5xl font-black tracking-tighter text-foreground drop-shadow-sm">Comece sua gestão hoje</h1>
+           <p className="text-muted-foreground text-xl font-medium opacity-80">Cadastre seu escritório e revolucione o controle de ponto da sua equipe.</p>
         </div>
 
-        <div className="glass-card rounded-[2.5rem] p-10 border border-primary/10 shadow-premium relative">
+        <div className="glass-card rounded-[3rem] p-12 border border-primary/10 shadow-2xl relative bg-background/40 backdrop-blur-2xl">
           <form onSubmit={onSubmit} className="space-y-8">
             <div className="space-y-6">
               <div className="grid md:grid-cols-2 gap-6">
@@ -99,7 +99,7 @@ function AdminSignup() {
                       required 
                       value={form.tenant_name} 
                       onChange={(e) => up("tenant_name", e.target.value)}
-                      className="bg-muted/30 border-none rounded-2xl h-12 px-4 focus-visible:ring-primary/40"
+                      className="bg-muted/20 border-border/40 rounded-2xl h-14 px-5 focus-visible:ring-primary/20 transition-all font-medium"
                     />
                  </div>
                  <div className="space-y-2">
@@ -109,7 +109,7 @@ function AdminSignup() {
                       placeholder="00.000.000/0000-00"
                       value={form.tenant_document} 
                       onChange={(e) => up("tenant_document", e.target.value)}
-                      className="bg-muted/30 border-none rounded-2xl h-12 px-4 focus-visible:ring-primary/40"
+                      className="bg-muted/20 border-border/40 rounded-2xl h-14 px-5 focus-visible:ring-primary/20 transition-all font-medium"
                     />
                  </div>
               </div>
@@ -122,7 +122,7 @@ function AdminSignup() {
                       placeholder="(00) 00000-0000"
                       value={form.tenant_phone} 
                       onChange={(e) => up("tenant_phone", e.target.value)}
-                      className="bg-muted/30 border-none rounded-2xl h-12 px-4 focus-visible:ring-primary/40"
+                      className="bg-muted/20 border-border/40 rounded-2xl h-14 px-5 focus-visible:ring-primary/20 transition-all font-medium"
                     />
                  </div>
                  <div className="space-y-2">
@@ -134,7 +134,7 @@ function AdminSignup() {
                       required 
                       value={form.email} 
                       onChange={(e) => up("email", e.target.value)}
-                      className="bg-muted/30 border-none rounded-2xl h-12 px-4 focus-visible:ring-primary/40"
+                      className="bg-muted/20 border-border/40 rounded-2xl h-14 px-5 focus-visible:ring-primary/20 transition-all font-medium"
                     />
                  </div>
               </div>
@@ -149,7 +149,7 @@ function AdminSignup() {
                       required 
                       value={form.password} 
                       onChange={(e) => up("password", e.target.value)}
-                      className="bg-muted/30 border-none rounded-2xl h-12 px-4 focus-visible:ring-primary/40"
+                      className="bg-muted/20 border-border/40 rounded-2xl h-14 px-5 focus-visible:ring-primary/20 transition-all font-medium"
                     />
                  </div>
                  <div className="space-y-2">
@@ -161,7 +161,7 @@ function AdminSignup() {
                       required 
                       value={form.confirm} 
                       onChange={(e) => up("confirm", e.target.value)}
-                      className="bg-muted/30 border-none rounded-2xl h-12 px-4 focus-visible:ring-primary/40"
+                      className="bg-muted/20 border-border/40 rounded-2xl h-14 px-5 focus-visible:ring-primary/20 transition-all font-medium"
                     />
                  </div>
               </div>
