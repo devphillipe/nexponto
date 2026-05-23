@@ -1,11 +1,12 @@
 import { createFileRoute, Link, Outlet, redirect, useNavigate, useLocation } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useProfile } from "@/lib/auth";
-import { LayoutDashboard, Users, Clock, LogOut, Bell, Search, Settings, FileText } from "lucide-react";
+import { LayoutDashboard, Users, Clock, LogOut, Bell, Search, Settings, FileText, Menu, X } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import { CommandMenu } from "@/components/CommandMenu";
-import { memo } from "react";
+import { memo, useState } from "react";
+import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 
 export const Route = createFileRoute("/_admin")({
   beforeLoad: async () => {
@@ -36,6 +37,7 @@ function AdminLayout() {
   const { data: profile } = useProfile();
   const navigate = useNavigate();
   const loc = useLocation();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   async function logout() {
     await supabase.auth.signOut();
@@ -43,8 +45,9 @@ function AdminLayout() {
   }
 
   return (
-    <div className="flex min-h-screen bg-background/50">
-      <aside className="hidden w-72 shrink-0 flex-col border-r border-border/40 bg-background/40 backdrop-blur-2xl p-8 md:flex sticky top-0 h-screen transition-all duration-300">
+    <div className="flex min-h-screen bg-background/50 overflow-x-hidden">
+      {/* Sidebar Desktop */}
+      <aside className="hidden w-72 shrink-0 flex-col border-r border-border/40 bg-background/40 backdrop-blur-2xl p-8 lg:flex sticky top-0 h-screen transition-all duration-300">
         <div className="mb-10 flex items-center gap-3 px-1">
           <Logo size={24} showWordmark={false} />
           <div className="min-w-0">
