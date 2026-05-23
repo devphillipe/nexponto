@@ -158,21 +158,21 @@ function PontosPage() {
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+    <div className="space-y-6 md:space-y-8 animate-in fade-in duration-500">
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
         <div>
-          <h1 className="font-display text-5xl font-bold tracking-tight text-foreground">Registros de Ponto</h1>
-          <p className="text-muted-foreground mt-3 text-xl font-medium">Visualize, ajuste e audite todas as batidas em tempo real.</p>
+          <h1 className="font-display text-3xl md:text-5xl font-bold tracking-tight text-foreground">Registros de Ponto</h1>
+          <p className="text-muted-foreground mt-2 md:mt-3 text-base md:text-xl font-medium">Visualize e audite todas as batidas em tempo real.</p>
         </div>
         
-        <div className="flex items-center gap-3">
-          <div className="glass-card p-3 rounded-2xl flex items-center gap-4 h-14 border border-border/40 shadow-sm transition-all hover:border-primary/30">
-            <Calendar className="h-5 w-5 text-primary ml-3" />
+        <div className="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
+          <div className="glass-card p-2 md:p-3 rounded-xl md:rounded-2xl flex items-center gap-4 h-12 md:h-14 border border-border/40 shadow-sm transition-all hover:border-primary/30 w-full sm:w-auto">
+            <Calendar className="h-4 md:h-5 w-4 md:w-5 text-primary ml-2 md:ml-3" />
             <Input 
               type="date" 
               value={date} 
               onChange={(e) => setDate(e.target.value)} 
-              className="bg-transparent border-none text-base font-bold focus-visible:ring-0 w-44 p-0 h-auto"
+              className="bg-transparent border-none text-sm md:text-base font-bold focus-visible:ring-0 w-full sm:w-40 md:w-44 p-0 h-auto"
             />
           </div>
 
@@ -181,7 +181,7 @@ function PontosPage() {
             if (!open) setEditingEntry(null);
           }}>
             <DialogTrigger asChild>
-              <Button size="lg" className="rounded-2xl shadow-xl shadow-primary/20 font-black uppercase tracking-widest text-xs px-8 h-14">
+              <Button size="lg" className="rounded-xl md:rounded-2xl shadow-xl shadow-primary/20 font-black uppercase tracking-widest text-[10px] md:text-xs px-6 md:px-8 h-12 md:h-14 w-full sm:w-auto">
                 <Plus className="h-5 w-5" /> Novo Registro
               </Button>
             </DialogTrigger>
