@@ -1,7 +1,7 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { KeyRound, ShieldCheck, ArrowLeft, Lock } from "lucide-react";
+import { KeyRound, ShieldCheck, Lock, AlertCircle } from "lucide-react";
 import { NextFlowBackground } from "@/components/NextFlowBackground";
 import { Logo } from "@/components/Logo";
 import { supabase } from "@/integrations/supabase/client";
@@ -14,58 +14,155 @@ export const Route = createFileRoute("/auth/reset-password")({
   component: ResetPassword,
 });
 
+type Status = "validating" | "ready" | "invalid";
+
 function ResetPassword() {
   const navigate = useNavigate();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [isSessionActive, setIsSessionActive] = useState(false);
+  const [status, setStatus] = useState<Status>("validating");
+  const [errorMsg, setErrorMsg] = useState<string>("");
 
   useEffect(() => {
-    // Check if we have a session (Supabase handles the token in the URL and sets the session)
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        setIsSessionActive(true);
-      } else {
-        toast.error("Sessão de recuperação expirada ou inválida.");
-        navigate({ to: "/admin/login" });
+    let isMounted = true;
+    let recoveryDetected = false;
+
+    // 1) Listen for the PASSWORD_RECOVERY event — fired by Supabase when
+    //    it processes a valid recovery token from the URL hash.
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!isMounted) return;
+      if (event === "PASSWORD_RECOVERY" && session) {
+        recoveryDetected = true;
+        setStatus("ready");
       }
     });
+
+    // 2) Parse URL for explicit errors (expired/invalid links come back as
+    //    `error`/`error_code` in the hash or query string).
+    const hash = window.location.hash.startsWith("#")
+      ? window.location.hash.slice(1)
+      : window.location.hash;
+    const hashParams = new URLSearchParams(hash);
+    const queryParams = new URLSearchParams(window.location.search);
+    const urlError =
+      hashParams.get("error_description") ||
+      queryParams.get("error_description") ||
+      hashParams.get("error") ||
+      queryParams.get("error");
+    const errorCode =
+      hashParams.get("error_code") || queryParams.get("error_code");
+
+    if (urlError) {
+      const friendly =
+        errorCode === "otp_expired" || /expired/i.test(urlError)
+          ? "O link de recuperação expirou. Solicite um novo e-mail de redefinição."
+          : "Link de recuperação inválido. Solicite um novo e-mail de redefinição.";
+      setErrorMsg(friendly);
+      setStatus("invalid");
+      return () => {
+        isMounted = false;
+        subscription.unsubscribe();
+      };
+    }
+
+    // 3) Fallback: validate the current session (and that it belongs to a
+    //    real, authentic user via getUser — re-validates the JWT).
+    (async () => {
+      // Give Supabase a tick to process the URL token
+      await new Promise((r) => setTimeout(r, 150));
+      if (!isMounted || recoveryDetected) return;
+
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (!sessionData.session) {
+        setErrorMsg("Sessão de recuperação ausente ou expirada. Solicite um novo link.");
+        setStatus("invalid");
+        return;
+      }
+
+      const { data: userData, error: userError } = await supabase.auth.getUser();
+      if (userError || !userData.user) {
+        setErrorMsg("Não foi possível validar a sessão de recuperação. Solicite um novo link.");
+        setStatus("invalid");
+        return;
+      }
+
+      setStatus("ready");
+    })();
+
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
   }, [navigate]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    
+
+    if (status !== "ready") return;
+
+    if (password.length < 8) {
+      toast.error("A senha deve ter pelo menos 8 caracteres.");
+      return;
+    }
+
     if (password !== confirmPassword) {
       toast.error("As senhas não coincidem.");
       return;
     }
 
-    if (password.length < 6) {
-      toast.error("A senha deve ter pelo menos 6 caracteres.");
-      return;
-    }
-
     setLoading(true);
     try {
+      // Re-validate session right before the update — guards against the
+      // user idling on the form until the recovery session expires.
+      const { data: userData, error: userError } = await supabase.auth.getUser();
+      if (userError || !userData.user) {
+        setErrorMsg("Sua sessão de recuperação expirou. Solicite um novo link.");
+        setStatus("invalid");
+        return;
+      }
+
       const { error } = await supabase.auth.updateUser({ password });
       if (error) {
         toast.error(error.message);
-      } else {
-        toast.success("Senha atualizada com sucesso!");
-        navigate({ to: "/admin/login" });
+        return;
       }
-    } catch (err) {
+
+      // Sign out so the user must log in with the new password.
+      await supabase.auth.signOut();
+      toast.success("Senha atualizada com sucesso! Faça login com a nova senha.");
+      navigate({ to: "/admin/login" });
+    } catch {
       toast.error("Ocorreu um erro inesperado.");
     } finally {
       setLoading(false);
     }
   }
 
-  if (!isSessionActive) {
+  if (status === "validating") {
     return (
       <div className="min-h-screen flex items-center justify-center p-6 bg-background">
-        <p className="text-muted-foreground animate-pulse">Verificando sessão...</p>
+        <p className="text-muted-foreground animate-pulse">Validando link de recuperação...</p>
+      </div>
+    );
+  }
+
+  if (status === "invalid") {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden">
+        <NextFlowBackground />
+        <div className="w-full max-w-md glass-card rounded-3xl p-10 border border-destructive/20 shadow-2xl bg-background/40 backdrop-blur-2xl text-center space-y-6 relative z-10">
+          <div className="mx-auto h-14 w-14 rounded-2xl bg-destructive/10 text-destructive grid place-items-center">
+            <AlertCircle className="h-7 w-7" />
+          </div>
+          <div className="space-y-2">
+            <h1 className="text-2xl font-black tracking-tight">Link inválido</h1>
+            <p className="text-muted-foreground text-sm">{errorMsg}</p>
+          </div>
+          <Button asChild className="w-full h-12 rounded-2xl font-bold">
+            <Link to="/admin/login">Voltar para o login</Link>
+          </Button>
+        </div>
       </div>
     );
   }
@@ -98,35 +195,37 @@ function ResetPassword() {
                 <Label htmlFor="password" className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/70 ml-2">Nova Senha</Label>
                 <div className="relative group">
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
-                  <Input 
-                    id="password" 
-                    type="password" 
+                  <Input
+                    id="password"
+                    type="password"
                     placeholder="••••••••"
-                    required 
-                    value={password} 
+                    required
+                    minLength={8}
+                    value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="bg-muted/20 border-border/40 rounded-2xl h-14 pl-12 pr-4 focus-visible:ring-primary/20 focus-visible:border-primary/30 transition-all font-medium"
                   />
                 </div>
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="confirmPassword" className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/70 ml-2">Confirmar Nova Senha</Label>
                 <div className="relative group">
                   <ShieldCheck className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
-                  <Input 
-                    id="confirmPassword" 
-                    type="password" 
+                  <Input
+                    id="confirmPassword"
+                    type="password"
                     placeholder="••••••••"
-                    required 
-                    value={confirmPassword} 
+                    required
+                    minLength={8}
+                    value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     className="bg-muted/20 border-border/40 rounded-2xl h-14 pl-12 pr-4 focus-visible:ring-primary/20 focus-visible:border-primary/30 transition-all font-medium"
                   />
                 </div>
               </div>
             </div>
-            
+
             <Button type="submit" disabled={loading} className="premium-button w-full h-16 rounded-2xl text-lg font-black uppercase tracking-widest shadow-xl shadow-primary/20 hover:shadow-2xl hover:shadow-primary/30 active:scale-[0.98] transition-all">
               {loading ? "Atualizando..." : "Alterar Senha"}
             </Button>
