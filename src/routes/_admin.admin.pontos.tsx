@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Clock, Calendar, Plus, Search, Trash2, Edit2, History, User } from "lucide-react";
+import { Clock, Calendar, Plus, Trash2, Edit2, History, User, ChevronDown, ChevronRight } from "lucide-react";
 import { useState, useMemo } from "react";
 import { format } from "date-fns";
 
@@ -30,6 +30,14 @@ function PontosPage() {
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editingEntry, setEditingEntry] = useState<any>(null);
+  const [expandedEmployees, setExpandedEmployees] = useState<Set<string>>(new Set());
+
+  const toggleEmployee = (name: string) => {
+    const next = new Set(expandedEmployees);
+    if (next.has(name)) next.delete(name);
+    else next.add(name);
+    setExpandedEmployees(next);
+  };
 
   const { data: employees } = useQuery({
     queryKey: ["employees"],
@@ -72,7 +80,6 @@ function PontosPage() {
 
   const addMutation = useMutation({
     mutationFn: async (newData: any) => {
-      // Ensure we don't have double seconds if entry_time already includes them
       const timePart = newData.entry_time.split(':').length === 2 ? `${newData.entry_time}:00` : newData.entry_time;
       const entry_at = `${newData.entry_date}T${timePart}`;
       
@@ -107,7 +114,7 @@ function PontosPage() {
       setEditingEntry(null);
       toast.success(editingEntry ? "Registro atualizado!" : "Ponto registrado!");
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast.error("Erro ao salvar: " + error.message);
     },
   });
@@ -173,9 +180,6 @@ function PontosPage() {
                     {editingEntry ? <Edit2 className="h-6 w-6" /> : <Plus className="h-6 w-6" />}
                     {editingEntry ? "Ajustar Ponto" : "Registrar Ponto"}
                   </DialogTitle>
-                  <DialogDescription>
-                    {editingEntry ? "Corrija os dados do registro selecionado." : "Lançamento manual de batida de ponto."}
-                  </DialogDescription>
                 </DialogHeader>
                 <div className="p-8 pt-4 space-y-4">
                   <div className="space-y-2">
@@ -242,82 +246,90 @@ function PontosPage() {
              <p className="text-muted-foreground">Nenhum ponto registrado nesta data.</p>
           </div>
         ) : (
-          Object.entries(groupedData).map(([employeeName, entries]: [string, any]) => (
-            <div key={employeeName} className="glass-card overflow-hidden rounded-[2rem] border border-border/40 bg-background/30 backdrop-blur-sm">
-              <div className="px-8 py-5 border-b border-border/40 bg-muted/10 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-                    <User className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-lg">{employeeName}</h3>
-                    <p className="text-xs text-muted-foreground">{entries.length} registro(s) no dia</p>
+          Object.entries(groupedData).map(([employeeName, entries]: [string, any]) => {
+            const isExpanded = expandedEmployees.has(employeeName);
+            return (
+              <div key={employeeName} className="glass-card overflow-hidden rounded-[2rem] border border-border/40 bg-background/30 backdrop-blur-sm">
+                <div 
+                  className="px-8 py-5 border-b border-border/40 bg-muted/10 flex items-center justify-between cursor-pointer hover:bg-muted/20"
+                  onClick={() => toggleEmployee(employeeName)}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                      {isExpanded ? <ChevronDown className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-lg">{employeeName}</h3>
+                      <p className="text-xs text-muted-foreground">{entries.length} registro(s) no dia</p>
+                    </div>
                   </div>
                 </div>
+                {isExpanded && (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead className="bg-muted/5 text-left text-[10px] uppercase font-bold tracking-widest text-muted-foreground">
+                        <tr>
+                          <th className="px-8 py-4">Horário</th>
+                          <th className="px-6 py-4">Tipo de Registro</th>
+                          <th className="px-6 py-4">Origem</th>
+                          <th className="px-6 py-4 text-right">Ações</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border/20">
+                        {entries.sort((a: any, b: any) => new Date(a.entry_at).getTime() - new Date(b.entry_at).getTime()).map((e: any) => (
+                          <tr key={e.id} className="hover:bg-muted/10 transition-colors">
+                            <td className="px-8 py-5 font-mono font-bold text-primary flex items-center gap-2">
+                              {new Date(e.entry_at).toLocaleTimeString("pt-BR", {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                second: "2-digit",
+                              })}
+                              {e.is_adjustment && (
+                                <span title="Registro Ajustado">
+                                  <History className="h-3 w-3 text-warning" />
+                                </span>
+                              )}
+                            </td>
+                            <td className="px-6 py-5 text-muted-foreground font-medium">
+                              <span className={`px-3 py-1 rounded-lg text-xs font-bold ${
+                                e.entry_type === 'entrada' ? 'bg-success/10 text-success' :
+                                e.entry_type === 'saida' ? 'bg-destructive/10 text-destructive' :
+                                'bg-primary/10 text-primary'
+                              }`}>
+                                {TYPE_LABEL[e.entry_type]}
+                              </span>
+                            </td>
+                            <td className="px-6 py-5">
+                              <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${e.source === "manual_admin" ? "bg-warning/10 text-warning" : "bg-success/10 text-success"}`}>
+                                {e.source === "manual_admin" ? "Admin" : "App"}
+                              </span>
+                            </td>
+                            <td className="px-6 py-5 text-right space-x-2">
+                              <Button variant="ghost" size="icon" onClick={() => handleEdit(e)} className="h-8 w-8 rounded-lg text-primary/60 hover:text-primary hover:bg-primary/10">
+                                <Edit2 className="h-3.5 w-3.5" />
+                              </Button>
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                onClick={() => {
+                                  if (confirm("Excluir este registro permanentemente?")) {
+                                    deleteMutation.mutate(e.id);
+                                  }
+                                }}
+                                className="h-8 w-8 rounded-lg text-destructive/60 hover:text-destructive hover:bg-destructive/10"
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </Button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
               </div>
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead className="bg-muted/5 text-left text-[10px] uppercase font-bold tracking-widest text-muted-foreground">
-                    <tr>
-                      <th className="px-8 py-4">Horário</th>
-                      <th className="px-6 py-4">Tipo de Registro</th>
-                      <th className="px-6 py-4">Origem</th>
-                      <th className="px-6 py-4 text-right">Ações</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border/20">
-                    {entries.sort((a: any, b: any) => new Date(a.entry_at).getTime() - new Date(b.entry_at).getTime()).map((e: any) => (
-                      <tr key={e.id} className="hover:bg-muted/10 transition-colors">
-                        <td className="px-8 py-5 font-mono font-bold text-primary flex items-center gap-2">
-                          {new Date(e.entry_at).toLocaleTimeString("pt-BR", {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                            second: "2-digit",
-                          })}
-                          {e.is_adjustment && (
-                            <span title="Registro Ajustado">
-                              <History className="h-3 w-3 text-warning" />
-                            </span>
-                          )}
-                        </td>
-                        <td className="px-6 py-5 text-muted-foreground font-medium">
-                          <span className={`px-3 py-1 rounded-lg text-xs font-bold ${
-                            e.entry_type === 'entrada' ? 'bg-success/10 text-success' :
-                            e.entry_type === 'saida' ? 'bg-destructive/10 text-destructive' :
-                            'bg-primary/10 text-primary'
-                          }`}>
-                            {TYPE_LABEL[e.entry_type]}
-                          </span>
-                        </td>
-                        <td className="px-6 py-5">
-                          <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${e.source === "manual_admin" ? "bg-warning/10 text-warning" : "bg-success/10 text-success"}`}>
-                            {e.source === "manual_admin" ? "Admin" : "App"}
-                          </span>
-                        </td>
-                        <td className="px-6 py-5 text-right space-x-2">
-                          <Button variant="ghost" size="icon" onClick={() => handleEdit(e)} className="h-8 w-8 rounded-lg text-primary/60 hover:text-primary hover:bg-primary/10">
-                            <Edit2 className="h-3.5 w-3.5" />
-                          </Button>
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            onClick={() => {
-                              if (confirm("Excluir este registro permanentemente?")) {
-                                deleteMutation.mutate(e.id);
-                              }
-                            }}
-                            className="h-8 w-8 rounded-lg text-destructive/60 hover:text-destructive hover:bg-destructive/10"
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
     </div>
