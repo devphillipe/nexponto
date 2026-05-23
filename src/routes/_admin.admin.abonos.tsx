@@ -53,7 +53,7 @@ function AbonosPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("absences")
-        .select("*, employees(full_name)")
+        .select("id, absence_date, reason, description, employee_id, employees(full_name)")
         .eq("tenant_id", profile!.tenant_id)
         .order("absence_date", { ascending: false });
       if (error) throw error;
