@@ -5,23 +5,23 @@
   --font-sans: "Inter", system-ui, sans-serif;
   --font-display: "Space Grotesk", system-ui, sans-serif;
 
-  --color-primary: #06b6d4;
-  --color-primary-foreground: #0a0f14;
-  --color-accent: #22d3ee;
-  --color-success: #10b981;
-  --color-warning: #f59e0b;
-  --color-destructive: #ef4444;
-  --color-background: #0b0d10;
-  --color-foreground: #f5f7fa;
-  --color-muted: #15181d;
-  --color-muted-foreground: #8b95a3;
-  --color-border: #1f242b;
-  --color-input: #1f242b;
-  --color-ring: #06b6d4;
+  --color-primary: #00e5ff;
+  --color-primary-foreground: #000000;
+  --color-accent: #00e5ff;
+  --color-success: #00f2a9;
+  --color-warning: #ffb800;
+  --color-destructive: #ff3366;
+  --color-background: #020406;
+  --color-foreground: #ffffff;
+  --color-muted: #0a0e14;
+  --color-muted-foreground: #6b7c8a;
+  --color-border: #141a21;
+  --color-input: #141a21;
+  --color-ring: #00e5ff;
 
-  --radius-xl: 1rem;
-  --radius-2xl: 1.5rem;
-  --radius-3xl: 2rem;
+  --radius-xl: 1.25rem;
+  --radius-2xl: 2rem;
+  --radius-3xl: 3rem;
 
   --animate-fade-in: fade-in 0.5s ease-out forwards;
   --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
@@ -46,26 +46,27 @@
 
 @layer components {
   .glass-card {
-    @apply bg-muted/40 backdrop-blur-md border border-border/40;
+    @apply bg-muted/30 backdrop-blur-2xl border border-border/40;
     will-change: transform, opacity;
   }
   
   .text-gradient {
-    @apply text-primary;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary via-primary/80 to-accent;
   }
   
   .nav-link {
-    @apply relative after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-primary after:transition-all hover:after:w-full;
+    @apply relative font-bold tracking-tight transition-all duration-300 hover:text-primary after:absolute after:-bottom-1 after:left-0 after:h-[2px] after:w-0 after:bg-primary after:transition-all hover:after:w-full;
   }
 
   .premium-button {
-    @apply bg-primary text-primary-foreground transition-all hover:bg-primary/90 active:scale-[0.98];
+    @apply bg-gradient-to-r from-primary to-primary/80 text-primary-foreground font-black uppercase tracking-widest transition-all duration-500 hover:shadow-2xl hover:shadow-primary/30 hover:-translate-y-1 active:scale-[0.98] border border-primary/20 shadow-xl shadow-primary/20;
   }
 }
 
 :root {
-  --gradient-primary: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
-  --shadow-glow: 0 8px 24px -8px rgba(6, 182, 212, 0.35);
+  --gradient-primary: linear-gradient(135deg, #00e5ff 0%, #00a3ff 100%);
+  --shadow-glow: 0 12px 48px -12px rgba(0, 229, 255, 0.4);
+  --shadow-premium: 0 20px 80px -20px rgba(0, 0, 0, 0.6);
 }
 
 @keyframes gradient {

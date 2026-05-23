@@ -113,7 +113,7 @@ function AdminLayout() {
         <header className="h-24 border-b border-border/40 flex items-center justify-between px-8 md:px-12 bg-background/60 backdrop-blur-2xl sticky top-0 z-30 transition-all duration-300">
            <CommandMenu />
             <div className="flex items-center gap-6 ml-auto">
-              <div className="h-10 w-[1px] bg-border/40 mx-2"></div>
+              <div className="h-10 w-[1px] bg-border mx-2"></div>
               <div className="flex items-center gap-4">
                 <div className="text-right hidden sm:block">
                   <div className="text-sm font-bold text-foreground leading-none mb-1">{profile?.full_name}</div>
