@@ -62,33 +62,36 @@ function FuncLogin() {
         <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-accent/20 blur-[120px] rounded-full"></div>
       </div>
 
-      <div className="w-full max-w-md space-y-8 animate-in fade-in zoom-in-95 duration-500">
-        <div className="text-center space-y-2">
-           <Link to="/" className="inline-flex mx-auto mb-4">
-              <Logo size={26} wordmarkClassName="text-2xl" />
+      <div className="w-full max-w-lg space-y-12 animate-in fade-in zoom-in-95 duration-1000 slide-in-from-bottom-8">
+        <div className="text-center space-y-4">
+           <Link to="/" className="inline-flex mx-auto mb-6 hover:scale-105 transition-transform duration-500">
+              <Logo size={32} wordmarkClassName="text-3xl" />
            </Link>
-           <h1 className="text-3xl font-bold tracking-tight">Portal do Funcionário</h1>
-           <p className="text-muted-foreground">Bem-vindo de volta! Acesse para registrar seu ponto.</p>
+           <h1 className="text-5xl font-black tracking-tighter text-foreground drop-shadow-sm">Portal do Funcionário</h1>
+           <p className="text-muted-foreground text-lg font-medium opacity-80">Bem-vindo de volta! Acesse para registrar seu ponto.</p>
         </div>
 
-        <div className="glass-card rounded-[2.5rem] p-10 border border-primary/10 shadow-premium relative">
-          <div className="absolute -top-6 left-1/2 -translate-x-1/2 h-12 w-12 rounded-2xl bg-background border border-border grid place-items-center text-primary shadow-lg">
-             <Fingerprint className="h-6 w-6" />
+        <div className="glass-card rounded-[3rem] p-12 border border-primary/10 shadow-2xl relative bg-background/40 backdrop-blur-2xl">
+          <div className="absolute -top-7 left-1/2 -translate-x-1/2 h-14 w-14 rounded-2xl bg-primary text-primary-foreground border border-primary shadow-xl shadow-primary/20 grid place-items-center">
+             <Fingerprint className="h-7 w-7" />
           </div>
 
           <form onSubmit={onSubmit} className="space-y-6 mt-4">
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">E-mail de Acesso</Label>
-                <Input 
-                  id="email" 
-                  type="email" 
-                  placeholder="seu.email@empresa.com"
-                  required 
-                  value={email} 
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="bg-muted/30 border-none rounded-2xl h-12 px-4 focus-visible:ring-primary/40"
-                />
+                <Label htmlFor="email" className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/70 ml-2">E-mail de Acesso</Label>
+                <div className="relative group">
+                  <Users className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                  <Input 
+                    id="email" 
+                    type="email" 
+                    placeholder="seu.email@empresa.com"
+                    required 
+                    value={email} 
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="bg-muted/20 border-border/40 rounded-2xl h-14 pl-12 pr-4 focus-visible:ring-primary/20 focus-visible:border-primary/30 transition-all font-medium"
+                  />
+                </div>
               </div>
               <div className="space-y-2">
                 <div className="flex justify-between items-center px-1">
@@ -107,8 +110,8 @@ function FuncLogin() {
               </div>
             </div>
             
-            <Button type="submit" disabled={loading} className="premium-button w-full h-14 rounded-2xl text-base font-bold">
-              {loading ? "Entrando..." : "Acessar Portal"}
+            <Button type="submit" disabled={loading} className="premium-button w-full h-16 rounded-2xl text-lg font-black uppercase tracking-widest shadow-xl shadow-primary/20 hover:shadow-2xl hover:shadow-primary/30 active:scale-[0.98] transition-all">
+              {loading ? "Sincronizando..." : "Acessar Portal"}
             </Button>
           </form>
 
