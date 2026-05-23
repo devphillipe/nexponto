@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Building2, ArrowLeft, ShieldCheck, Mail } from "lucide-react";
+import { Building2, ArrowLeft, ShieldCheck, Mail, KeyRound } from "lucide-react";
 import { NextFlowBackground } from "@/components/NextFlowBackground";
 import { Logo } from "@/components/Logo";
 import { supabase } from "@/integrations/supabase/client";
@@ -19,6 +19,9 @@ function AdminLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showForgot, setShowForgot] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
+  const [sendingReset, setSendingReset] = useState(false);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -56,6 +59,26 @@ function AdminLogin() {
     }
   }
 
+  async function handleResetPassword(e: React.FormEvent) {
+    e.preventDefault();
+    setSendingReset(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+        redirectTo: `${window.location.origin}/auth/reset-password`,
+      });
+      if (error) {
+        toast.error(error.message);
+      } else {
+        toast.success("E-mail de recuperação enviado! Verifique sua caixa de entrada.");
+        setShowForgot(false);
+      }
+    } catch (err) {
+      toast.error("Erro ao enviar e-mail de recuperação.");
+    } finally {
+      setSendingReset(false);
+    }
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden">
       <NextFlowBackground />
@@ -74,52 +97,99 @@ function AdminLogin() {
         </div>
 
         <div className="glass-card rounded-3xl sm:rounded-[3rem] p-8 sm:p-12 border border-primary/10 shadow-2xl relative bg-background/40 backdrop-blur-2xl mx-4 sm:mx-0">
-          <form onSubmit={onSubmit} className="space-y-8">
-            <div className="space-y-6">
-              <div className="space-y-3">
-                <Label htmlFor="email" className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/70 ml-2">E-mail Corporativo</Label>
-                <div className="relative group">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
+          {!showForgot ? (
+            <form onSubmit={onSubmit} className="space-y-8">
+              <div className="space-y-6">
+                <div className="space-y-3">
+                  <Label htmlFor="email" className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/70 ml-2">E-mail Corporativo</Label>
+                  <div className="relative group">
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                    <Input 
+                      id="email" 
+                      type="email" 
+                      placeholder="exemplo@escritorio.com"
+                      required 
+                      value={email} 
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="bg-muted/20 border-border/40 rounded-2xl h-14 pl-12 pr-4 focus-visible:ring-primary/20 focus-visible:border-primary/30 transition-all font-medium"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center px-1">
+                    <Label htmlFor="password" title="Senha" className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Senha de Acesso</Label>
+                    <button 
+                      type="button"
+                      onClick={() => setShowForgot(true)}
+                      className="text-[11px] font-bold text-primary hover:underline"
+                    >
+                      Esqueceu?
+                    </button>
+                  </div>
                   <Input 
-                    id="email" 
-                    type="email" 
-                    placeholder="exemplo@escritorio.com"
+                    id="password" 
+                    type="password" 
+                    placeholder="••••••••"
                     required 
-                    value={email} 
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="bg-muted/20 border-border/40 rounded-2xl h-14 pl-12 pr-4 focus-visible:ring-primary/20 focus-visible:border-primary/30 transition-all font-medium"
+                    value={password} 
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="bg-muted/30 border-none rounded-2xl h-12 px-4 focus-visible:ring-primary/40"
                   />
                 </div>
               </div>
-              <div className="space-y-2">
-                <div className="flex justify-between items-center px-1">
-                  <Label htmlFor="password" title="Senha" className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Senha de Acesso</Label>
-                  <a href="#" className="text-[11px] font-bold text-primary hover:underline">Esqueceu?</a>
+              
+              <Button type="submit" disabled={loading} className="premium-button w-full h-16 rounded-2xl text-lg font-black uppercase tracking-widest shadow-xl shadow-primary/20 hover:shadow-2xl hover:shadow-primary/30 active:scale-[0.98] transition-all">
+                {loading ? "Autenticando..." : "Acessar Painel"}
+              </Button>
+            </form>
+          ) : (
+            <form onSubmit={handleResetPassword} className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
+              <div className="space-y-6">
+                <div className="text-center space-y-2">
+                  <div className="h-12 w-12 bg-primary/10 rounded-2xl grid place-items-center mx-auto mb-4">
+                    <KeyRound className="h-6 w-6 text-primary" />
+                  </div>
+                  <h3 className="text-xl font-bold">Recuperar Senha</h3>
+                  <p className="text-sm text-muted-foreground">Enviaremos um link para você redefinir sua senha.</p>
                 </div>
-                <Input 
-                  id="password" 
-                  type="password" 
-                  placeholder="••••••••"
-                  required 
-                  value={password} 
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="bg-muted/30 border-none rounded-2xl h-12 px-4 focus-visible:ring-primary/40"
-                />
+                
+                <div className="space-y-3">
+                  <Label htmlFor="resetEmail" className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/70 ml-2">E-mail de Recuperação</Label>
+                  <div className="relative group">
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                    <Input 
+                      id="resetEmail" 
+                      type="email" 
+                      placeholder="seu@email.com"
+                      required 
+                      value={resetEmail} 
+                      onChange={(e) => setResetEmail(e.target.value)}
+                      className="bg-muted/20 border-border/40 rounded-2xl h-14 pl-12 pr-4 focus-visible:ring-primary/20 focus-visible:border-primary/30 transition-all font-medium"
+                    />
+                  </div>
+                </div>
               </div>
-            </div>
-            
-            <Button type="submit" disabled={loading} className="premium-button w-full h-16 rounded-2xl text-lg font-black uppercase tracking-widest shadow-xl shadow-primary/20 hover:shadow-2xl hover:shadow-primary/30 active:scale-[0.98] transition-all">
-              {loading ? "Autenticando..." : "Acessar Painel"}
-            </Button>
-          </form>
+              
+              <div className="space-y-4">
+                <Button type="submit" disabled={sendingReset} className="premium-button w-full h-16 rounded-2xl text-lg font-black uppercase tracking-widest">
+                  {sendingReset ? "Enviando..." : "Enviar Link"}
+                </Button>
+                <Button type="button" variant="ghost" onClick={() => setShowForgot(false)} className="w-full font-bold text-sm">
+                  Voltar para o Login
+                </Button>
+              </div>
+            </form>
+          )}
 
           <div className="mt-8 pt-8 border-t border-border/40 text-center space-y-4">
-            <p className="text-sm text-muted-foreground">
-              Ainda não tem conta?{" "}
-              <Link to="/admin/cadastro" className="text-primary font-bold hover:underline decoration-2 underline-offset-4">
-                Cadastre seu escritório
-              </Link>
-            </p>
+            {!showForgot && (
+              <p className="text-sm text-muted-foreground">
+                Ainda não tem conta?{" "}
+                <Link to="/admin/cadastro" className="text-primary font-bold hover:underline decoration-2 underline-offset-4">
+                  Cadastre seu escritório
+                </Link>
+              </p>
+            )}
             <div className="flex items-center justify-center gap-2 text-[10px] text-muted-foreground uppercase tracking-widest font-bold">
                <ShieldCheck className="h-3 w-3" /> Acesso Seguro NexPonto
             </div>
