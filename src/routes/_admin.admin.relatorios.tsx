@@ -74,7 +74,7 @@ function RelatoriosPage() {
 
       const reportData = employeesToReport.map(emp => {
         const empEntries = entries?.filter(e => e.employee_id === emp.id) || [];
-        const empAbsences = absences?.filter(a => a.absence_date === dateStr); // Fix: dateStr is not defined here yet
+        const empAbsences = absences?.filter(a => a.employee_id === emp.id) || [];
         
         const days = eachDayOfInterval({ start: startDate, end: endDate });
         
