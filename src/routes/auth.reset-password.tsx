@@ -255,6 +255,13 @@ function ResetPassword() {
               </div>
             </div>
 
+            {formError && (
+              <div className="flex items-start gap-2 rounded-2xl border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive animate-in fade-in slide-in-from-top-1 duration-300">
+                <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+                <span className="leading-relaxed">{formError}</span>
+              </div>
+            )}
+
             <Button type="submit" disabled={loading} className="premium-button w-full h-16 rounded-2xl text-lg font-black uppercase tracking-widest shadow-xl shadow-primary/20 hover:shadow-2xl hover:shadow-primary/30 active:scale-[0.98] transition-all">
               {loading ? "Atualizando..." : "Alterar Senha"}
             </Button>
