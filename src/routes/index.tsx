@@ -47,10 +47,7 @@ function Landing() {
       </header>
 
       <section className="flex flex-1 flex-col items-center justify-center py-12 sm:py-16 text-center relative">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full -z-10 overflow-hidden pointer-events-none">
-          <div className="absolute top-1/4 left-1/4 w-48 h-48 sm:w-64 sm:h-64 bg-primary/10 rounded-full blur-[80px] sm:blur-[100px] animate-pulse-slow"></div>
-          <div className="absolute bottom-1/4 right-1/4 w-48 h-48 sm:w-64 sm:h-64 bg-primary/10 rounded-full blur-[80px] sm:blur-[100px] animate-pulse-slow delay-1000"></div>
-        </div>
+
 
         <div className="mb-6 animate-fade-in inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-xs font-medium text-primary shadow-[0_0_15px_rgba(var(--color-primary),0.1)]">
           <Zap className="h-3.5 w-3.5 fill-primary" />
