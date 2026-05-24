@@ -3,7 +3,7 @@ import { memo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useProfile } from "@/lib/auth";
-import { Users, Clock, CheckCircle2, AlertCircle, ArrowUpRight, TrendingUp, CheckCircle } from "lucide-react";
+import { Users, Clock, CheckCircle2, AlertCircle, ArrowUpRight, TrendingUp, TrendingDown, Activity, CheckCircle } from "lucide-react";
 import { CardSkeleton } from "@/components/SkeletonLoader";
 import { useNavigate } from "@tanstack/react-router";
 
@@ -68,6 +68,23 @@ function Dashboard() {
     { label: "Pendências", value: "0", icon: AlertCircle, trend: "Tudo em dia", color: "text-muted-foreground" },
   ], [stats]);
 
+  const productivity = useMemo(() => {
+    const active = stats?.active ?? 0;
+    const punches = stats?.todayPunches ?? 0;
+    if (!active) {
+      return { label: "Sem dados ainda", icon: Activity, tone: "bg-muted/20 border-border/40 text-muted-foreground shadow-none" };
+    }
+    const expected = active * 4;
+    const rate = expected > 0 ? punches / expected : 0;
+    if (rate >= 0.75) {
+      return { label: "Produtividade em alta", icon: TrendingUp, tone: "bg-success/10 border-success/20 text-success shadow-success/5" };
+    }
+    if (rate >= 0.35) {
+      return { label: "Produtividade estável", icon: Activity, tone: "bg-primary/10 border-primary/20 text-primary shadow-primary/5" };
+    }
+    return { label: "Produtividade baixa", icon: TrendingDown, tone: "bg-warning/10 border-warning/20 text-warning shadow-warning/5" };
+  }, [stats]);
+
   return (
     <div className="space-y-12 animate-in fade-in slide-in-from-bottom-6 duration-1000">
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
@@ -77,9 +94,9 @@ function Dashboard() {
           </h1>
           <p className="text-muted-foreground mt-2 md:mt-3 text-base md:text-xl font-medium">Aqui está o resumo do seu escritório hoje.</p>
         </div>
-        <div className="flex items-center self-start gap-3 px-5 py-2.5 bg-primary/10 rounded-2xl border border-primary/20 text-primary text-sm font-bold shadow-sm shadow-primary/5">
-           <TrendingUp className="h-4 w-4" />
-           Produtividade em alta
+        <div className={`flex items-center self-start gap-3 px-5 py-2.5 rounded-2xl border text-sm font-bold shadow-sm ${productivity.tone}`}>
+           <productivity.icon className="h-4 w-4" />
+           {productivity.label}
         </div>
       </div>
 
