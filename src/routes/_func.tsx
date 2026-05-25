@@ -1,7 +1,7 @@
 import { createFileRoute, Link, Outlet, redirect, useNavigate, useLocation } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useProfile } from "@/lib/auth";
-import { Clock, History, LogOut, User, Bell } from "lucide-react";
+import { Clock, History, LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { memo } from "react";
 
@@ -25,7 +25,9 @@ export const Route = createFileRoute("/_func")({
 const nav = [
   { to: "/funcionario/meu-ponto", label: "Registrar Ponto", icon: Clock },
   { to: "/funcionario/historico", label: "Meu Histórico", icon: History },
+  { to: "/funcionario/perfil", label: "Perfil", icon: User },
 ] as const;
+
 
 function FuncLayout() {
   const { data: profile } = useProfile();
