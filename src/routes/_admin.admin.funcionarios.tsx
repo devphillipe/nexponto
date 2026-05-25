@@ -243,7 +243,6 @@ function EditEmployeeDialog({ employee, onDone }: { employee: any, onDone: () =>
   const [form, setForm] = useState({
     full_name: employee.full_name || "",
     email: employee.email || "",
-    password: "",
     cpf: employee.cpf || "",
     phone: employee.phone || "",
     position: employee.position || "",
