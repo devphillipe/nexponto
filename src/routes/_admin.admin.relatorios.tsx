@@ -201,10 +201,23 @@ function RelatoriosPage() {
         reportData.forEach((rd, index) => {
           if (index > 0) doc.addPage();
           
+          // Reserved logo area: 45x45mm box at top-left, image scaled to fit while preserving aspect ratio
+          const LOGO_BOX = { x: 14, y: 8, w: 45, h: 45 };
+          let headerLeftX = 14;
           if (logoDataUrl) {
             try {
-              // Ajustando tamanho da logo para ficar mais visível e com folga
-              doc.addImage(logoDataUrl, "PNG", 14, 8, 25, 25);
+              const props = (doc as any).getImageProperties(logoDataUrl);
+              const ratio = props.width / props.height;
+              let w = LOGO_BOX.w;
+              let h = LOGO_BOX.w / ratio;
+              if (h > LOGO_BOX.h) {
+                h = LOGO_BOX.h;
+                w = LOGO_BOX.h * ratio;
+              }
+              const cx = LOGO_BOX.x + (LOGO_BOX.w - w) / 2;
+              const cy = LOGO_BOX.y + (LOGO_BOX.h - h) / 2;
+              doc.addImage(logoDataUrl, "PNG", cx, cy, w, h);
+              headerLeftX = LOGO_BOX.x + LOGO_BOX.w + 6;
             } catch (e) {
               console.error("Could not add image to PDF", e);
             }
@@ -212,39 +225,39 @@ function RelatoriosPage() {
           
           doc.setTextColor(33, 150, 243);
           doc.setFontSize(22);
-          doc.text("Relatório de Ponto", logoDataUrl ? 45 : 14, 20);
+          doc.text("Relatório de Ponto", headerLeftX, 22);
           
           doc.setTextColor(100, 100, 100);
           doc.setFontSize(10);
-          doc.text(profile?.tenant_name || "NexPonto", logoDataUrl ? 45 : 14, 28);
+          doc.text(profile?.tenant_name || "NexPonto", headerLeftX, 30);
           
           doc.setDrawColor(230, 230, 230);
-          doc.line(14, 35, 196, 35);
+          doc.line(14, 56, 196, 56);
 
           doc.setTextColor(60, 60, 60);
           doc.setFontSize(12);
-          doc.text(`Colaborador: ${rd.employee}`, 14, 45);
-          doc.text(`Período: ${month}`, 14, 51);
+          doc.text(`Colaborador: ${rd.employee}`, 14, 64);
+          doc.text(`Período: ${month}`, 14, 70);
 
           doc.setFillColor(245, 247, 250);
-          doc.roundedRect(14, 58, 182, 25, 3, 3, "F");
+          doc.roundedRect(14, 76, 182, 25, 3, 3, "F");
           
           doc.setFontSize(10);
-          doc.text("Total Trabalhado", 20, 68);
+          doc.text("Total Trabalhado", 20, 86);
           doc.setFontSize(12);
-          doc.text(rd.totalWorked, 20, 76);
+          doc.text(rd.totalWorked, 20, 94);
 
           doc.setFontSize(10);
-          doc.text("Total Esperado", 80, 68);
+          doc.text("Total Esperado", 80, 86);
           doc.setFontSize(12);
-          doc.text(rd.totalExpected, 80, 76);
+          doc.text(rd.totalExpected, 80, 94);
 
           doc.setFontSize(10);
-          doc.text("Saldo de Horas", 140, 68);
+          doc.text("Saldo de Horas", 140, 86);
           doc.setFontSize(14);
           const isNegative = rd.balance.startsWith("-");
           doc.setTextColor(isNegative ? 244 : 76, isNegative ? 67 : 175, isNegative ? 54 : 80);
-          doc.text(rd.balance, 140, 76);
+          doc.text(rd.balance, 140, 94);
 
           const tableBody = rd.dailyReports.map(d => [
             d.date, 
@@ -257,7 +270,7 @@ function RelatoriosPage() {
           ]);
 
           autoTable(doc, {
-            startY: 90,
+            startY: 108,
             head: [["Data", "Entrada", "Almoço (S)", "Almoço (R)", "Saída", "Total", "Status"]],
             body: tableBody,
             theme: "grid",
@@ -274,9 +287,15 @@ function RelatoriosPage() {
               }
               if (data.column.index === 6 && data.cell.text[0] === "Falta") {
                 data.cell.styles.textColor = [244, 67, 54];
+                data.cell.styles.fontStyle = "bold";
+              }
+              if (data.column.index === 6 && data.cell.text[0] === "Presente") {
+                data.cell.styles.textColor = [46, 160, 67];
+                data.cell.styles.fontStyle = "bold";
               }
             }
           });
+
           doc.setTextColor(60, 60, 60);
           doc.setFontSize(10);
           const finalY = (doc as any).lastAutoTable.finalY + 20;

@@ -115,7 +115,6 @@ export const updateEmployee = createServerFn({ method: "POST" })
       id: z.string().uuid(),
       full_name: z.string().min(2).max(120),
       email: z.string().email().max(180),
-      password: z.string().min(8).max(72).optional().nullable(),
       cpf: z.string().max(20).optional().nullable(),
       phone: z.string().max(30).optional().nullable(),
       position: z.string().max(80).optional().nullable(),
@@ -162,19 +161,13 @@ export const updateEmployee = createServerFn({ method: "POST" })
       throw new Error("Acesso negado: o funcionário pertence a outro escritório.");
     }
 
-    const updateAuth: any = {
-      email: data.email,
-    };
-    if (data.password) {
-      updateAuth.password = data.password;
-    }
-
-    // Update auth user
+    // Update auth user (email only; password is managed by the employee in their profile)
     const { error: authErr } = await supabaseAdmin.auth.admin.updateUserById(
       employee.user_id,
-      updateAuth
+      { email: data.email },
     );
     if (authErr) throw new Error(authErr.message);
+
 
     // Update profile
     await supabaseAdmin.from("profiles").update({

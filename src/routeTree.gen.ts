@@ -18,6 +18,7 @@ import { Route as FuncionarioLoginRouteImport } from './routes/funcionario.login
 import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-password'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AdminCadastroRouteImport } from './routes/admin.cadastro'
+import { Route as FuncFuncionarioPerfilRouteImport } from './routes/_func.funcionario.perfil'
 import { Route as FuncFuncionarioMeuPontoRouteImport } from './routes/_func.funcionario.meu-ponto'
 import { Route as FuncFuncionarioHistoricoRouteImport } from './routes/_func.funcionario.historico'
 import { Route as AdminAdminRelatoriosRouteImport } from './routes/_admin.admin.relatorios'
@@ -69,6 +70,11 @@ const AdminCadastroRoute = AdminCadastroRouteImport.update({
   id: '/admin/cadastro',
   path: '/admin/cadastro',
   getParentRoute: () => rootRouteImport,
+} as any)
+const FuncFuncionarioPerfilRoute = FuncFuncionarioPerfilRouteImport.update({
+  id: '/funcionario/perfil',
+  path: '/funcionario/perfil',
+  getParentRoute: () => FuncRoute,
 } as any)
 const FuncFuncionarioMeuPontoRoute = FuncFuncionarioMeuPontoRouteImport.update({
   id: '/funcionario/meu-ponto',
@@ -128,6 +134,7 @@ export interface FileRoutesByFullPath {
   '/admin/relatorios': typeof AdminAdminRelatoriosRoute
   '/funcionario/historico': typeof FuncFuncionarioHistoricoRoute
   '/funcionario/meu-ponto': typeof FuncFuncionarioMeuPontoRoute
+  '/funcionario/perfil': typeof FuncFuncionarioPerfilRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -145,6 +152,7 @@ export interface FileRoutesByTo {
   '/admin/relatorios': typeof AdminAdminRelatoriosRoute
   '/funcionario/historico': typeof FuncFuncionarioHistoricoRoute
   '/funcionario/meu-ponto': typeof FuncFuncionarioMeuPontoRoute
+  '/funcionario/perfil': typeof FuncFuncionarioPerfilRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -165,6 +173,7 @@ export interface FileRoutesById {
   '/_admin/admin/relatorios': typeof AdminAdminRelatoriosRoute
   '/_func/funcionario/historico': typeof FuncFuncionarioHistoricoRoute
   '/_func/funcionario/meu-ponto': typeof FuncFuncionarioMeuPontoRoute
+  '/_func/funcionario/perfil': typeof FuncFuncionarioPerfilRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -184,6 +193,7 @@ export interface FileRouteTypes {
     | '/admin/relatorios'
     | '/funcionario/historico'
     | '/funcionario/meu-ponto'
+    | '/funcionario/perfil'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -201,6 +211,7 @@ export interface FileRouteTypes {
     | '/admin/relatorios'
     | '/funcionario/historico'
     | '/funcionario/meu-ponto'
+    | '/funcionario/perfil'
   id:
     | '__root__'
     | '/'
@@ -220,6 +231,7 @@ export interface FileRouteTypes {
     | '/_admin/admin/relatorios'
     | '/_func/funcionario/historico'
     | '/_func/funcionario/meu-ponto'
+    | '/_func/funcionario/perfil'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -298,6 +310,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/cadastro'
       preLoaderRoute: typeof AdminCadastroRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_func/funcionario/perfil': {
+      id: '/_func/funcionario/perfil'
+      path: '/funcionario/perfil'
+      fullPath: '/funcionario/perfil'
+      preLoaderRoute: typeof FuncFuncionarioPerfilRouteImport
+      parentRoute: typeof FuncRoute
     }
     '/_func/funcionario/meu-ponto': {
       id: '/_func/funcionario/meu-ponto'
@@ -381,11 +400,13 @@ const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 interface FuncRouteChildren {
   FuncFuncionarioHistoricoRoute: typeof FuncFuncionarioHistoricoRoute
   FuncFuncionarioMeuPontoRoute: typeof FuncFuncionarioMeuPontoRoute
+  FuncFuncionarioPerfilRoute: typeof FuncFuncionarioPerfilRoute
 }
 
 const FuncRouteChildren: FuncRouteChildren = {
   FuncFuncionarioHistoricoRoute: FuncFuncionarioHistoricoRoute,
   FuncFuncionarioMeuPontoRoute: FuncFuncionarioMeuPontoRoute,
+  FuncFuncionarioPerfilRoute: FuncFuncionarioPerfilRoute,
 }
 
 const FuncRouteWithChildren = FuncRoute._addFileChildren(FuncRouteChildren)

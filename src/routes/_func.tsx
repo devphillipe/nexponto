@@ -1,7 +1,7 @@
 import { createFileRoute, Link, Outlet, redirect, useNavigate, useLocation } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useProfile } from "@/lib/auth";
-import { Clock, History, LogOut, User, Bell } from "lucide-react";
+import { Clock, History, LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { memo } from "react";
 
@@ -25,7 +25,9 @@ export const Route = createFileRoute("/_func")({
 const nav = [
   { to: "/funcionario/meu-ponto", label: "Registrar Ponto", icon: Clock },
   { to: "/funcionario/historico", label: "Meu Histórico", icon: History },
+  { to: "/funcionario/perfil", label: "Perfil", icon: User },
 ] as const;
+
 
 function FuncLayout() {
   const { data: profile } = useProfile();
@@ -41,8 +43,12 @@ function FuncLayout() {
     <div className="mx-auto flex h-screen max-w-2xl flex-col px-4 py-4 animate-fade-in overflow-hidden">
       <header className="mb-4 flex items-center justify-between glass-card p-3 rounded-2xl">
         <div className="flex items-center gap-3">
-           <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 grid place-items-center font-bold text-primary border border-primary/10">
-              {profile?.full_name?.charAt(0) || "U"}
+           <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 grid place-items-center font-bold text-primary border border-primary/10 overflow-hidden">
+              {profile?.avatar_url ? (
+                <img src={profile.avatar_url} alt="Avatar" className="h-full w-full object-cover" />
+              ) : (
+                profile?.full_name?.charAt(0) || "U"
+              )}
            </div>
            <div className="min-w-0">
              <div className="font-display text-xs font-bold tracking-tight truncate">{profile?.full_name}</div>
