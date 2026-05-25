@@ -302,15 +302,9 @@ function EditEmployeeDialog({ employee, onDone }: { employee: any, onDone: () =>
               <Label htmlFor="edit-fn">Nome completo *</Label>
               <Input id="edit-fn" required value={form.full_name} onChange={(e) => up("full_name", e.target.value)} />
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <Label htmlFor="edit-em">E-mail (login) *</Label>
-                <Input id="edit-em" type="email" required value={form.email} onChange={(e) => up("email", e.target.value)} />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="edit-pw">Nova Senha (deixe em branco para manter)</Label>
-                <Input id="edit-pw" type="text" minLength={8} value={form.password} onChange={(e) => up("password", e.target.value)} />
-              </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="edit-em">E-mail (login) *</Label>
+              <Input id="edit-em" type="email" required value={form.email} onChange={(e) => up("email", e.target.value)} />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
