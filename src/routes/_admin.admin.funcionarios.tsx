@@ -264,7 +264,6 @@ function EditEmployeeDialog({ employee, onDone }: { employee: any, onDone: () =>
           id: employee.id,
           full_name: form.full_name,
           email: form.email,
-          password: form.password || null,
           cpf: form.cpf || null,
           phone: form.phone || null,
           position: form.position || null,
