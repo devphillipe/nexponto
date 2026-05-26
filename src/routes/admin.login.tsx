@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PasswordInput } from "@/components/forms/PasswordInput";
 import { translateAuthError } from "@/lib/auth-errors";
 
 export const Route = createFileRoute("/admin/login")({
@@ -118,6 +119,8 @@ function AdminLogin() {
                       id="email" 
                       type="email" 
                       placeholder="exemplo@escritorio.com"
+                      autoComplete="email"
+                      inputMode="email"
                       required 
                       value={email} 
                       onChange={(e) => setEmail(e.target.value)}
@@ -127,23 +130,23 @@ function AdminLogin() {
                 </div>
                 <div className="space-y-2">
                   <div className="flex justify-between items-center px-1">
-                    <Label htmlFor="password" title="Senha" className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Senha de Acesso</Label>
+                    <Label htmlFor="password" className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Senha de Acesso</Label>
                     <button 
                       type="button"
                       onClick={() => setShowForgot(true)}
-                      className="text-[11px] font-bold text-primary hover:underline"
+                      className="text-[11px] font-bold text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 rounded"
                     >
                       Esqueceu?
                     </button>
                   </div>
-                  <Input 
-                    id="password" 
-                    type="password" 
-                    placeholder="••••••••"
-                    required 
-                    value={password} 
+                  <PasswordInput
+                    id="password"
+                    placeholder="Sua senha"
+                    autoComplete="current-password"
+                    required
+                    value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="bg-muted/30 border-none rounded-2xl h-12 px-4 focus-visible:ring-primary/40"
+                    inputClassName="bg-muted/30 border-none rounded-2xl h-12 px-4 focus-visible:ring-primary/40"
                   />
                 </div>
               </div>
@@ -205,17 +208,21 @@ function AdminLogin() {
                       id="resetEmail" 
                       type="email" 
                       placeholder="seu@email.com"
+                      autoComplete="email"
+                      inputMode="email"
                       required 
                       value={resetEmail} 
                       onChange={(e) => { setResetEmail(e.target.value); if (resetError) setResetError(""); }}
+                      aria-invalid={!!resetError}
+                      aria-describedby={resetError ? "resetEmailError" : undefined}
                       className="bg-muted/20 border-border/40 rounded-2xl h-14 pl-12 pr-4 focus-visible:ring-primary/20 focus-visible:border-primary/30 transition-all font-medium"
                     />
                   </div>
                 </div>
 
                 {resetError && (
-                  <div className="flex items-start gap-2 rounded-2xl border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive animate-in fade-in slide-in-from-top-1 duration-300">
-                    <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+                  <div id="resetEmailError" role="alert" className="flex items-start gap-2 rounded-2xl border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive animate-in fade-in slide-in-from-top-1 duration-300">
+                    <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" aria-hidden />
                     <span className="leading-relaxed">{resetError}</span>
                   </div>
                 )}

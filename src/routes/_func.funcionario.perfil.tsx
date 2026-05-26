@@ -10,6 +10,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { PasswordInput } from "@/components/forms/PasswordInput";
+import { PasswordStrengthMeter } from "@/components/forms/PasswordStrengthMeter";
+import { getPasswordStrength } from "@/lib/validators";
 import { toast } from "sonner";
 import { translateAuthError } from "@/lib/auth-errors";
 import { Camera, Lock, User as UserIcon, Loader2, Check } from "lucide-react";
@@ -98,8 +101,9 @@ function PerfilPage() {
 
   async function changePassword(e: React.FormEvent) {
     e.preventDefault();
-    if (pw.length < 8) {
-      toast.error("A senha deve ter no mínimo 8 caracteres.");
+    const strength = getPasswordStrength(pw);
+    if (!strength.metAll) {
+      toast.error("A senha não atende a todos os requisitos.");
       return;
     }
     if (pw !== pw2) {
@@ -213,32 +217,41 @@ function PerfilPage() {
           <CardDescription>Defina uma nova senha de acesso.</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={changePassword} className="space-y-4">
+          <form onSubmit={changePassword} className="space-y-4" noValidate>
             <div className="space-y-1.5">
               <Label htmlFor="new-pw">Nova senha</Label>
-              <Input
+              <PasswordInput
                 id="new-pw"
-                type="password"
                 value={pw}
                 onChange={(e) => setPw(e.target.value)}
                 minLength={8}
                 required
-                placeholder="Mínimo 8 caracteres"
+                autoComplete="new-password"
+                placeholder="Crie uma senha forte"
+                aria-describedby="new-pw-strength"
               />
+              <div id="new-pw-strength" className="pt-2">
+                <PasswordStrengthMeter password={pw} />
+              </div>
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="new-pw2">Confirmar nova senha</Label>
-              <Input
+              <PasswordInput
                 id="new-pw2"
-                type="password"
                 value={pw2}
                 onChange={(e) => setPw2(e.target.value)}
                 minLength={8}
                 required
+                autoComplete="new-password"
+                placeholder="Repita a senha"
+                aria-invalid={pw2.length > 0 && pw2 !== pw}
               />
+              {pw2.length > 0 && pw2 !== pw && (
+                <p className="text-xs text-destructive">As senhas não coincidem.</p>
+              )}
             </div>
-            <Button type="submit" disabled={pwLoading} className="w-full rounded-xl">
-              {pwLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
+            <Button type="submit" disabled={pwLoading} className="w-full rounded-xl" aria-busy={pwLoading}>
+              {pwLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" aria-hidden /> : null}
               Alterar senha
             </Button>
           </form>

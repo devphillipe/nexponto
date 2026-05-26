@@ -1,13 +1,15 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { KeyRound, ShieldCheck, Lock, AlertCircle, CheckCircle2 } from "lucide-react";
+import { KeyRound, ShieldCheck, AlertCircle, CheckCircle2 } from "lucide-react";
 import { NextFlowBackground } from "@/components/NextFlowBackground";
 import { Logo } from "@/components/Logo";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PasswordInput } from "@/components/forms/PasswordInput";
+import { PasswordStrengthMeter } from "@/components/forms/PasswordStrengthMeter";
+import { getPasswordStrength } from "@/lib/validators";
 import { translateAuthError } from "@/lib/auth-errors";
 
 export const Route = createFileRoute("/auth/reset-password")({
@@ -104,8 +106,9 @@ function ResetPassword() {
 
     if (status !== "ready") return;
 
-    if (password.length < 8) {
-      setFormError("A senha deve ter pelo menos 8 caracteres.");
+    const strength = getPasswordStrength(password);
+    if (!strength.metAll) {
+      setFormError("A senha não atende a todos os requisitos. Verifique a lista abaixo.");
       return;
     }
 
@@ -219,45 +222,47 @@ function ResetPassword() {
           </div>
 
           <form onSubmit={onSubmit} className="space-y-6 mt-4">
-            <div className="space-y-4">
+            <div className="space-y-5">
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/70 ml-2">Nova Senha</Label>
-                <div className="relative group">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="••••••••"
-                    required
-                    minLength={8}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="bg-muted/20 border-border/40 rounded-2xl h-14 pl-12 pr-4 focus-visible:ring-primary/20 focus-visible:border-primary/30 transition-all font-medium"
-                  />
+                <PasswordInput
+                  id="password"
+                  placeholder="Crie uma senha forte"
+                  autoComplete="new-password"
+                  required
+                  minLength={8}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  aria-describedby="password-strength"
+                  inputClassName="bg-muted/20 border-border/40 rounded-2xl h-14 px-4 focus-visible:ring-primary/20 focus-visible:border-primary/30 transition-all font-medium"
+                />
+                <div id="password-strength" className="pt-2">
+                  <PasswordStrengthMeter password={password} />
                 </div>
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="confirmPassword" className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/70 ml-2">Confirmar Nova Senha</Label>
-                <div className="relative group">
-                  <ShieldCheck className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
-                  <Input
-                    id="confirmPassword"
-                    type="password"
-                    placeholder="••••••••"
-                    required
-                    minLength={8}
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="bg-muted/20 border-border/40 rounded-2xl h-14 pl-12 pr-4 focus-visible:ring-primary/20 focus-visible:border-primary/30 transition-all font-medium"
-                  />
-                </div>
+                <PasswordInput
+                  id="confirmPassword"
+                  placeholder="Repita a senha"
+                  autoComplete="new-password"
+                  required
+                  minLength={8}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  aria-invalid={confirmPassword.length > 0 && confirmPassword !== password}
+                  inputClassName="bg-muted/20 border-border/40 rounded-2xl h-14 px-4 focus-visible:ring-primary/20 focus-visible:border-primary/30 transition-all font-medium"
+                />
+                {confirmPassword.length > 0 && confirmPassword !== password && (
+                  <p className="text-xs text-destructive ml-2">As senhas não coincidem.</p>
+                )}
               </div>
             </div>
 
             {formError && (
-              <div className="flex items-start gap-2 rounded-2xl border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive animate-in fade-in slide-in-from-top-1 duration-300">
-                <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+              <div role="alert" className="flex items-start gap-2 rounded-2xl border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive animate-in fade-in slide-in-from-top-1 duration-300">
+                <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" aria-hidden />
                 <span className="leading-relaxed">{formError}</span>
               </div>
             )}
