@@ -217,32 +217,41 @@ function PerfilPage() {
           <CardDescription>Defina uma nova senha de acesso.</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={changePassword} className="space-y-4">
+          <form onSubmit={changePassword} className="space-y-4" noValidate>
             <div className="space-y-1.5">
               <Label htmlFor="new-pw">Nova senha</Label>
-              <Input
+              <PasswordInput
                 id="new-pw"
-                type="password"
                 value={pw}
                 onChange={(e) => setPw(e.target.value)}
                 minLength={8}
                 required
-                placeholder="Mínimo 8 caracteres"
+                autoComplete="new-password"
+                placeholder="Crie uma senha forte"
+                aria-describedby="new-pw-strength"
               />
+              <div id="new-pw-strength" className="pt-2">
+                <PasswordStrengthMeter password={pw} />
+              </div>
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="new-pw2">Confirmar nova senha</Label>
-              <Input
+              <PasswordInput
                 id="new-pw2"
-                type="password"
                 value={pw2}
                 onChange={(e) => setPw2(e.target.value)}
                 minLength={8}
                 required
+                autoComplete="new-password"
+                placeholder="Repita a senha"
+                aria-invalid={pw2.length > 0 && pw2 !== pw}
               />
+              {pw2.length > 0 && pw2 !== pw && (
+                <p className="text-xs text-destructive">As senhas não coincidem.</p>
+              )}
             </div>
-            <Button type="submit" disabled={pwLoading} className="w-full rounded-xl">
-              {pwLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
+            <Button type="submit" disabled={pwLoading} className="w-full rounded-xl" aria-busy={pwLoading}>
+              {pwLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" aria-hidden /> : null}
               Alterar senha
             </Button>
           </form>
