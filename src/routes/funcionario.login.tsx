@@ -54,7 +54,7 @@ function FuncLogin() {
       navigate({ to: "/funcionario/meu-ponto" });
     } catch (err) {
       setLoading(false);
-      toast.error("Ocorreu um erro inesperado.");
+      toast.error(translateAuthError(err));
     }
   }
 
