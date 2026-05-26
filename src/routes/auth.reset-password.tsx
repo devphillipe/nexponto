@@ -106,8 +106,9 @@ function ResetPassword() {
 
     if (status !== "ready") return;
 
-    if (password.length < 8) {
-      setFormError("A senha deve ter pelo menos 8 caracteres.");
+    const strength = getPasswordStrength(password);
+    if (!strength.metAll) {
+      setFormError("A senha não atende a todos os requisitos. Verifique a lista abaixo.");
       return;
     }
 
