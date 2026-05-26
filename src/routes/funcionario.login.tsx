@@ -90,6 +90,8 @@ function FuncLogin() {
                     id="email" 
                     type="email" 
                     placeholder="seu.email@empresa.com"
+                    autoComplete="email"
+                    inputMode="email"
                     required 
                     value={email} 
                     onChange={(e) => setEmail(e.target.value)}
@@ -99,16 +101,16 @@ function FuncLogin() {
               </div>
               <div className="space-y-2">
                 <div className="flex justify-between items-center px-1">
-                  <Label htmlFor="password" title="Senha" className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Sua Senha</Label>
+                  <Label htmlFor="password" className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Sua Senha</Label>
                 </div>
-                <Input 
-                  id="password" 
-                  type="password" 
-                  placeholder="••••••••"
-                  required 
-                  value={password} 
+                <PasswordInput
+                  id="password"
+                  placeholder="Sua senha"
+                  autoComplete="current-password"
+                  required
+                  value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="bg-muted/30 border-none rounded-2xl h-12 px-4 focus-visible:ring-primary/40"
+                  inputClassName="bg-muted/30 border-none rounded-2xl h-12 px-4 focus-visible:ring-primary/40"
                 />
               </div>
             </div>
