@@ -101,8 +101,9 @@ function PerfilPage() {
 
   async function changePassword(e: React.FormEvent) {
     e.preventDefault();
-    if (pw.length < 8) {
-      toast.error("A senha deve ter no mínimo 8 caracteres.");
+    const strength = getPasswordStrength(pw);
+    if (!strength.metAll) {
+      toast.error("A senha não atende a todos os requisitos.");
       return;
     }
     if (pw !== pw2) {
