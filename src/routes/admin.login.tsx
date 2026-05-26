@@ -119,6 +119,8 @@ function AdminLogin() {
                       id="email" 
                       type="email" 
                       placeholder="exemplo@escritorio.com"
+                      autoComplete="email"
+                      inputMode="email"
                       required 
                       value={email} 
                       onChange={(e) => setEmail(e.target.value)}
@@ -128,23 +130,23 @@ function AdminLogin() {
                 </div>
                 <div className="space-y-2">
                   <div className="flex justify-between items-center px-1">
-                    <Label htmlFor="password" title="Senha" className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Senha de Acesso</Label>
+                    <Label htmlFor="password" className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Senha de Acesso</Label>
                     <button 
                       type="button"
                       onClick={() => setShowForgot(true)}
-                      className="text-[11px] font-bold text-primary hover:underline"
+                      className="text-[11px] font-bold text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 rounded"
                     >
                       Esqueceu?
                     </button>
                   </div>
-                  <Input 
-                    id="password" 
-                    type="password" 
-                    placeholder="••••••••"
-                    required 
-                    value={password} 
+                  <PasswordInput
+                    id="password"
+                    placeholder="Sua senha"
+                    autoComplete="current-password"
+                    required
+                    value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="bg-muted/30 border-none rounded-2xl h-12 px-4 focus-visible:ring-primary/40"
+                    inputClassName="bg-muted/30 border-none rounded-2xl h-12 px-4 focus-visible:ring-primary/40"
                   />
                 </div>
               </div>
