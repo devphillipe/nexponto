@@ -208,9 +208,13 @@ function AdminLogin() {
                       id="resetEmail" 
                       type="email" 
                       placeholder="seu@email.com"
+                      autoComplete="email"
+                      inputMode="email"
                       required 
                       value={resetEmail} 
                       onChange={(e) => { setResetEmail(e.target.value); if (resetError) setResetError(""); }}
+                      aria-invalid={!!resetError}
+                      aria-describedby={resetError ? "resetEmailError" : undefined}
                       className="bg-muted/20 border-border/40 rounded-2xl h-14 pl-12 pr-4 focus-visible:ring-primary/20 focus-visible:border-primary/30 transition-all font-medium"
                     />
                   </div>
