@@ -1,13 +1,15 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { KeyRound, ShieldCheck, Lock, AlertCircle, CheckCircle2 } from "lucide-react";
+import { KeyRound, ShieldCheck, AlertCircle, CheckCircle2 } from "lucide-react";
 import { NextFlowBackground } from "@/components/NextFlowBackground";
 import { Logo } from "@/components/Logo";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PasswordInput } from "@/components/forms/PasswordInput";
+import { PasswordStrengthMeter } from "@/components/forms/PasswordStrengthMeter";
+import { getPasswordStrength } from "@/lib/validators";
 import { translateAuthError } from "@/lib/auth-errors";
 
 export const Route = createFileRoute("/auth/reset-password")({
