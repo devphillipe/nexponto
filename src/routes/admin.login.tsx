@@ -221,8 +221,8 @@ function AdminLogin() {
                 </div>
 
                 {resetError && (
-                  <div className="flex items-start gap-2 rounded-2xl border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive animate-in fade-in slide-in-from-top-1 duration-300">
-                    <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+                  <div id="resetEmailError" role="alert" className="flex items-start gap-2 rounded-2xl border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive animate-in fade-in slide-in-from-top-1 duration-300">
+                    <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" aria-hidden />
                     <span className="leading-relaxed">{resetError}</span>
                   </div>
                 )}
