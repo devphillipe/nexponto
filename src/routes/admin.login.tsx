@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PasswordInput } from "@/components/forms/PasswordInput";
 import { translateAuthError } from "@/lib/auth-errors";
 
 export const Route = createFileRoute("/admin/login")({
