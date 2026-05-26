@@ -29,7 +29,7 @@ function FuncLogin() {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error || !data.user) {
         setLoading(false);
-        toast.error(error?.message ?? "Falha no login");
+        toast.error(translateAuthError(error, "Falha no login. Verifique seus dados."));
         return;
       }
 
