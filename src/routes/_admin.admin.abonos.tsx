@@ -233,8 +233,9 @@ function AbonosPage() {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="description">Observações / Justificativa</Label>
-                  <Input id="description" name="description" placeholder="Ex: Atestado médico de 2 dias" className="rounded-xl h-11 border-border/40 bg-background/50" />
+                  <Label htmlFor="description">Justificativa *</Label>
+                  <Textarea id="description" name="description" required minLength={3} maxLength={500} rows={3} placeholder="Ex: Atestado médico de 2 dias" className="rounded-xl border-border/40 bg-background/50" aria-describedby="desc-hint" />
+                  <p id="desc-hint" className="text-[11px] text-muted-foreground">Descreva o motivo do abono. Mínimo 3 caracteres.</p>
                 </div>
               </div>
               <DialogFooter className="p-8 bg-muted/20 border-t border-border/40">
