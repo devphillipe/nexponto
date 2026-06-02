@@ -368,8 +368,8 @@ function EditAbonoDialog({ abono, employees, onSave, isPending }: { abono: any, 
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="edit-description">Observações / Justificativa</Label>
-              <Input id="edit-description" name="description" defaultValue={abono.description} placeholder="Ex: Atestado médico de 2 dias" className="rounded-xl h-11 border-border/40 bg-background/50" />
+              <Label htmlFor="edit-description">Justificativa *</Label>
+              <Textarea id="edit-description" name="description" required minLength={3} maxLength={500} rows={3} defaultValue={abono.description} placeholder="Ex: Atestado médico de 2 dias" className="rounded-xl border-border/40 bg-background/50" />
             </div>
           </div>
           <DialogFooter className="p-8 bg-muted/20 border-t border-border/40">
