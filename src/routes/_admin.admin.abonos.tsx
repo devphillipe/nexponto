@@ -181,11 +181,16 @@ function AbonosPage() {
             <form onSubmit={(e) => {
               e.preventDefault();
               const formData = new FormData(e.currentTarget);
+              const description = String(formData.get("description") || "").trim();
+              if (description.length < 3) {
+                toast.error("Informe uma justificativa de pelo menos 3 caracteres.");
+                return;
+              }
               addMutation.mutate({
                 employee_id: formData.get("employee_id"),
                 absence_date: formData.get("date"),
                 reason: formData.get("reason"),
-                description: formData.get("description"),
+                description,
               });
             }}>
               <DialogHeader className="p-8 pb-4">
