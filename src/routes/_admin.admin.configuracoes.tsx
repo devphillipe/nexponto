@@ -9,6 +9,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { toast } from "sonner";
 import { Building2, Mail, Phone, MapPin, Clock, Globe, Upload, Loader2, Image as ImageIcon, Search as SearchIcon } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
+import { CpfCnpjInput, PhoneInput, CepInput } from "@/components/forms/SpecializedInputs";
+import { onlyDigits, formatCep } from "@/lib/masks";
 
 export const Route = createFileRoute("/_admin/admin/configuracoes")({
   head: () => ({ meta: [{ title: "Configurações — NexPonto Admin" }] }),
