@@ -82,7 +82,7 @@ function FuncLayout() {
         })}
       </nav>
 
-      <main className="flex-1 overflow-y-auto no-scrollbar">
+      <main id="main-content" className="flex-1 overflow-y-auto no-scrollbar">
         <Outlet />
       </main>
 
