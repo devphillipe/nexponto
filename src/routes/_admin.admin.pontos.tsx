@@ -189,12 +189,17 @@ function PontosPage() {
               <form onSubmit={(e) => {
                 e.preventDefault();
                 const formData = new FormData(e.currentTarget);
+                const notes = String(formData.get("notes") || "").trim();
+                if (!notes) {
+                  toast.error("Informe uma justificativa para o registro manual.");
+                  return;
+                }
                 addMutation.mutate({
                   employee_id: formData.get("employee_id"),
                   entry_date: formData.get("entry_date"),
                   entry_time: formData.get("entry_time"),
                   entry_type: formData.get("entry_type"),
-                  notes: formData.get("notes"),
+                  notes,
                 });
               }}>
                 <DialogHeader className="p-8 pb-4">
@@ -202,12 +207,15 @@ function PontosPage() {
                     {editingEntry ? <Edit2 className="h-6 w-6" /> : <Plus className="h-6 w-6" />}
                     {editingEntry ? "Ajustar Ponto" : "Registrar Ponto"}
                   </DialogTitle>
+                  <DialogDescription>
+                    Registros manuais ficam marcados como ajuste e exigem justificativa.
+                  </DialogDescription>
                 </DialogHeader>
                 <div className="p-8 pt-4 space-y-4">
                   <div className="space-y-2">
-                    <Label>Colaborador</Label>
+                    <Label htmlFor="employee_id_field">Colaborador *</Label>
                     <Select name="employee_id" defaultValue={editingEntry?.employee_id} required>
-                      <SelectTrigger className="rounded-xl h-11 border-border/40 bg-background/50">
+                      <SelectTrigger id="employee_id_field" className="rounded-xl h-11 border-border/40 bg-background/50">
                         <SelectValue placeholder="Selecione o funcionário" />
                       </SelectTrigger>
                       <SelectContent>
@@ -219,18 +227,18 @@ function PontosPage() {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label>Data</Label>
-                      <Input name="entry_date" type="date" defaultValue={editingEntry?.entry_date || date} required className="rounded-xl h-11 border-border/40 bg-background/50" />
+                      <Label htmlFor="entry_date">Data *</Label>
+                      <Input id="entry_date" name="entry_date" type="date" defaultValue={editingEntry?.entry_date || date} required className="rounded-xl h-11 border-border/40 bg-background/50" />
                     </div>
                     <div className="space-y-2">
-                      <Label>Horário</Label>
-                      <Input name="entry_time" type="time" step="1" defaultValue={editingEntry ? format(new Date(editingEntry.entry_at), "HH:mm:ss") : ""} required className="rounded-xl h-11 border-border/40 bg-background/50" />
+                      <Label htmlFor="entry_time">Horário *</Label>
+                      <Input id="entry_time" name="entry_time" type="time" step="1" inputMode="numeric" defaultValue={editingEntry ? format(new Date(editingEntry.entry_at), "HH:mm:ss") : ""} required className="rounded-xl h-11 border-border/40 bg-background/50" />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label>Tipo de Registro</Label>
+                    <Label htmlFor="entry_type_field">Tipo de Registro *</Label>
                     <Select name="entry_type" defaultValue={editingEntry?.entry_type || "entrada"} required>
-                      <SelectTrigger className="rounded-xl h-11 border-border/40 bg-background/50">
+                      <SelectTrigger id="entry_type_field" className="rounded-xl h-11 border-border/40 bg-background/50">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -241,13 +249,14 @@ function PontosPage() {
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label>Observações</Label>
-                    <Input name="notes" placeholder="Motivo do ajuste..." defaultValue={editingEntry?.notes || ""} className="rounded-xl h-11 border-border/40 bg-background/50" />
+                    <Label htmlFor="notes">Justificativa *</Label>
+                    <Input id="notes" name="notes" required minLength={3} maxLength={300} placeholder="Motivo do ajuste manual" defaultValue={editingEntry?.notes || ""} className="rounded-xl h-11 border-border/40 bg-background/50" aria-describedby="notes-hint" />
+                    <p id="notes-hint" className="text-[11px] text-muted-foreground">Obrigatória para registros manuais. Mínimo 3 caracteres.</p>
                   </div>
                 </div>
                 <DialogFooter className="p-8 bg-muted/20 border-t border-border/40">
                   <Button type="button" variant="ghost" onClick={() => setIsAddOpen(false)} className="rounded-xl">Cancelar</Button>
-                  <Button type="submit" disabled={addMutation.isPending} className="rounded-xl px-8 font-bold">
+                  <Button type="submit" disabled={addMutation.isPending} aria-busy={addMutation.isPending} className="rounded-xl px-8 font-bold">
                     {addMutation.isPending ? "Salvando..." : "Salvar Registro"}
                   </Button>
                 </DialogFooter>
