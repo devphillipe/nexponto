@@ -18,6 +18,11 @@ import {
 } from "@/components/ui/dialog";
 import { Plus, Mail, User, Briefcase, Calendar, ShieldCheck, Search, Edit2 } from "lucide-react";
 import { TableSkeleton } from "@/components/SkeletonLoader";
+import { CpfInput, PhoneInput, DateBrInput } from "@/components/forms/SpecializedInputs";
+import { PasswordInput } from "@/components/forms/PasswordInput";
+import { cpfSchema, phoneSchema, emailSchema, strongPasswordSchema } from "@/lib/validators";
+import { dateBrToIso, dateIsoToBr, isValidDateBr } from "@/lib/masks";
+import { z } from "zod";
 
 export const Route = createFileRoute("/_admin/admin/funcionarios")({
   head: () => ({ meta: [{ title: "Funcionários — NexPonto Admin" }] }),
