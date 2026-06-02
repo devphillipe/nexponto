@@ -9,6 +9,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { toast } from "sonner";
 import { Building2, Mail, Phone, MapPin, Clock, Globe, Upload, Loader2, Image as ImageIcon, Search as SearchIcon } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
+import { CpfCnpjInput, PhoneInput, CepInput } from "@/components/forms/SpecializedInputs";
+import { onlyDigits, formatCep } from "@/lib/masks";
 
 export const Route = createFileRoute("/_admin/admin/configuracoes")({
   head: () => ({ meta: [{ title: "Configurações — NexPonto Admin" }] }),
@@ -233,10 +235,10 @@ function ConfiguracoesPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="document">CNPJ / CPF</Label>
-              <Input 
-                id="document" 
-                value={formData.document} 
-                onChange={e => setFormData(prev => ({ ...prev, document: e.target.value }))}
+              <CpfCnpjInput
+                id="document"
+                value={onlyDigits(formData.document)}
+                onValueChange={(v) => setFormData(prev => ({ ...prev, document: v }))}
               />
             </div>
             <div className="space-y-2">
@@ -246,6 +248,8 @@ function ConfiguracoesPage() {
                 <Input 
                   id="email" 
                   type="email"
+                  autoComplete="email"
+                  inputMode="email"
                   value={formData.email} 
                   onChange={e => setFormData(prev => ({ ...prev, email: e.target.value }))}
                   className="pl-10"
@@ -254,27 +258,21 @@ function ConfiguracoesPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="phone">Telefone</Label>
-              <div className="relative">
-                <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input 
-                  id="phone" 
-                  value={formData.phone} 
-                  onChange={e => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                  className="pl-10"
-                />
-              </div>
+              <PhoneInput
+                id="phone"
+                value={onlyDigits(formData.phone)}
+                onValueChange={(v) => setFormData(prev => ({ ...prev, phone: v }))}
+              />
             </div>
             <div className="space-y-2 md:col-span-1">
               <Label htmlFor="cep">CEP (Busca Automática)</Label>
-              <div className="relative">
-                <SearchIcon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input 
-                  id="cep" 
-                  placeholder="00000-000"
-                  onChange={e => fetchAddress(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
+              <CepInput
+                id="cep"
+                value=""
+                onValueChange={(v) => {
+                  if (v.length === 8) fetchAddress(formatCep(v));
+                }}
+              />
             </div>
             <div className="space-y-2 md:col-span-1">
               <Label htmlFor="address">Endereço Completo</Label>

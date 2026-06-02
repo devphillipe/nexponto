@@ -115,30 +115,34 @@ function MyClockPage() {
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-60"></div>
         
         <div className="mb-4 space-y-1">
-           <div className="font-mono text-5xl sm:text-6xl font-black tracking-tighter text-primary drop-shadow-sm select-none">
+           <div
+             className="font-mono text-5xl sm:text-6xl font-black tracking-tighter text-primary drop-shadow-sm select-none"
+             aria-live="off"
+             aria-label={`Horário atual ${now.toLocaleTimeString("pt-BR")}`}
+           >
              {now.toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' })}<span className="text-2xl sm:text-3xl opacity-30">:{now.toLocaleTimeString("pt-BR", { second: '2-digit' })}</span>
            </div>
            <div className="flex items-center justify-center gap-1.5 text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">
-              <MapPin className="h-2.5 w-2.5" /> Escritório Central
+              <MapPin className="h-2.5 w-2.5" aria-hidden="true" /> Escritório Central
            </div>
         </div>
 
         {employee?.active === false ? (
-          <div className="p-6 rounded-3xl bg-destructive/10 border border-destructive/20">
+          <div role="alert" className="p-6 rounded-3xl bg-destructive/10 border border-destructive/20">
             <p className="text-sm font-bold text-destructive">
               CONTA INATIVA. Contate o administrador do sistema.
             </p>
           </div>
         ) : nextType ? (
           <div className="max-w-md mx-auto space-y-4">
-            <div className="p-4 rounded-2xl bg-muted/20 border border-border/20 relative">
+            <div className="p-4 rounded-2xl bg-muted/20 border border-border/20 relative" aria-live="polite">
                <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-background border border-border text-[8px] font-black uppercase tracking-[0.15em] text-primary shadow-sm">
                  Próximo Registro
                </span>
                <div className={`text-xl font-black uppercase tracking-tighter flex items-center justify-center gap-3 ${META[nextType].tone}`}>
                   {(() => {
                     const Icon = META[nextType].icon;
-                    return <Icon className="h-5 w-5" />;
+                    return <Icon className="h-5 w-5" aria-hidden="true" />;
                   })()}
                   {META[nextType].label}
                </div>
@@ -148,10 +152,12 @@ function MyClockPage() {
               size="lg"
               onClick={punch}
               disabled={punching}
-              className="premium-button h-14 sm:h-16 w-full rounded-2xl text-lg font-black uppercase tracking-widest gap-3 shadow-lg shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
+              aria-busy={punching}
+              aria-label={`Registrar ${META[nextType].label} agora`}
+              className="premium-button min-h-14 sm:min-h-16 w-full rounded-2xl text-lg font-black uppercase tracking-widest gap-3 shadow-lg shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
             >
-              <Smartphone className="h-5 w-5" />
-              {punching ? "Sincronizando..." : "Registrar Agora"}
+              <Smartphone className="h-5 w-5" aria-hidden="true" />
+              {punching ? "Sincronizando..." : `Registrar ${META[nextType].label}`}
             </Button>
             
             <p className="text-xs text-muted-foreground">
@@ -159,9 +165,9 @@ function MyClockPage() {
             </p>
           </div>
         ) : (
-          <div className="py-10 space-y-4">
+          <div className="py-10 space-y-4" role="status" aria-live="polite">
             <div className="h-24 w-24 rounded-full bg-success/10 border-4 border-success/20 flex items-center justify-center mx-auto mb-4 animate-bounce">
-               <CheckCircle2 className="h-12 w-12 text-success" />
+               <CheckCircle2 className="h-12 w-12 text-success" aria-hidden="true" />
             </div>
             <h2 className="text-2xl font-bold">Jornada Concluída!</h2>
             <p className="text-muted-foreground max-w-xs mx-auto">

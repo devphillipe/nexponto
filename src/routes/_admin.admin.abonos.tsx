@@ -5,6 +5,7 @@ import { useProfile } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
@@ -180,11 +181,16 @@ function AbonosPage() {
             <form onSubmit={(e) => {
               e.preventDefault();
               const formData = new FormData(e.currentTarget);
+              const description = String(formData.get("description") || "").trim();
+              if (description.length < 3) {
+                toast.error("Informe uma justificativa de pelo menos 3 caracteres.");
+                return;
+              }
               addMutation.mutate({
                 employee_id: formData.get("employee_id"),
                 absence_date: formData.get("date"),
                 reason: formData.get("reason"),
-                description: formData.get("description"),
+                description,
               });
             }}>
               <DialogHeader className="p-8 pb-4">
@@ -227,8 +233,9 @@ function AbonosPage() {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="description">Observações / Justificativa</Label>
-                  <Input id="description" name="description" placeholder="Ex: Atestado médico de 2 dias" className="rounded-xl h-11 border-border/40 bg-background/50" />
+                  <Label htmlFor="description">Justificativa *</Label>
+                  <Textarea id="description" name="description" required minLength={3} maxLength={500} rows={3} placeholder="Ex: Atestado médico de 2 dias" className="rounded-xl border-border/40 bg-background/50" aria-describedby="desc-hint" />
+                  <p id="desc-hint" className="text-[11px] text-muted-foreground">Descreva o motivo do abono. Mínimo 3 caracteres.</p>
                 </div>
               </div>
               <DialogFooter className="p-8 bg-muted/20 border-t border-border/40">
@@ -308,11 +315,16 @@ function EditAbonoDialog({ abono, employees, onSave, isPending }: { abono: any, 
         <form onSubmit={(e) => {
           e.preventDefault();
           const formData = new FormData(e.currentTarget);
+          const description = String(formData.get("description") || "").trim();
+          if (description.length < 3) {
+            toast.error("Informe uma justificativa de pelo menos 3 caracteres.");
+            return;
+          }
           onSave({
             employee_id: formData.get("employee_id"),
             absence_date: formData.get("date"),
             reason: formData.get("reason"),
-            description: formData.get("description"),
+            description,
           });
           setOpen(false);
         }}>
@@ -356,8 +368,8 @@ function EditAbonoDialog({ abono, employees, onSave, isPending }: { abono: any, 
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="edit-description">Observações / Justificativa</Label>
-              <Input id="edit-description" name="description" defaultValue={abono.description} placeholder="Ex: Atestado médico de 2 dias" className="rounded-xl h-11 border-border/40 bg-background/50" />
+              <Label htmlFor="edit-description">Justificativa *</Label>
+              <Textarea id="edit-description" name="description" required minLength={3} maxLength={500} rows={3} defaultValue={abono.description} placeholder="Ex: Atestado médico de 2 dias" className="rounded-xl border-border/40 bg-background/50" />
             </div>
           </div>
           <DialogFooter className="p-8 bg-muted/20 border-t border-border/40">

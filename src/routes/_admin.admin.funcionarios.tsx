@@ -18,6 +18,11 @@ import {
 } from "@/components/ui/dialog";
 import { Plus, Mail, User, Briefcase, Calendar, ShieldCheck, Search, Edit2 } from "lucide-react";
 import { TableSkeleton } from "@/components/SkeletonLoader";
+import { CpfInput, PhoneInput, DateBrInput } from "@/components/forms/SpecializedInputs";
+import { PasswordInput } from "@/components/forms/PasswordInput";
+import { cpfSchema, phoneSchema, emailSchema, strongPasswordSchema } from "@/lib/validators";
+import { dateBrToIso, dateIsoToBr, isValidDateBr } from "@/lib/masks";
+import { z } from "zod";
 
 export const Route = createFileRoute("/_admin/admin/funcionarios")({
   head: () => ({ meta: [{ title: "Funcionários — NexPonto Admin" }] }),
@@ -138,9 +143,28 @@ function EmployeesPage() {
   );
 }
 
+const newEmployeeSchema = z.object({
+  full_name: z.string().trim().min(3, "Informe o nome completo.").max(120),
+  email: emailSchema,
+  password: strongPasswordSchema,
+  cpf: z.string().optional().refine(
+    (v) => !v || cpfSchema.safeParse(v).success,
+    "Informe um CPF válido."
+  ),
+  phone: z.string().optional().refine(
+    (v) => !v || phoneSchema.safeParse(v).success,
+    "Informe um telefone válido."
+  ),
+  hire_date_br: z.string().optional().refine(
+    (v) => !v || isValidDateBr(v),
+    "Informe uma data válida (DD/MM/AAAA)."
+  ),
+});
+
 function NewEmployeeForm({ onDone }: { onDone: () => void }) {
   const createFn = useServerFn(createEmployee);
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [form, setForm] = useState({
     full_name: "",
     email: "",
@@ -149,28 +173,39 @@ function NewEmployeeForm({ onDone }: { onDone: () => void }) {
     phone: "",
     position: "",
     department: "",
-    hire_date: "",
+    hire_date_br: "",
     daily_hours: "",
   });
 
   function up<K extends keyof typeof form>(k: K, v: string) {
     setForm((f) => ({ ...f, [k]: v }));
+    if (errors[k as string]) setErrors((e) => ({ ...e, [k as string]: "" }));
   }
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    const parsed = newEmployeeSchema.safeParse(form);
+    if (!parsed.success) {
+      const fieldErrors: Record<string, string> = {};
+      for (const issue of parsed.error.issues) {
+        fieldErrors[issue.path[0] as string] = issue.message;
+      }
+      setErrors(fieldErrors);
+      toast.error("Revise os campos destacados.");
+      return;
+    }
     setLoading(true);
     try {
       await createFn({
         data: {
-          full_name: form.full_name,
-          email: form.email,
+          full_name: form.full_name.trim(),
+          email: form.email.trim().toLowerCase(),
           password: form.password,
           cpf: form.cpf || null,
           phone: form.phone || null,
           position: form.position || null,
           department: form.department || null,
-          hire_date: form.hire_date || null,
+          hire_date: form.hire_date_br ? dateBrToIso(form.hire_date_br) : null,
           daily_hours: form.daily_hours ? Number(form.daily_hours) : null,
         },
       });
@@ -183,63 +218,98 @@ function NewEmployeeForm({ onDone }: { onDone: () => void }) {
     }
   }
 
+  const err = (k: string) =>
+    errors[k] ? (
+      <p id={`${k}-error`} className="text-xs text-destructive font-medium" role="alert">
+        {errors[k]}
+      </p>
+    ) : null;
+  const aria = (k: string) => ({
+    "aria-invalid": !!errors[k],
+    "aria-describedby": errors[k] ? `${k}-error` : undefined,
+  });
+
   return (
-    <form onSubmit={onSubmit} className="space-y-3">
+    <form onSubmit={onSubmit} className="space-y-3" noValidate>
       <div className="space-y-1.5">
         <Label htmlFor="fn">Nome completo *</Label>
-        <Input id="fn" required value={form.full_name} onChange={(e) => up("full_name", e.target.value)} />
+        <Input id="fn" autoComplete="name" required value={form.full_name} onChange={(e) => up("full_name", e.target.value)} {...aria("full_name")} />
+        {err("full_name")}
       </div>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div className="space-y-1.5">
           <Label htmlFor="em">E-mail (login) *</Label>
-          <Input id="em" type="email" required value={form.email} onChange={(e) => up("email", e.target.value)} />
+          <Input id="em" type="email" autoComplete="email" inputMode="email" required value={form.email} onChange={(e) => up("email", e.target.value)} {...aria("email")} />
+          {err("email")}
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="pw">Senha provisória *</Label>
-          <Input id="pw" type="text" required minLength={8} value={form.password} onChange={(e) => up("password", e.target.value)} />
+          <PasswordInput id="pw" autoComplete="new-password" required value={form.password} onChange={(e) => up("password", e.target.value)} {...aria("password")} />
+          {err("password")}
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div className="space-y-1.5">
           <Label htmlFor="cpf">CPF</Label>
-          <Input id="cpf" value={form.cpf} onChange={(e) => up("cpf", e.target.value)} />
+          <CpfInput id="cpf" value={form.cpf} onValueChange={(v) => up("cpf", v)} {...aria("cpf")} />
+          {err("cpf")}
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="phone">Telefone</Label>
-          <Input id="phone" value={form.phone} onChange={(e) => up("phone", e.target.value)} />
+          <PhoneInput id="phone" value={form.phone} onValueChange={(v) => up("phone", v)} {...aria("phone")} />
+          {err("phone")}
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div className="space-y-1.5">
           <Label htmlFor="pos">Cargo</Label>
-          <Input id="pos" value={form.position} onChange={(e) => up("position", e.target.value)} />
+          <Input id="pos" autoComplete="organization-title" value={form.position} onChange={(e) => up("position", e.target.value)} />
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="dep">Departamento</Label>
           <Input id="dep" value={form.department} onChange={(e) => up("department", e.target.value)} />
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div className="space-y-1.5">
           <Label htmlFor="hd">Admissão</Label>
-          <Input id="hd" type="date" value={form.hire_date} onChange={(e) => up("hire_date", e.target.value)} />
+          <DateBrInput id="hd" value={form.hire_date_br} onValueChange={(v) => up("hire_date_br", v)} {...aria("hire_date_br")} />
+          {err("hire_date_br")}
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="dh">Jornada diária (h)</Label>
-          <Input id="dh" type="number" step="0.5" min="1" max="24" placeholder="Padrão do escritório" value={form.daily_hours} onChange={(e) => up("daily_hours", e.target.value)} />
+          <Input id="dh" type="number" inputMode="decimal" step="0.5" min="1" max="24" placeholder="Padrão do escritório" value={form.daily_hours} onChange={(e) => up("daily_hours", e.target.value)} />
         </div>
       </div>
-      <Button type="submit" disabled={loading} className="w-full">
+      <Button type="submit" disabled={loading} className="w-full" aria-busy={loading}>
         {loading ? "Cadastrando..." : "Cadastrar funcionário"}
       </Button>
     </form>
   );
 }
 
+const editEmployeeSchema = z.object({
+  full_name: z.string().trim().min(3, "Informe o nome completo.").max(120),
+  email: emailSchema,
+  cpf: z.string().optional().refine(
+    (v) => !v || cpfSchema.safeParse(v).success,
+    "Informe um CPF válido."
+  ),
+  phone: z.string().optional().refine(
+    (v) => !v || phoneSchema.safeParse(v).success,
+    "Informe um telefone válido."
+  ),
+  hire_date_br: z.string().optional().refine(
+    (v) => !v || isValidDateBr(v),
+    "Informe uma data válida (DD/MM/AAAA)."
+  ),
+});
+
 function EditEmployeeDialog({ employee, onDone }: { employee: any, onDone: () => void }) {
   const [open, setOpen] = useState(false);
   const updateFn = useServerFn(updateEmployee);
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [form, setForm] = useState({
     full_name: employee.full_name || "",
     email: employee.email || "",
@@ -247,28 +317,39 @@ function EditEmployeeDialog({ employee, onDone }: { employee: any, onDone: () =>
     phone: employee.phone || "",
     position: employee.position || "",
     department: employee.department || "",
-    hire_date: employee.hire_date || "",
+    hire_date_br: employee.hire_date ? dateIsoToBr(employee.hire_date) : "",
     daily_hours: employee.daily_hours ? String(employee.daily_hours) : "",
   });
 
   function up<K extends keyof typeof form>(k: K, v: string) {
     setForm((f) => ({ ...f, [k]: v }));
+    if (errors[k as string]) setErrors((e) => ({ ...e, [k as string]: "" }));
   }
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    const parsed = editEmployeeSchema.safeParse(form);
+    if (!parsed.success) {
+      const fieldErrors: Record<string, string> = {};
+      for (const issue of parsed.error.issues) {
+        fieldErrors[issue.path[0] as string] = issue.message;
+      }
+      setErrors(fieldErrors);
+      toast.error("Revise os campos destacados.");
+      return;
+    }
     setLoading(true);
     try {
       await updateFn({
         data: {
           id: employee.id,
-          full_name: form.full_name,
-          email: form.email,
+          full_name: form.full_name.trim(),
+          email: form.email.trim().toLowerCase(),
           cpf: form.cpf || null,
           phone: form.phone || null,
           position: form.position || null,
           department: form.department || null,
-          hire_date: form.hire_date || null,
+          hire_date: form.hire_date_br ? dateBrToIso(form.hire_date_br) : null,
           daily_hours: form.daily_hours ? Number(form.daily_hours) : null,
         },
       });
@@ -282,10 +363,21 @@ function EditEmployeeDialog({ employee, onDone }: { employee: any, onDone: () =>
     }
   }
 
+  const err = (k: string) =>
+    errors[k] ? (
+      <p id={`edit-${k}-error`} className="text-xs text-destructive font-medium" role="alert">
+        {errors[k]}
+      </p>
+    ) : null;
+  const aria = (k: string) => ({
+    "aria-invalid": !!errors[k],
+    "aria-describedby": errors[k] ? `edit-${k}-error` : undefined,
+  });
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-primary/10 hover:text-primary">
+        <Button variant="ghost" size="icon" aria-label={`Editar ${employee.full_name}`} className="h-8 w-8 rounded-lg hover:bg-primary/10 hover:text-primary">
           <Edit2 className="h-4 w-4" />
         </Button>
       </DialogTrigger>
@@ -293,50 +385,55 @@ function EditEmployeeDialog({ employee, onDone }: { employee: any, onDone: () =>
         <div className="bg-primary/5 p-8 border-b border-primary/10">
           <DialogHeader>
             <DialogTitle className="text-2xl font-display font-bold">Editar Colaborador</DialogTitle>
-            <p className="text-muted-foreground text-sm mt-1">Atualize os dados cadastrais e credenciais do funcionário.</p>
+            <p className="text-muted-foreground text-sm mt-1">Atualize os dados cadastrais do funcionário.</p>
           </DialogHeader>
         </div>
         <div className="p-8">
-          <form onSubmit={onSubmit} className="space-y-3">
+          <form onSubmit={onSubmit} className="space-y-3" noValidate>
             <div className="space-y-1.5">
               <Label htmlFor="edit-fn">Nome completo *</Label>
-              <Input id="edit-fn" required value={form.full_name} onChange={(e) => up("full_name", e.target.value)} />
+              <Input id="edit-fn" autoComplete="name" required value={form.full_name} onChange={(e) => up("full_name", e.target.value)} {...aria("full_name")} />
+              {err("full_name")}
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="edit-em">E-mail (login) *</Label>
-              <Input id="edit-em" type="email" required value={form.email} onChange={(e) => up("email", e.target.value)} />
+              <Input id="edit-em" type="email" autoComplete="email" inputMode="email" required value={form.email} onChange={(e) => up("email", e.target.value)} {...aria("email")} />
+              {err("email")}
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label htmlFor="edit-cpf">CPF</Label>
-                <Input id="edit-cpf" value={form.cpf} onChange={(e) => up("cpf", e.target.value)} />
+                <CpfInput id="edit-cpf" value={form.cpf} onValueChange={(v) => up("cpf", v)} {...aria("cpf")} />
+                {err("cpf")}
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="edit-phone">Telefone</Label>
-                <Input id="edit-phone" value={form.phone} onChange={(e) => up("phone", e.target.value)} />
+                <PhoneInput id="edit-phone" value={form.phone} onValueChange={(v) => up("phone", v)} {...aria("phone")} />
+                {err("phone")}
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label htmlFor="edit-pos">Cargo</Label>
-                <Input id="edit-pos" value={form.position} onChange={(e) => up("position", e.target.value)} />
+                <Input id="edit-pos" autoComplete="organization-title" value={form.position} onChange={(e) => up("position", e.target.value)} />
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="edit-dep">Departamento</Label>
                 <Input id="edit-dep" value={form.department} onChange={(e) => up("department", e.target.value)} />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label htmlFor="edit-hd">Admissão</Label>
-                <Input id="edit-hd" type="date" value={form.hire_date} onChange={(e) => up("hire_date", e.target.value)} />
+                <DateBrInput id="edit-hd" value={form.hire_date_br} onValueChange={(v) => up("hire_date_br", v)} {...aria("hire_date_br")} />
+                {err("hire_date_br")}
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="edit-dh">Jornada diária (h)</Label>
-                <Input id="edit-dh" type="number" step="0.5" min="1" max="24" placeholder="Padrão do escritório" value={form.daily_hours} onChange={(e) => up("daily_hours", e.target.value)} />
+                <Input id="edit-dh" type="number" inputMode="decimal" step="0.5" min="1" max="24" placeholder="Padrão do escritório" value={form.daily_hours} onChange={(e) => up("daily_hours", e.target.value)} />
               </div>
             </div>
-            <Button type="submit" disabled={loading} className="w-full mt-4">
+            <Button type="submit" disabled={loading} className="w-full mt-4" aria-busy={loading}>
               {loading ? "Salvando..." : "Salvar Alterações"}
             </Button>
           </form>
@@ -345,6 +442,7 @@ function EditEmployeeDialog({ employee, onDone }: { employee: any, onDone: () =>
     </Dialog>
   );
 }
+
 
 const EmployeeTableRow = memo(({ e, handleToggle, qc }: { e: any, handleToggle: any, qc: any }) => (
   <tr className="hover:bg-muted/10 transition-colors group">
