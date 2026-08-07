@@ -27,6 +27,23 @@ function ResetPassword() {
   const [status, setStatus] = useState<Status>("validating");
   const [errorMsg, setErrorMsg] = useState<string>("");
   const [formError, setFormError] = useState<string>("");
+  const [isEmployeePortal, setIsEmployeePortal] = useState(false);
+
+  useEffect(() => {
+    const portal = new URLSearchParams(window.location.search).get("portal");
+    if (portal === "funcionario") setIsEmployeePortal(true);
+  }, []);
+
+  const LoginButton = ({ label, className }: { label: string; className: string }) =>
+    isEmployeePortal ? (
+      <Button asChild className={className}>
+        <Link to="/funcionario/login">{label}</Link>
+      </Button>
+    ) : (
+      <Button asChild className={className}>
+        <Link to="/admin/login">{label}</Link>
+      </Button>
+    );
 
   useEffect(() => {
     let isMounted = true;
@@ -165,9 +182,7 @@ function ResetPassword() {
             <h1 className="text-2xl font-black tracking-tight">Link inválido</h1>
             <p className="text-muted-foreground text-sm">{errorMsg}</p>
           </div>
-          <Button asChild className="w-full h-12 rounded-2xl font-bold">
-            <Link to="/admin/login">Voltar para o login</Link>
-          </Button>
+          <LoginButton label="Voltar para o login" className="w-full h-12 rounded-2xl font-bold" />
         </div>
       </div>
     );
@@ -191,9 +206,7 @@ function ResetPassword() {
               Sua nova senha foi configurada com sucesso. Agora você já pode fazer login com a nova senha.
             </p>
           </div>
-          <Button asChild className="premium-button w-full h-14 rounded-2xl font-bold uppercase tracking-widest">
-            <Link to="/admin/login">Ir para o Login</Link>
-          </Button>
+          <LoginButton label="Ir para o Login" className="premium-button w-full h-14 rounded-2xl font-bold uppercase tracking-widest" />
         </div>
       </div>
     );

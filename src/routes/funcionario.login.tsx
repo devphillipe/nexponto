@@ -77,7 +77,7 @@ function FuncLogin() {
     setSendingReset(true);
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(trimmed, {
-        redirectTo: `${window.location.origin}/auth/reset-password`,
+        redirectTo: `${window.location.origin}/auth/reset-password?portal=funcionario`,
       });
       if (error) {
         setResetError(translateAuthError(error, "Não foi possível enviar o e-mail de recuperação."));
