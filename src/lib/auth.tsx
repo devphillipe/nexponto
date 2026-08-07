@@ -41,6 +41,16 @@ export type ProfileInfo = {
   role: "admin" | "employee" | null;
 };
 
+/** Converts a stored avatar value (path or legacy public URL) into a storage path. */
+export function toAvatarPath(value: string | null): string | null {
+  if (!value) return null;
+  const marker = "/storage/v1/object/public/avatars/";
+  const i = value.indexOf(marker);
+  if (i !== -1) return value.slice(i + marker.length).split("?")[0];
+  if (value.startsWith("http")) return null;
+  return value;
+}
+
 export function useProfile() {
   const { user } = useAuth();
   return useQuery({
@@ -55,6 +65,16 @@ export function useProfile() {
         .eq("id", user.id)
         .maybeSingle();
       if (!profile) return null;
+      // Avatars live in a private bucket — resolve a short-lived signed URL.
+      let avatarUrl: string | null = null;
+      const avatarPath = toAvatarPath((profile as any).avatar_url ?? null);
+      if (avatarPath) {
+        const { data: signed } = await supabase.storage
+          .from("avatars")
+          .createSignedUrl(avatarPath, 60 * 60);
+        avatarUrl = signed?.signedUrl ?? null;
+      }
+
       const { data: roles } = await supabase
         .from("user_roles")
         .select("role")
