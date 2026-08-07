@@ -88,7 +88,7 @@ export function useProfile() {
         tenant_id: profile.tenant_id,
         full_name: profile.full_name,
         email: profile.email,
-        avatar_url: (profile as any).avatar_url ?? null,
+        avatar_url: avatarUrl,
         tenant_name: (profile as any).tenants?.name ?? "",
         tenant_logo_url: (profile as any).tenants?.logo_url ?? null,
         role: role as "admin" | "employee" | null,
