@@ -83,11 +83,12 @@ function PerfilPage() {
         .from("avatars")
         .upload(path, blob, { contentType: "image/jpeg", upsert: true });
       if (upErr) throw upErr;
-      const { data: pub } = supabase.storage.from("avatars").getPublicUrl(path);
+      // Private bucket: store only the object path; signed URLs are generated on read.
       const { error: dbErr } = await supabase
         .from("profiles")
-        .update({ avatar_url: pub.publicUrl })
+        .update({ avatar_url: path })
         .eq("id", user.id);
+
       if (dbErr) throw dbErr;
       toast.success("Foto de perfil atualizada!");
       setImgSrc(null);
