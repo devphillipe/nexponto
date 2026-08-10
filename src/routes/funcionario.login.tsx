@@ -172,6 +172,20 @@ function FuncLogin() {
                 </div>
               </div>
 
+              <div className="flex items-center justify-between px-1">
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    id="remember-email"
+                    checked={rememberEmail}
+                    onCheckedChange={(checked) => setRememberEmail(checked === true)}
+                    aria-label="Lembrar e-mail"
+                  />
+                  <Label htmlFor="remember-email" className="text-xs font-medium text-muted-foreground cursor-pointer">
+                    Lembrar e-mail
+                  </Label>
+                </div>
+              </div>
+
               <Button type="submit" disabled={loading} className="premium-button w-full h-16 rounded-2xl text-lg font-black uppercase tracking-widest shadow-xl shadow-primary/20 hover:shadow-2xl hover:shadow-primary/30 active:scale-[0.98] transition-all">
                 {loading ? "Sincronizando..." : "Acessar Portal"}
               </Button>
