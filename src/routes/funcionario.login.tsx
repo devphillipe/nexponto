@@ -22,12 +22,21 @@ function FuncLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [rememberEmail, setRememberEmail] = useState(false);
 
   const [showForgot, setShowForgot] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
   const [sendingReset, setSendingReset] = useState(false);
   const [resetSent, setResetSent] = useState(false);
   const [resetError, setResetError] = useState("");
+
+  useEffect(() => {
+    const saved = window.localStorage.getItem("nexponto-remembered-email");
+    if (saved) {
+      setEmail(saved);
+      setRememberEmail(true);
+    }
+  }, []);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -56,6 +65,12 @@ function FuncLogin() {
         setLoading(false);
         toast.error("Esta conta não é de funcionário.");
         return;
+      }
+
+      if (rememberEmail) {
+        window.localStorage.setItem("nexponto-remembered-email", email.trim());
+      } else {
+        window.localStorage.removeItem("nexponto-remembered-email");
       }
 
       navigate({ to: "/funcionario/meu-ponto" });
