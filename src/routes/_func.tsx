@@ -40,7 +40,15 @@ function FuncLayout() {
   }
 
   return (
-    <div className="mx-auto flex h-screen max-w-2xl flex-col px-4 py-4 animate-fade-in overflow-hidden">
+    <div
+      className="mx-auto flex h-[100dvh] max-w-2xl flex-col px-4 animate-fade-in overflow-hidden"
+      style={{
+        paddingTop: "calc(env(safe-area-inset-top) + 1rem)",
+        paddingBottom: "calc(env(safe-area-inset-bottom) + 0.5rem)",
+        paddingLeft: "calc(env(safe-area-inset-left) + 1rem)",
+        paddingRight: "calc(env(safe-area-inset-right) + 1rem)",
+      }}
+    >
       <header className="mb-4 flex items-center justify-between glass-card p-3 rounded-2xl">
         <div className="flex items-center gap-3">
            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 grid place-items-center font-bold text-primary border border-primary/10 overflow-hidden">
