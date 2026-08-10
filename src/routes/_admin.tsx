@@ -113,7 +113,7 @@ function AdminLayout() {
       </aside>
 
       <div className="flex-1 flex flex-col min-w-0 max-w-full">
-        <header className="h-20 md:h-24 border-b border-border/40 flex items-center justify-between px-4 md:px-8 lg:px-12 bg-background/60 backdrop-blur-2xl sticky top-0 z-30 transition-all duration-300">
+        <header className="h-20 md:h-24 border-b border-border/40 flex items-center justify-between px-4 md:px-8 lg:px-12 bg-background/60 backdrop-blur-2xl sticky top-0 z-30 transition-all duration-300 safe-top safe-x box-content">
            <div className="flex items-center gap-4 lg:hidden">
              <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
                <SheetTrigger asChild>
