@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Users, ArrowLeft, ShieldCheck, Fingerprint, Mail, KeyRound, CheckCircle2, AlertCircle } from "lucide-react";
 import { NextFlowBackground } from "@/components/NextFlowBackground";
@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { PasswordInput } from "@/components/forms/PasswordInput";
 import { translateAuthError } from "@/lib/auth-errors";
 
@@ -21,12 +22,21 @@ function FuncLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [rememberEmail, setRememberEmail] = useState(false);
 
   const [showForgot, setShowForgot] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
   const [sendingReset, setSendingReset] = useState(false);
   const [resetSent, setResetSent] = useState(false);
   const [resetError, setResetError] = useState("");
+
+  useEffect(() => {
+    const saved = window.localStorage.getItem("nexponto-remembered-email");
+    if (saved) {
+      setEmail(saved);
+      setRememberEmail(true);
+    }
+  }, []);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -55,6 +65,12 @@ function FuncLogin() {
         setLoading(false);
         toast.error("Esta conta não é de funcionário.");
         return;
+      }
+
+      if (rememberEmail) {
+        window.localStorage.setItem("nexponto-remembered-email", email.trim());
+      } else {
+        window.localStorage.removeItem("nexponto-remembered-email");
       }
 
       navigate({ to: "/funcionario/meu-ponto" });
@@ -153,6 +169,20 @@ function FuncLogin() {
                     onChange={(e) => setPassword(e.target.value)}
                     inputClassName="bg-muted/30 border-none rounded-2xl h-12 px-4 focus-visible:ring-primary/40"
                   />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between px-1">
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    id="remember-email"
+                    checked={rememberEmail}
+                    onCheckedChange={(checked) => setRememberEmail(checked === true)}
+                    aria-label="Lembrar e-mail"
+                  />
+                  <Label htmlFor="remember-email" className="text-xs font-medium text-muted-foreground cursor-pointer">
+                    Lembrar e-mail
+                  </Label>
                 </div>
               </div>
 
