@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Users, ArrowLeft, ShieldCheck, Fingerprint, Mail, KeyRound, CheckCircle2, AlertCircle } from "lucide-react";
 import { NextFlowBackground } from "@/components/NextFlowBackground";
@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { PasswordInput } from "@/components/forms/PasswordInput";
 import { translateAuthError } from "@/lib/auth-errors";
 
