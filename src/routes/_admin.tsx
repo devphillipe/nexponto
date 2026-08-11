@@ -200,7 +200,11 @@ function AdminLayout() {
             </div>
         </header>
         
-        <main id="main-content" className="flex-1 p-4 md:p-8 lg:p-12 max-w-[1600px] mx-auto w-full animate-in fade-in slide-in-from-bottom-4 duration-700 overflow-x-hidden safe-bottom safe-x">
+        <main
+          id="main-content"
+          className="flex-1 max-w-[1600px] mx-auto w-full animate-in fade-in slide-in-from-bottom-4 duration-700 overflow-x-hidden p-4 md:p-8 lg:p-12 [padding-bottom:calc(1rem+var(--sab))] md:[padding-bottom:calc(2rem+var(--sab))] lg:[padding-bottom:calc(3rem+var(--sab))] [padding-left:calc(1rem+var(--sal))] [padding-right:calc(1rem+var(--sar))] md:[padding-left:calc(2rem+var(--sal))] md:[padding-right:calc(2rem+var(--sar))] lg:[padding-left:calc(3rem+var(--sal))] lg:[padding-right:calc(3rem+var(--sar))]"
+        >
+
           <Outlet />
         </main>
       </div>
