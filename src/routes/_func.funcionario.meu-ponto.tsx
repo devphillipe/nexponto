@@ -269,8 +269,12 @@ function computeWorked(entries: { entry_type: string; entry_at: string }[]) {
     ra = get("retorno_almoco"),
     sf = get("saida");
   let total = 0;
+  if (e1 && !sa && !ra) {
+    // Jornada sem almoço: entrada -> saída (ou em andamento)
+    total += (sf ? new Date(sf).getTime() : Date.now()) - new Date(e1).getTime();
+    return Math.max(0, total);
+  }
   if (e1 && sa) total += new Date(sa).getTime() - new Date(e1).getTime();
-  else if (e1 && !sa && !ra) total += Date.now() - new Date(e1).getTime();
   if (ra && sf) total += new Date(sf).getTime() - new Date(ra).getTime();
   else if (ra && !sf) total += Date.now() - new Date(ra).getTime();
   return Math.max(0, total);
