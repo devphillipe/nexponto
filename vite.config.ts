@@ -20,6 +20,8 @@ export default defineConfig({
         registerType: "autoUpdate",
         injectRegister: null,
         filename: "sw.js",
+        outDir: "dist/client",
+
         devOptions: { enabled: false },
         includeAssets: ["icon-192.png", "icon-512.png"],
         manifest: false, // public/manifest.json is the single source of truth
