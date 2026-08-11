@@ -45,9 +45,9 @@ function AdminLayout() {
   }
 
   return (
-    <div className="flex min-h-screen bg-background/50 overflow-x-hidden">
+    <div className="flex min-h-dvh bg-background/50 overflow-x-hidden">
       {/* Sidebar Desktop */}
-      <aside className="hidden w-72 shrink-0 flex-col border-r border-border/40 bg-background/40 backdrop-blur-2xl p-8 lg:flex sticky top-0 h-dvh safe-top safe-bottom transition-all duration-300">
+      <aside className="hidden w-72 shrink-0 flex-col border-r border-border/40 bg-background/40 backdrop-blur-2xl p-8 lg:flex sticky top-0 h-dvh transition-all duration-300">
         <div className="mb-10 flex items-center gap-3 px-1">
           <Logo size={24} showWordmark={false} />
           <div className="min-w-0">
