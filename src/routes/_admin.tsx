@@ -47,7 +47,7 @@ function AdminLayout() {
   return (
     <div className="flex min-h-screen bg-background/50 overflow-x-hidden">
       {/* Sidebar Desktop */}
-      <aside className="hidden w-72 shrink-0 flex-col border-r border-border/40 bg-background/40 backdrop-blur-2xl p-8 lg:flex sticky top-0 h-screen transition-all duration-300">
+      <aside className="hidden w-72 shrink-0 flex-col border-r border-border/40 bg-background/40 backdrop-blur-2xl p-8 lg:flex sticky top-0 h-dvh safe-top safe-bottom transition-all duration-300">
         <div className="mb-10 flex items-center gap-3 px-1">
           <Logo size={24} showWordmark={false} />
           <div className="min-w-0">
@@ -79,13 +79,13 @@ function AdminLayout() {
               <Link
                 key={item.to}
                 to={item.to}
-                className={`group flex items-center gap-3 rounded-2xl px-5 py-3.5 text-sm font-semibold transition-all duration-300 ${
+                className={`group flex items-center gap-3 rounded-2xl px-5 py-3.5 min-h-[3rem] text-sm font-semibold transition-all duration-300 ${
                   active
                     ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-[1.02] border border-primary/20"
                     : "text-muted-foreground hover:bg-muted/50 hover:text-foreground hover:translate-x-1"
                 }`}
               >
-                <item.icon className={`h-4.5 w-4.5 transition-colors duration-300 ${active ? "text-primary-foreground" : "group-hover:text-primary"}`} />
+                <item.icon className={`h-5 w-5 transition-colors duration-300 ${active ? "text-primary-foreground" : "group-hover:text-primary"}`} />
                 {item.label}
               </Link>
             );
@@ -95,19 +95,19 @@ function AdminLayout() {
         <div className="mt-auto space-y-4 pt-6 border-t border-border/40">
            <Link 
              to="/admin/configuracoes"
-             className={`flex w-full items-center gap-3 rounded-2xl px-5 py-3.5 text-sm font-semibold transition-all duration-300 ${
+             className={`flex w-full items-center gap-3 rounded-2xl px-5 py-3.5 min-h-[3rem] text-sm font-semibold transition-all duration-300 ${
                loc.pathname.startsWith("/admin/configuracoes")
                  ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
                  : "text-muted-foreground hover:bg-muted/50 hover:text-foreground hover:translate-x-1"
              }`}
            >
-             <Settings className="h-4.5 w-4.5" /> Configurações
+             <Settings className="h-5 w-5" /> Configurações
            </Link>
            <button 
              onClick={logout}
-             className="flex w-full items-center gap-3 rounded-2xl px-5 py-3.5 text-sm font-semibold text-destructive/80 hover:bg-destructive/10 hover:text-destructive transition-all duration-300 hover:translate-x-1"
+             className="flex w-full items-center gap-3 rounded-2xl px-5 py-3.5 min-h-[3rem] text-sm font-semibold text-destructive/80 hover:bg-destructive/10 hover:text-destructive transition-all duration-300 hover:translate-x-1"
            >
-             <LogOut className="h-4.5 w-4.5" /> Sair do Sistema
+             <LogOut className="h-5 w-5" /> Sair do Sistema
            </button>
         </div>
       </aside>
@@ -121,8 +121,8 @@ function AdminLayout() {
                    <Menu className="h-6 w-6" />
                  </Button>
                </SheetTrigger>
-               <SheetContent side="left" className="p-0 w-80 border-r border-border/40 bg-background/95 backdrop-blur-2xl">
-                 <div className="flex flex-col h-full p-6">
+               <SheetContent side="left" className="p-0 w-[85vw] max-w-xs border-r border-border/40 bg-background/95 backdrop-blur-2xl">
+                 <div className="flex h-full flex-col p-6 [padding-top:calc(1.5rem+var(--sat))] [padding-bottom:calc(1.5rem+var(--sab))] [padding-left:calc(1.5rem+var(--sal))]">
                     <SheetHeader className="mb-10 text-left px-2">
                       <div className="flex items-center gap-3">
                         <Logo size={24} showWordmark={false} />
@@ -138,13 +138,13 @@ function AdminLayout() {
                             key={item.to}
                             to={item.to}
                             onClick={() => setIsMobileMenuOpen(false)}
-                            className={`group flex items-center gap-3 rounded-2xl px-5 py-3.5 text-sm font-semibold transition-all duration-300 ${
+                            className={`group flex items-center gap-3 rounded-2xl px-5 py-3.5 min-h-[3rem] text-sm font-semibold transition-all duration-300 ${
                               active
                                 ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-[1.02] border border-primary/20"
                                 : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
                             }`}
                           >
-                            <item.icon className={`h-4.5 w-4.5 transition-colors duration-300 ${active ? "text-primary-foreground" : "group-hover:text-primary"}`} />
+                            <item.icon className={`h-5 w-5 transition-colors duration-300 ${active ? "text-primary-foreground" : "group-hover:text-primary"}`} />
                             {item.label}
                           </Link>
                         );
@@ -155,19 +155,19 @@ function AdminLayout() {
                       <Link 
                         to="/admin/configuracoes"
                         onClick={() => setIsMobileMenuOpen(false)}
-                        className={`flex w-full items-center gap-3 rounded-2xl px-5 py-3.5 text-sm font-semibold transition-all duration-300 ${
+                        className={`flex w-full items-center gap-3 rounded-2xl px-5 py-3.5 min-h-[3rem] text-sm font-semibold transition-all duration-300 ${
                           loc.pathname.startsWith("/admin/configuracoes")
                             ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
                             : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
                         }`}
                       >
-                        <Settings className="h-4.5 w-4.5" /> Configurações
+                        <Settings className="h-5 w-5" /> Configurações
                       </Link>
                       <button 
                         onClick={() => { setIsMobileMenuOpen(false); logout(); }}
-                        className="flex w-full items-center gap-3 rounded-2xl px-5 py-3.5 text-sm font-semibold text-destructive/80 hover:bg-destructive/10 hover:text-destructive transition-all duration-300"
+                        className="flex w-full items-center gap-3 rounded-2xl px-5 py-3.5 min-h-[3rem] text-sm font-semibold text-destructive/80 hover:bg-destructive/10 hover:text-destructive transition-all duration-300"
                       >
-                        <LogOut className="h-4.5 w-4.5" /> Sair
+                        <LogOut className="h-5 w-5" /> Sair
                       </button>
                     </div>
                  </div>
