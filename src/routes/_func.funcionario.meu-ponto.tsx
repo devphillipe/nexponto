@@ -69,8 +69,14 @@ function MyClockPage() {
     },
   });
 
+  // Jornadas menores que 8h não têm intervalo de almoço: só entrada e saída.
+  const hasLunch = (employee?.daily_hours ?? 8) >= 8;
+  const sequence: readonly EntryType[] = hasLunch
+    ? SEQUENCE
+    : (["entrada", "saida"] as const);
+
   const done = new Set(todayEntries?.map((e) => e.entry_type) ?? []);
-  const nextType: EntryType | null = SEQUENCE.find((t) => !done.has(t)) ?? null;
+  const nextType: EntryType | null = sequence.find((t) => !done.has(t)) ?? null;
 
   async function punch() {
     if (!employee || !nextType) return;
@@ -183,7 +189,7 @@ function MyClockPage() {
             <Clock className="h-5 w-5 text-primary" /> Histórico de Hoje
           </h2>
           <div className="space-y-3">
-            {SEQUENCE.map((t) => {
+            {sequence.map((t) => {
               const entry = todayEntries?.find((e) => e.entry_type === t);
               const Icon = META[t].icon;
               return (
@@ -263,8 +269,12 @@ function computeWorked(entries: { entry_type: string; entry_at: string }[]) {
     ra = get("retorno_almoco"),
     sf = get("saida");
   let total = 0;
+  if (e1 && !sa && !ra) {
+    // Jornada sem almoço: entrada -> saída (ou em andamento)
+    total += (sf ? new Date(sf).getTime() : Date.now()) - new Date(e1).getTime();
+    return Math.max(0, total);
+  }
   if (e1 && sa) total += new Date(sa).getTime() - new Date(e1).getTime();
-  else if (e1 && !sa && !ra) total += Date.now() - new Date(e1).getTime();
   if (ra && sf) total += new Date(sf).getTime() - new Date(ra).getTime();
   else if (ra && !sf) total += Date.now() - new Date(ra).getTime();
   return Math.max(0, total);
