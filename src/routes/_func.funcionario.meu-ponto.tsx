@@ -189,7 +189,7 @@ function MyClockPage() {
             <Clock className="h-5 w-5 text-primary" /> Histórico de Hoje
           </h2>
           <div className="space-y-3">
-            {SEQUENCE.map((t) => {
+            {sequence.map((t) => {
               const entry = todayEntries?.find((e) => e.entry_type === t);
               const Icon = META[t].icon;
               return (
