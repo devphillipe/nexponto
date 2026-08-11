@@ -113,14 +113,15 @@ function AdminLayout() {
       </aside>
 
       <div className="flex-1 flex flex-col min-w-0 max-w-full">
-        <header className="h-20 md:h-24 border-b border-border/40 flex items-center justify-between px-4 md:px-8 lg:px-12 bg-background/60 backdrop-blur-2xl sticky top-0 z-30 transition-all duration-300 safe-top safe-x box-content">
-           <div className="flex items-center gap-4 lg:hidden">
+        <header className="h-20 md:h-24 border-b border-border/40 flex items-center justify-between bg-background/60 backdrop-blur-2xl sticky top-0 z-30 transition-all duration-300 box-content [padding-top:var(--sat)] [padding-left:calc(1rem+var(--sal))] [padding-right:calc(1rem+var(--sar))] md:[padding-left:calc(2rem+var(--sal))] md:[padding-right:calc(2rem+var(--sar))] lg:[padding-left:calc(3rem+var(--sal))] lg:[padding-right:calc(3rem+var(--sar))]">
+           <div className="flex items-center gap-3 lg:hidden">
              <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
                <SheetTrigger asChild>
-                 <Button variant="ghost" size="icon" className="h-10 w-10">
-                   <Menu className="h-6 w-6" />
+                 <Button variant="ghost" size="icon" aria-label="Abrir menu" className="h-12 w-12 touch-target rounded-2xl">
+                   <Menu className="h-7 w-7" />
                  </Button>
                </SheetTrigger>
+
                <SheetContent side="left" className="p-0 w-[85vw] max-w-xs border-r border-border/40 bg-background/95 backdrop-blur-2xl">
                  <div className="flex h-full flex-col p-6 [padding-top:calc(1.5rem+var(--sat))] [padding-bottom:calc(1.5rem+var(--sab))] [padding-left:calc(1.5rem+var(--sal))]">
                     <SheetHeader className="mb-10 text-left px-2">
