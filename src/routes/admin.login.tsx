@@ -91,7 +91,7 @@ function AdminLogin() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden">
+    <div className="min-h-dvh flex items-center justify-center p-6 [padding-top:calc(1.5rem+var(--sat))] [padding-bottom:calc(1.5rem+var(--sab))] [padding-left:calc(1.5rem+var(--sal))] [padding-right:calc(1.5rem+var(--sar))] relative overflow-hidden">
       <NextFlowBackground />
       <div className="absolute top-0 left-0 w-full h-full -z-10 opacity-30 pointer-events-none">
         <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-primary/20 blur-[120px] rounded-full"></div>

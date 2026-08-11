@@ -16,7 +16,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 function NotFoundComponent() {
   return (
-    <div className="flex min-h-screen items-center justify-center px-4">
+    <div className="flex min-h-dvh items-center justify-center px-4 safe-area">
       <div className="glass-card max-w-md rounded-2xl p-10 text-center">
         <h1 className="text-7xl font-bold">404</h1>
         <h2 className="mt-4 text-xl font-semibold">Página não encontrada</h2>
@@ -40,7 +40,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
   const router = useRouter();
   return (
-    <div className="flex min-h-screen items-center justify-center px-4">
+    <div className="flex min-h-dvh items-center justify-center px-4 safe-area">
       <div className="glass-card max-w-md rounded-2xl p-10 text-center">
         <h1 className="text-xl font-semibold">Algo deu errado</h1>
         <p className="mt-2 text-sm text-muted-foreground">{error.message}</p>
