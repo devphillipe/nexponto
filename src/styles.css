@@ -46,6 +46,9 @@
   :focus-visible {
     @apply outline-2 outline-offset-2 outline-ring;
   }
+  #lovable-badge {
+    display: none !important;
+  }
   /* Respeitar usuários que pedem menos movimento */
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
