@@ -84,37 +84,66 @@
   --gradient-primary: linear-gradient(135deg, #00e5ff 0%, #00a3ff 100%);
   --shadow-glow: 0 12px 48px -12px rgba(0, 229, 255, 0.4);
   --shadow-premium: 0 20px 80px -20px rgba(0, 0, 0, 0.6);
+
+  /* Safe area tokens — fonte única de verdade para notch / dynamic island / home indicator */
+  --sat: env(safe-area-inset-top, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
 }
 
-@keyframes gradient {
-  0% { bg-position: 0% 50%; }
-  50% { bg-position: 100% 50%; }
-  100% { bg-position: 0% 50%; }
+html {
+  background-color: var(--color-background);
+  /* evita "salto" da viewport em iOS standalone */
+  height: -webkit-fill-available;
 }
 
-@layer utilities {
-  .no-scrollbar {
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
-  .no-scrollbar::-webkit-scrollbar {
+body {
+  min-height: 100dvh;
+  overscroll-behavior-y: none;
+}
+
+@utility no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
     display: none;
   }
-  .safe-top {
-    padding-top: env(safe-area-inset-top);
-  }
-  .safe-bottom {
-    padding-bottom: env(safe-area-inset-bottom);
-  }
-  .safe-x {
-    padding-left: env(safe-area-inset-left);
-    padding-right: env(safe-area-inset-right);
-  }
-  .safe-area {
-    padding-top: env(safe-area-inset-top);
-    padding-bottom: env(safe-area-inset-bottom);
-    padding-left: env(safe-area-inset-left);
-    padding-right: env(safe-area-inset-right);
-  }
 }
+
+@utility safe-top {
+  padding-top: var(--sat);
+}
+
+@utility safe-bottom {
+  padding-bottom: var(--sab);
+}
+
+@utility safe-x {
+  padding-left: var(--sal);
+  padding-right: var(--sar);
+}
+
+@utility safe-area {
+  padding-top: var(--sat);
+  padding-bottom: var(--sab);
+  padding-left: var(--sal);
+  padding-right: var(--sar);
+}
+
+/* Margens seguras (para elementos flutuantes / sticky) */
+@utility safe-mt {
+  margin-top: var(--sat);
+}
+
+@utility safe-mb {
+  margin-bottom: var(--sab);
+}
+
+/* Alvo de toque mínimo recomendado (44x44) */
+@utility touch-target {
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+}
+
 
