@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Users, ArrowLeft, ShieldCheck, Fingerprint, Mail, KeyRound, CheckCircle2, AlertCircle } from "lucide-react";
+import { IdCard, ArrowLeft, ShieldCheck, Fingerprint, KeyRound, CheckCircle2, AlertCircle } from "lucide-react";
 import { NextFlowBackground } from "@/components/NextFlowBackground";
 import { Logo } from "@/components/Logo";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,6 +11,12 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { PasswordInput } from "@/components/forms/PasswordInput";
 import { translateAuthError } from "@/lib/auth-errors";
+import { CpfInput } from "@/components/forms/SpecializedInputs";
+import { isValidCpf, formatCpf, onlyDigits } from "@/lib/masks";
+import {
+  signInEmployeeWithCpf,
+  requestEmployeePasswordResetByCpf,
+} from "@/lib/employee-auth.functions";
 
 export const Route = createFileRoute("/funcionario/login")({
   head: () => ({ meta: [{ title: "Entrar — NexPonto Funcionário" }] }),
@@ -19,64 +25,55 @@ export const Route = createFileRoute("/funcionario/login")({
 
 function FuncLogin() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
+  const [cpf, setCpf] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [rememberEmail, setRememberEmail] = useState(false);
+  const [rememberCpf, setRememberCpf] = useState(false);
 
   const [showForgot, setShowForgot] = useState(false);
-  const [resetEmail, setResetEmail] = useState("");
+  const [resetCpf, setResetCpf] = useState("");
   const [sendingReset, setSendingReset] = useState(false);
   const [resetSent, setResetSent] = useState(false);
+  const [resetMaskedEmail, setResetMaskedEmail] = useState<string | null>(null);
   const [resetError, setResetError] = useState("");
 
   useEffect(() => {
-    const saved = window.localStorage.getItem("nexponto-remembered-email");
+    const saved = window.localStorage.getItem("nexponto-remembered-cpf");
     if (saved) {
-      setEmail(saved);
-      setRememberEmail(true);
+      setCpf(onlyDigits(saved).slice(0, 11));
+      setRememberCpf(true);
     }
   }, []);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!isValidCpf(cpf)) {
+      toast.error("Informe um CPF válido.");
+      return;
+    }
     setLoading(true);
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error || !data.user) {
+      const session = await signInEmployeeWithCpf({ data: { cpf, password } });
+      const { error } = await supabase.auth.setSession({
+        access_token: session.access_token,
+        refresh_token: session.refresh_token,
+      });
+      if (error) {
         setLoading(false);
         toast.error(translateAuthError(error, "Falha no login. Verifique seus dados."));
         return;
       }
 
-      const { data: roles, error: roleError } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", data.user.id);
-
-      if (roleError) {
-        setLoading(false);
-        toast.error("Erro ao verificar permissões.");
-        return;
-      }
-
-      if (!roles?.some((r) => r.role === "employee")) {
-        await supabase.auth.signOut();
-        setLoading(false);
-        toast.error("Esta conta não é de funcionário.");
-        return;
-      }
-
-      if (rememberEmail) {
-        window.localStorage.setItem("nexponto-remembered-email", email.trim());
+      if (rememberCpf) {
+        window.localStorage.setItem("nexponto-remembered-cpf", cpf);
       } else {
-        window.localStorage.removeItem("nexponto-remembered-email");
+        window.localStorage.removeItem("nexponto-remembered-cpf");
       }
 
       navigate({ to: "/funcionario/meu-ponto" });
     } catch (err) {
       setLoading(false);
-      toast.error(translateAuthError(err));
+      toast.error(translateAuthError(err, "CPF ou senha inválidos."));
     }
   }
 
@@ -84,22 +81,21 @@ function FuncLogin() {
     e.preventDefault();
     setResetError("");
 
-    const trimmed = resetEmail.trim();
-    if (!trimmed || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
-      setResetError("Informe um e-mail válido.");
+    if (!isValidCpf(resetCpf)) {
+      setResetError("Informe um CPF válido.");
       return;
     }
 
     setSendingReset(true);
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(trimmed, {
-        redirectTo: `${window.location.origin}/auth/reset-password?portal=funcionario`,
+      const res = await requestEmployeePasswordResetByCpf({
+        data: {
+          cpf: resetCpf,
+          redirectTo: `${window.location.origin}/auth/reset-password?portal=funcionario`,
+        },
       });
-      if (error) {
-        setResetError(translateAuthError(error, "Não foi possível enviar o e-mail de recuperação."));
-      } else {
-        setResetSent(true);
-      }
+      setResetMaskedEmail(res.email);
+      setResetSent(true);
     } catch (err) {
       setResetError(translateAuthError(err, "Erro ao enviar e-mail de recuperação."));
     } finally {
@@ -133,18 +129,14 @@ function FuncLogin() {
             <form onSubmit={onSubmit} className="space-y-6 mt-4">
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/70 ml-2">E-mail de Acesso</Label>
+                  <Label htmlFor="cpf" className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/70 ml-2">CPF Cadastrado</Label>
                   <div className="relative group">
-                    <Users className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="seu.email@empresa.com"
-                      autoComplete="email"
-                      inputMode="email"
+                    <IdCard className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                    <CpfInput
+                      id="cpf"
                       required
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      value={cpf}
+                      onValueChange={setCpf}
                       className="bg-muted/20 border-border/40 rounded-2xl h-14 pl-12 pr-4 focus-visible:ring-primary/20 focus-visible:border-primary/30 transition-all font-medium"
                     />
                   </div>
@@ -154,7 +146,7 @@ function FuncLogin() {
                     <Label htmlFor="password" className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Sua Senha</Label>
                     <button
                       type="button"
-                      onClick={() => { setShowForgot(true); setResetEmail(email); }}
+                      onClick={() => { setShowForgot(true); setResetCpf(cpf); }}
                       className="text-[11px] font-bold text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 rounded"
                     >
                       Esqueceu?
@@ -175,13 +167,13 @@ function FuncLogin() {
               <div className="flex items-center justify-between px-1">
                 <div className="flex items-center gap-2">
                   <Checkbox
-                    id="remember-email"
-                    checked={rememberEmail}
-                    onCheckedChange={(checked) => setRememberEmail(checked === true)}
-                    aria-label="Lembrar e-mail"
+                    id="remember-cpf"
+                    checked={rememberCpf}
+                    onCheckedChange={(checked) => setRememberCpf(checked === true)}
+                    aria-label="Lembrar CPF"
                   />
-                  <Label htmlFor="remember-email" className="text-xs font-medium text-muted-foreground cursor-pointer">
-                    Lembrar e-mail
+                  <Label htmlFor="remember-cpf" className="text-xs font-medium text-muted-foreground cursor-pointer">
+                    Lembrar CPF
                   </Label>
                 </div>
               </div>
@@ -198,8 +190,9 @@ function FuncLogin() {
               <div className="space-y-2">
                 <h2 className="text-2xl font-black tracking-tight">E-mail enviado!</h2>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  Se existir uma conta para{" "}
-                  <span className="font-bold text-foreground break-all">{resetEmail}</span>, você receberá um link para redefinir a senha.
+                  Se existir uma conta para o CPF{" "}
+                  <span className="font-bold text-foreground break-all">{formatCpf(resetCpf)}</span>, enviamos um link de redefinição
+                  {resetMaskedEmail ? <> para <span className="font-bold text-foreground break-all">{resetMaskedEmail}</span></> : null}.
                   Verifique também a pasta de spam.
                 </p>
                 <p className="text-xs text-muted-foreground/80 pt-2">O link expira em 1 hora.</p>
@@ -213,7 +206,7 @@ function FuncLogin() {
                   Voltar para o Login
                 </Button>
                 <Button type="button" variant="ghost" onClick={() => setResetSent(false)} className="w-full font-bold text-sm">
-                  Reenviar para outro e-mail
+                  Tentar com outro CPF
                 </Button>
               </div>
             </div>
@@ -224,31 +217,27 @@ function FuncLogin() {
                   <KeyRound className="h-6 w-6 text-primary" aria-hidden />
                 </div>
                 <h2 className="text-xl font-bold">Recuperar Senha</h2>
-                <p className="text-sm text-muted-foreground">Enviaremos um link para você criar uma nova senha.</p>
+                <p className="text-sm text-muted-foreground">Informe seu CPF e enviaremos um link para o e-mail cadastrado.</p>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="resetEmail" className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/70 ml-2">E-mail de Recuperação</Label>
+                <Label htmlFor="resetCpf" className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/70 ml-2">CPF Cadastrado</Label>
                 <div className="relative group">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
-                  <Input
-                    id="resetEmail"
-                    type="email"
-                    placeholder="seu.email@empresa.com"
-                    autoComplete="email"
-                    inputMode="email"
+                  <IdCard className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                  <CpfInput
+                    id="resetCpf"
                     required
-                    value={resetEmail}
-                    onChange={(e) => { setResetEmail(e.target.value); if (resetError) setResetError(""); }}
+                    value={resetCpf}
+                    onValueChange={(v) => { setResetCpf(v); if (resetError) setResetError(""); }}
                     aria-invalid={!!resetError}
-                    aria-describedby={resetError ? "resetEmailError" : undefined}
+                    aria-describedby={resetError ? "resetCpfError" : undefined}
                     className="bg-muted/20 border-border/40 rounded-2xl h-14 pl-12 pr-4 focus-visible:ring-primary/20 focus-visible:border-primary/30 transition-all font-medium"
                   />
                 </div>
               </div>
 
               {resetError && (
-                <div id="resetEmailError" role="alert" className="flex items-start gap-2 rounded-2xl border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive animate-in fade-in slide-in-from-top-1 duration-300">
+                <div id="resetCpfError" role="alert" className="flex items-start gap-2 rounded-2xl border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive animate-in fade-in slide-in-from-top-1 duration-300">
                   <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" aria-hidden />
                   <span className="leading-relaxed">{resetError}</span>
                 </div>
