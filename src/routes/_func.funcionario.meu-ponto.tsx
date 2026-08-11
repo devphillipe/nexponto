@@ -69,8 +69,14 @@ function MyClockPage() {
     },
   });
 
+  // Jornadas menores que 8h não têm intervalo de almoço: só entrada e saída.
+  const hasLunch = (employee?.daily_hours ?? 8) >= 8;
+  const sequence: readonly EntryType[] = hasLunch
+    ? SEQUENCE
+    : (["entrada", "saida"] as const);
+
   const done = new Set(todayEntries?.map((e) => e.entry_type) ?? []);
-  const nextType: EntryType | null = SEQUENCE.find((t) => !done.has(t)) ?? null;
+  const nextType: EntryType | null = sequence.find((t) => !done.has(t)) ?? null;
 
   async function punch() {
     if (!employee || !nextType) return;
