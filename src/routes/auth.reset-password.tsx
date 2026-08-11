@@ -164,7 +164,7 @@ function ResetPassword() {
 
   if (status === "validating") {
     return (
-      <div className="min-h-screen flex items-center justify-center p-6 bg-background">
+      <div className="min-h-dvh flex items-center justify-center p-6 [padding-top:calc(1.5rem+var(--sat))] [padding-bottom:calc(1.5rem+var(--sab))] [padding-left:calc(1.5rem+var(--sal))] [padding-right:calc(1.5rem+var(--sar))] bg-background">
         <p className="text-muted-foreground animate-pulse">Validando link de recuperação...</p>
       </div>
     );
@@ -172,7 +172,7 @@ function ResetPassword() {
 
   if (status === "invalid") {
     return (
-      <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden">
+      <div className="min-h-dvh flex items-center justify-center p-6 [padding-top:calc(1.5rem+var(--sat))] [padding-bottom:calc(1.5rem+var(--sab))] [padding-left:calc(1.5rem+var(--sal))] [padding-right:calc(1.5rem+var(--sar))] relative overflow-hidden">
         <NextFlowBackground />
         <div className="w-full max-w-md glass-card rounded-3xl p-10 border border-destructive/20 shadow-2xl bg-background/40 backdrop-blur-2xl text-center space-y-6 relative z-10">
           <div className="mx-auto h-14 w-14 rounded-2xl bg-destructive/10 text-destructive grid place-items-center">
@@ -190,7 +190,7 @@ function ResetPassword() {
 
   if (status === "success") {
     return (
-      <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden">
+      <div className="min-h-dvh flex items-center justify-center p-6 [padding-top:calc(1.5rem+var(--sat))] [padding-bottom:calc(1.5rem+var(--sab))] [padding-left:calc(1.5rem+var(--sal))] [padding-right:calc(1.5rem+var(--sar))] relative overflow-hidden">
         <NextFlowBackground />
         <div className="absolute top-0 left-0 w-full h-full -z-10 opacity-30 pointer-events-none">
           <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-emerald-500/20 blur-[120px] rounded-full"></div>
@@ -213,7 +213,7 @@ function ResetPassword() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden">
+    <div className="min-h-dvh flex items-center justify-center p-6 [padding-top:calc(1.5rem+var(--sat))] [padding-bottom:calc(1.5rem+var(--sab))] [padding-left:calc(1.5rem+var(--sal))] [padding-right:calc(1.5rem+var(--sar))] relative overflow-hidden">
       <NextFlowBackground />
       <div className="absolute top-0 left-0 w-full h-full -z-10 opacity-30 pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-primary/20 blur-[120px] rounded-full"></div>

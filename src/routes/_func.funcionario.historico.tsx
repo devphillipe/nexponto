@@ -94,13 +94,14 @@ function HistoryPage() {
                 
                 <button 
                   onClick={() => toggleDay(date)}
-                  className="w-full flex items-center justify-between p-4 sm:p-6 hover:bg-muted/5 transition-colors text-left"
+                  aria-expanded={isExpanded}
+                  className="w-full flex items-center justify-between gap-3 p-4 sm:p-6 min-h-[3.25rem] hover:bg-muted/5 active:bg-muted/10 transition-colors text-left"
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-xl bg-primary/10">
-                      <Calendar className="h-4 w-4 text-primary" />
+                  <div className="flex min-w-0 items-center gap-3">
+                    <div className="p-2 shrink-0 rounded-xl bg-primary/10">
+                      <Calendar className="h-5 w-5 text-primary" />
                     </div>
-                    <span className="font-bold text-sm sm:text-base capitalize">
+                    <span className="truncate font-bold text-sm sm:text-base capitalize">
                       {new Date(date + "T00:00:00").toLocaleDateString("pt-BR", {
                         weekday: "long",
                         day: "2-digit",
@@ -108,11 +109,12 @@ function HistoryPage() {
                       })}
                     </span>
                   </div>
+
                   <div className="flex items-center gap-3">
                     <span className="text-[10px] sm:text-xs uppercase font-bold tracking-widest text-muted-foreground">
                        {items?.length} registros
                     </span>
-                    <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-300 ${isExpanded ? "rotate-180" : ""}`} />
+                    <ChevronDown className={`h-5 w-5 text-muted-foreground transition-transform duration-300 ${isExpanded ? "rotate-180" : ""}`} />
                   </div>
                 </button>
                 

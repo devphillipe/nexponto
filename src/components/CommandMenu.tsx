@@ -82,30 +82,30 @@ export function CommandMenu() {
           <CommandEmpty>Nenhum resultado encontrado.</CommandEmpty>
           <CommandGroup heading="Sugestões">
             <CommandItem onSelect={() => runCommand(() => navigate({ to: "/admin/dashboard" }))}>
-              <LayoutDashboard className="mr-2 h-4 w-4" />
+              <LayoutDashboard className="mr-2 h-5 w-5" />
               <span>Dashboard</span>
             </CommandItem>
             <CommandItem onSelect={() => runCommand(() => navigate({ to: "/admin/funcionarios" }))}>
-              <Users className="mr-2 h-4 w-4" />
+              <Users className="mr-2 h-5 w-5" />
               <span>Funcionários</span>
             </CommandItem>
             <CommandItem onSelect={() => runCommand(() => navigate({ to: "/admin/pontos" }))}>
-              <Clock className="mr-2 h-4 w-4" />
+              <Clock className="mr-2 h-5 w-5" />
               <span>Controle de Pontos</span>
             </CommandItem>
             <CommandItem onSelect={() => runCommand(() => navigate({ to: "/admin/relatorios" }))}>
-              <FileText className="mr-2 h-4 w-4" />
+              <FileText className="mr-2 h-5 w-5" />
               <span>Relatórios</span>
             </CommandItem>
           </CommandGroup>
           <CommandSeparator />
           <CommandGroup heading="Ações Rápidas">
             <CommandItem onSelect={() => runCommand(() => navigate({ to: "/admin/funcionarios" }))}>
-              <UserPlus className="mr-2 h-4 w-4" />
+              <UserPlus className="mr-2 h-5 w-5" />
               <span>Cadastrar Funcionário</span>
             </CommandItem>
             <CommandItem onSelect={() => runCommand(() => navigate({ to: "/admin/abonos" }))}>
-              <Plus className="mr-2 h-4 w-4" />
+              <Plus className="mr-2 h-5 w-5" />
               <span>Lançar Abono</span>
             </CommandItem>
           </CommandGroup>
@@ -118,7 +118,7 @@ export function CommandMenu() {
                     key={emp.id}
                     onSelect={() => runCommand(() => navigate({ to: `/admin/pontos`, search: { employee: emp.id } } as any))}
                   >
-                    <Users className="mr-2 h-4 w-4" />
+                    <Users className="mr-2 h-5 w-5" />
                     <span>{emp.full_name}</span>
                   </CommandItem>
                 ))}
@@ -128,7 +128,7 @@ export function CommandMenu() {
           <CommandSeparator />
           <CommandGroup heading="Configurações">
             <CommandItem onSelect={() => runCommand(() => navigate({ to: "/admin/configuracoes" }))}>
-              <Settings className="mr-2 h-4 w-4" />
+              <Settings className="mr-2 h-5 w-5" />
               <span>Configurações do Escritório</span>
             </CommandItem>
           </CommandGroup>

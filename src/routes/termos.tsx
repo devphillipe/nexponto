@@ -11,7 +11,7 @@ export const Route = createFileRoute("/termos")({
 
 function TermsPage() {
   return (
-    <main className="relative mx-auto min-h-screen max-w-4xl px-6 py-12 md:py-20">
+    <main className="relative mx-auto min-h-dvh max-w-4xl px-6 py-12 md:py-20 [padding-top:calc(3rem+var(--sat))] [padding-bottom:calc(3rem+var(--sab))] [padding-left:calc(1.5rem+var(--sal))] [padding-right:calc(1.5rem+var(--sar))]">
       <NextFlowBackground />
       
       <div className="mb-12">

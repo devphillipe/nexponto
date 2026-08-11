@@ -41,17 +41,19 @@ function FuncLayout() {
 
   return (
     <div
-      className="mx-auto flex h-[100dvh] max-w-2xl flex-col px-4 animate-fade-in overflow-hidden"
+      className="mx-auto flex max-w-2xl flex-col overflow-hidden animate-fade-in"
       style={{
-        paddingTop: "calc(env(safe-area-inset-top) + 1rem)",
-        paddingBottom: "calc(env(safe-area-inset-bottom) + 0.5rem)",
-        paddingLeft: "calc(env(safe-area-inset-left) + 1rem)",
-        paddingRight: "calc(env(safe-area-inset-right) + 1rem)",
+        height: "100svh",
+        minHeight: "100dvh",
+        paddingTop: "calc(var(--sat) + 0.75rem)",
+        paddingBottom: "calc(var(--sab) + 0.5rem)",
+        paddingLeft: "calc(var(--sal) + 1rem)",
+        paddingRight: "calc(var(--sar) + 1rem)",
       }}
     >
-      <header className="mb-4 flex items-center justify-between glass-card p-3 rounded-2xl">
-        <div className="flex items-center gap-3">
-           <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 grid place-items-center font-bold text-primary border border-primary/10 overflow-hidden">
+      <header className="mb-3 flex items-center justify-between gap-3 glass-card p-3 rounded-2xl">
+        <div className="flex min-w-0 items-center gap-3">
+           <div className="h-11 w-11 shrink-0 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 grid place-items-center font-bold text-primary border border-primary/10 overflow-hidden">
               {profile?.avatar_url ? (
                 <img src={profile.avatar_url} alt="Avatar" className="h-full w-full object-cover" />
               ) : (
@@ -59,42 +61,49 @@ function FuncLayout() {
               )}
            </div>
            <div className="min-w-0">
-             <div className="font-display text-xs font-bold tracking-tight truncate">{profile?.full_name}</div>
+             <div className="truncate font-display text-sm font-bold tracking-tight">{profile?.full_name}</div>
              <div className="truncate text-[9px] text-muted-foreground uppercase font-bold tracking-widest">{profile?.tenant_name}</div>
            </div>
         </div>
-         <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" onClick={logout} aria-label="Sair" className="h-10 w-10 rounded-xl text-destructive/70 hover:text-destructive hover:bg-destructive/10">
-              <LogOut className="h-6 w-6" />
+         <div className="flex shrink-0 items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={logout}
+              aria-label="Sair"
+              className="h-12 w-12 touch-target rounded-2xl border border-destructive/20 bg-destructive/10 text-destructive hover:bg-destructive/20 hover:text-destructive active:scale-95 transition-all"
+            >
+              <LogOut className="h-7 w-7" />
             </Button>
          </div>
       </header>
 
-      <nav className="mb-4 flex gap-2 p-1 glass-card rounded-xl border border-border/40">
+      <nav className="mb-3 flex gap-2 p-1 glass-card rounded-2xl border border-border/40">
         {nav.map((item) => {
           const active = loc.pathname.startsWith(item.to);
           return (
             <Link
               key={item.to}
               to={item.to}
-              className={`flex flex-1 items-center justify-center gap-2.5 rounded-xl px-4 py-3.5 text-sm font-bold transition-all ${
+              aria-current={active ? "page" : undefined}
+              className={`flex min-h-[3rem] flex-1 min-w-0 items-center justify-center gap-2 rounded-xl px-2 py-3 text-xs sm:text-sm font-bold transition-all active:scale-[0.97] ${
                 active
-                  ? "bg-primary text-primary-foreground shadow-[var(--shadow-glow)] scale-[1.02]"
+                  ? "bg-primary text-primary-foreground shadow-[var(--shadow-glow)]"
                   : "text-muted-foreground hover:text-foreground hover:bg-white/5"
               }`}
             >
-              <item.icon className="h-4.5 w-4.5" />
-              {item.label}
+              <item.icon className="h-5 w-5 shrink-0" />
+              <span className="truncate">{item.label}</span>
             </Link>
           );
         })}
       </nav>
 
-      <main id="main-content" className="flex-1 overflow-y-auto no-scrollbar">
+      <main id="main-content" className="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar overscroll-contain">
         <Outlet />
       </main>
 
-      <footer className="py-2 text-center">
+      <footer className="pt-2 text-center">
          <div className="flex items-center justify-center gap-2">
             <div className="h-1 w-1 rounded-full bg-success animate-pulse"></div>
             <span className="text-[8px] uppercase font-bold tracking-widest text-muted-foreground/50">NexPonto v1.0</span>
@@ -103,3 +112,4 @@ function FuncLayout() {
     </div>
   );
 }
+

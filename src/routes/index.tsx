@@ -16,7 +16,7 @@ export const Route = createFileRoute("/")({
 
 function Landing() {
   return (
-    <main className="relative mx-auto flex min-h-screen max-w-7xl flex-col px-4 sm:px-8 py-8 sm:py-12">
+    <main className="relative mx-auto flex min-h-dvh max-w-7xl flex-col px-4 sm:px-8 py-8 sm:py-12 [padding-top:calc(2rem+var(--sat))] [padding-bottom:calc(2rem+var(--sab))] [padding-left:calc(1rem+var(--sal))] [padding-right:calc(1rem+var(--sar))]">
       <NextFlowBackground />
       <header className="flex items-center justify-between mb-12 sm:mb-20 animate-in fade-in slide-in-from-top-4 duration-1000">
         <Logo size={22} wordmarkClassName="text-lg sm:text-2xl" />

@@ -154,7 +154,7 @@ function PerfilPage() {
               <div className="flex-1 space-y-2 text-center sm:text-left">
                 <p className="text-sm text-muted-foreground">JPG, PNG ou WebP — até 5MB.</p>
                 <Button onClick={() => fileRef.current?.click()} variant="outline" className="rounded-xl">
-                  <Camera className="h-4 w-4 mr-2" /> Selecionar imagem
+                  <Camera className="h-5 w-5 mr-2" /> Selecionar imagem
                 </Button>
               </div>
               <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={onPickFile} />
@@ -180,7 +180,7 @@ function PerfilPage() {
               </div>
               <div className="flex gap-3">
                 <Button onClick={saveAvatar} disabled={uploading} className="flex-1 rounded-xl">
-                  {uploading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Check className="h-4 w-4 mr-2" />}
+                  {uploading ? <Loader2 className="h-5 w-5 mr-2 animate-spin" /> : <Check className="h-5 w-5 mr-2" />}
                   Salvar foto
                 </Button>
                 <Button variant="outline" onClick={() => setImgSrc(null)} disabled={uploading} className="rounded-xl">
@@ -252,7 +252,7 @@ function PerfilPage() {
               )}
             </div>
             <Button type="submit" disabled={pwLoading} className="w-full rounded-xl" aria-busy={pwLoading}>
-              {pwLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" aria-hidden /> : null}
+              {pwLoading ? <Loader2 className="h-5 w-5 mr-2 animate-spin" aria-hidden /> : null}
               Alterar senha
             </Button>
           </form>
