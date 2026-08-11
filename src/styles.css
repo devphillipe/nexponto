@@ -94,9 +94,8 @@
 
 html {
   background-color: var(--color-background);
-  /* evita "salto" da viewport em iOS standalone */
-  height: -webkit-fill-available;
 }
+
 
 body {
   min-height: 100dvh;
