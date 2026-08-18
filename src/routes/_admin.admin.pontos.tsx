@@ -45,13 +45,15 @@ function PontosPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("employees")
-        .select("id, full_name")
+        .select("id, full_name, daily_hours")
         .eq("tenant_id", profile!.tenant_id)
-        .eq("active", true);
+        .eq("active", true)
+        .order("full_name");
       if (error) throw error;
       return data;
     },
   });
+
 
   const { data, isLoading } = useQuery({
     queryKey: ["time-entries", date, profile?.tenant_id],
