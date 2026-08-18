@@ -216,16 +216,29 @@ function PontosPage() {
             />
           </div>
 
-          <Dialog open={isAddOpen} onOpenChange={(open) => {
-            setIsAddOpen(open);
-            if (!open) setEditingEntry(null);
-          }}>
+          <Dialog open={isBatchOpen} onOpenChange={setIsBatchOpen}>
             <DialogTrigger asChild>
               <Button size="lg" className="rounded-xl md:rounded-2xl shadow-xl shadow-primary/20 font-black uppercase tracking-widest text-[10px] md:text-xs px-6 md:px-8 h-12 md:h-14 w-full sm:w-auto">
                 <Plus className="h-5 w-5" /> Novo Registro
               </Button>
             </DialogTrigger>
+            <DialogContent className="sm:max-w-[640px] rounded-[2rem] border-none glass-card p-0 overflow-hidden max-h-[90dvh] overflow-y-auto">
+              <BatchPontoForm
+                employees={(employees as any) || []}
+                defaultDate={date}
+                isPending={batchMutation.isPending}
+                onCancel={() => setIsBatchOpen(false)}
+                onSubmit={(p) => batchMutation.mutate(p)}
+              />
+            </DialogContent>
+          </Dialog>
+
+          <Dialog open={isAddOpen} onOpenChange={(open) => {
+            setIsAddOpen(open);
+            if (!open) setEditingEntry(null);
+          }}>
             <DialogContent className="sm:max-w-[500px] rounded-[2rem] border-none glass-card p-0 overflow-hidden">
+
               <form onSubmit={(e) => {
                 e.preventDefault();
                 const formData = new FormData(e.currentTarget);
