@@ -87,7 +87,7 @@ function FuncLayout() {
               key={item.to}
               to={item.to}
               aria-current={active ? "page" : undefined}
-              className={`flex min-h-[3rem] flex-1 min-w-0 items-center justify-center gap-2 rounded-xl px-2 py-3 text-xs sm:text-sm font-bold transition-all active:scale-[0.97] ${
+              className={`flex min-h-[3rem] flex-1 min-w-0 flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-2 rounded-xl px-1.5 py-2 text-[10px] sm:text-sm font-bold transition-all active:scale-[0.97] ${
                 active
                   ? "bg-primary text-primary-foreground shadow-[var(--shadow-glow)]"
                   : "text-muted-foreground hover:text-foreground hover:bg-white/5"
