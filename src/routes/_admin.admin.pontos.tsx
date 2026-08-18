@@ -29,7 +29,9 @@ function PontosPage() {
   const queryClient = useQueryClient();
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [isBatchOpen, setIsBatchOpen] = useState(false);
   const [editingEntry, setEditingEntry] = useState<any>(null);
+
   const [expandedEmployees, setExpandedEmployees] = useState<Set<string>>(new Set());
 
   const toggleEmployee = (name: string) => {
