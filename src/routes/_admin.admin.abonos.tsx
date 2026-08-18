@@ -241,6 +241,187 @@ function AbonosPage() {
   );
 }
 
+type BatchPayload = { employee_ids: string[]; dates: string[]; reason: string; description: string };
+
+function buildDateRange(start: string, end: string, skipWeekends: boolean): string[] {
+  if (!start) return [];
+  const finish = end && end >= start ? end : start;
+  const dates: string[] = [];
+  const cursor = new Date(start + "T12:00:00");
+  const last = new Date(finish + "T12:00:00");
+  while (cursor <= last && dates.length < 366) {
+    const day = cursor.getDay();
+    if (!skipWeekends || (day !== 0 && day !== 6)) {
+      dates.push(format(cursor, "yyyy-MM-dd"));
+    }
+    cursor.setDate(cursor.getDate() + 1);
+  }
+  return dates;
+}
+
+function BatchAbonoForm({
+  employees,
+  isPending,
+  onCancel,
+  onSubmit,
+}: {
+  employees: { id: string; full_name: string }[];
+  isPending: boolean;
+  onCancel: () => void;
+  onSubmit: (payload: BatchPayload) => void;
+}) {
+  const [selected, setSelected] = useState<string[]>([]);
+  const [empSearch, setEmpSearch] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [skipWeekends, setSkipWeekends] = useState(true);
+  const [reason, setReason] = useState("atestado");
+  const [description, setDescription] = useState("");
+
+  const filteredEmployees = employees.filter((e) =>
+    e.full_name.toLowerCase().includes(empSearch.toLowerCase())
+  );
+  const allSelected = filteredEmployees.length > 0 && filteredEmployees.every((e) => selected.includes(e.id));
+  const dates = buildDateRange(startDate, endDate, skipWeekends);
+  const total = selected.length * dates.length;
+
+  const toggle = (id: string) =>
+    setSelected((prev) => (prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]));
+
+  const toggleAll = () =>
+    setSelected((prev) =>
+      allSelected
+        ? prev.filter((id) => !filteredEmployees.some((e) => e.id === id))
+        : Array.from(new Set([...prev, ...filteredEmployees.map((e) => e.id)]))
+    );
+
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        if (!selected.length) return toast.error("Selecione ao menos um colaborador.");
+        if (!dates.length) return toast.error("Selecione ao menos uma data válida.");
+        if (description.trim().length < 3) return toast.error("Informe uma justificativa de pelo menos 3 caracteres.");
+        onSubmit({ employee_ids: selected, dates, reason, description: description.trim() });
+      }}
+    >
+      <DialogHeader className="p-6 md:p-8 pb-4">
+        <DialogTitle className="text-2xl font-bold text-primary flex items-center gap-2">
+          <FileCheck className="h-6 w-6" /> Registrar Abono
+        </DialogTitle>
+        <DialogDescription>Abone um ou vários dias para um ou vários colaboradores.</DialogDescription>
+      </DialogHeader>
+
+      <div className="p-6 md:p-8 pt-4 space-y-5">
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <Label>Colaboradores ({selected.length} selecionados)</Label>
+            <Button type="button" variant="ghost" size="sm" className="h-8 rounded-lg text-xs font-bold" onClick={toggleAll}>
+              {allSelected ? "Limpar seleção" : "Selecionar todos"}
+            </Button>
+          </div>
+          <Input
+            placeholder="Buscar colaborador..."
+            value={empSearch}
+            onChange={(e) => setEmpSearch(e.target.value)}
+            className="rounded-xl h-11 border-border/40 bg-background/50"
+          />
+          <div className="max-h-52 overflow-y-auto rounded-xl border border-border/40 bg-background/40 divide-y divide-border/20">
+            {filteredEmployees.length === 0 ? (
+              <p className="p-4 text-sm text-muted-foreground">Nenhum colaborador encontrado.</p>
+            ) : (
+              filteredEmployees.map((emp) => (
+                <label
+                  key={emp.id}
+                  className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-muted/20 transition-colors"
+                >
+                  <Checkbox checked={selected.includes(emp.id)} onCheckedChange={() => toggle(emp.id)} />
+                  <span className="text-sm font-medium">{emp.full_name}</span>
+                </label>
+              ))
+            )}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="start-date">Data inicial</Label>
+            <Input
+              id="start-date"
+              type="date"
+              required
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="rounded-xl h-11 border-border/40 bg-background/50"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="end-date">Data final (opcional)</Label>
+            <Input
+              id="end-date"
+              type="date"
+              min={startDate || undefined}
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              className="rounded-xl h-11 border-border/40 bg-background/50"
+            />
+          </div>
+        </div>
+
+        <label className="flex items-center gap-3 cursor-pointer">
+          <Checkbox checked={skipWeekends} onCheckedChange={(v) => setSkipWeekends(v === true)} />
+          <span className="text-sm text-muted-foreground">Ignorar sábados e domingos</span>
+        </label>
+
+        <div className="space-y-2">
+          <Label htmlFor="reason">Motivo</Label>
+          <Select value={reason} onValueChange={setReason}>
+            <SelectTrigger className="rounded-xl h-11 border-border/40 bg-background/50">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {REASONS.map((r) => (
+                <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="description">Justificativa *</Label>
+          <Textarea
+            id="description"
+            required
+            minLength={3}
+            maxLength={500}
+            rows={3}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Ex: Atestado médico de 2 dias"
+            className="rounded-xl border-border/40 bg-background/50"
+          />
+        </div>
+
+        {total > 0 && (
+          <div className="rounded-xl bg-primary/5 border border-primary/20 px-4 py-3 text-sm">
+            <span className="font-bold text-primary">{total}</span> abono(s) serão criados —{" "}
+            {selected.length} colaborador(es) × {dates.length} dia(s).
+          </div>
+        )}
+      </div>
+
+      <DialogFooter className="p-6 md:p-8 bg-muted/20 border-t border-border/40">
+        <Button type="button" variant="ghost" onClick={onCancel} className="rounded-xl">Cancelar</Button>
+        <Button type="submit" disabled={isPending || total === 0} className="rounded-xl px-8 font-bold">
+          {isPending ? "Salvando..." : total > 1 ? `Salvar ${total} abonos` : "Salvar Abono"}
+        </Button>
+      </DialogFooter>
+    </form>
+  );
+}
+
+
+
 function EditAbonoDialog({ abono, employees, onSave, isPending }: { abono: any, employees: any[], onSave: (data: any) => void, isPending: boolean }) {
   const [open, setOpen] = useState(false);
 
