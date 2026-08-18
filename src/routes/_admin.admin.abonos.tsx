@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
@@ -63,52 +64,52 @@ function AbonosPage() {
   });
 
   const addMutation = useMutation({
-    mutationFn: async (newData: any) => {
-      // 1. Insert into absences
-      const { data: absence, error: absenceError } = await supabase
-        .from("absences")
-        .insert([{
-          ...newData,
+    mutationFn: async (payload: { employee_ids: string[]; dates: string[]; reason: string; description: string }) => {
+      const { employee_ids, dates, reason, description } = payload;
+      const reasonLabel = REASONS.find((r) => r.value === reason)?.label || reason;
+
+      const absenceRows = employee_ids.flatMap((employee_id) =>
+        dates.map((absence_date) => ({
+          employee_id,
+          absence_date,
+          reason: reason as any,
+          description,
           tenant_id: profile!.tenant_id,
-          approved_by: profile!.id
-        }])
-        .select()
-        .single();
-      
+          approved_by: profile!.id,
+        }))
+      );
+
+      const { error: absenceError } = await supabase.from("absences").insert(absenceRows);
       if (absenceError) throw absenceError;
 
-      // 2. Insert into time_entries to show in the point sheet
-      // We create a special entry for the absence
-      const { error: entryError } = await supabase
-        .from("time_entries")
-        .insert([{
-          employee_id: newData.employee_id,
-          tenant_id: profile!.tenant_id,
-          entry_date: newData.absence_date,
-          entry_at: `${newData.absence_date}T00:00:00Z`,
-          entry_type: "entrada", // Use entrada as fallback since abono isn't in types yet, but notes will explain it
-          notes: `ABONO: ${REASONS.find(r => r.value === newData.reason)?.label || newData.reason}. ${newData.description || ""}`,
-          source: "manual_admin",
-          is_adjustment: true,
-          created_by: profile!.id
-        }]);
+      const entryRows = absenceRows.map((a) => ({
+        employee_id: a.employee_id,
+        tenant_id: profile!.tenant_id,
+        entry_date: a.absence_date,
+        entry_at: `${a.absence_date}T00:00:00Z`,
+        entry_type: "entrada" as any,
+        notes: `ABONO: ${reasonLabel}. ${description || ""}`,
+        source: "manual_admin" as any,
+        is_adjustment: true,
+        created_by: profile!.id,
+      }));
 
-      if (entryError) {
-        console.error("Erro ao criar entrada de ponto para abono:", entryError);
-        // We don't throw here to not revert the absence creation, 
-        // but it would be better to use a transaction if possible or handle it gracefully
-      }
+      const { error: entryError } = await supabase.from("time_entries").insert(entryRows);
+      if (entryError) console.error("Erro ao criar entradas de ponto para abono:", entryError);
+
+      return absenceRows.length;
     },
-    onSuccess: () => {
+    onSuccess: (count) => {
       queryClient.invalidateQueries({ queryKey: ["absences"] });
       queryClient.invalidateQueries({ queryKey: ["time-entries"] });
       setIsAddOpen(false);
-      toast.success("Abono registrado com sucesso!");
+      toast.success(count === 1 ? "Abono registrado com sucesso!" : `${count} abonos registrados com sucesso!`);
     },
     onError: (error) => {
       toast.error("Erro ao registrar abono: " + error.message);
     },
   });
+
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
@@ -177,75 +178,15 @@ function AbonosPage() {
               <Plus className="h-5 w-5" /> Novo Abono
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[500px] rounded-[2rem] border-none glass-card p-0 overflow-hidden shadow-2xl">
-            <form onSubmit={(e) => {
-              e.preventDefault();
-              const formData = new FormData(e.currentTarget);
-              const description = String(formData.get("description") || "").trim();
-              if (description.length < 3) {
-                toast.error("Informe uma justificativa de pelo menos 3 caracteres.");
-                return;
-              }
-              addMutation.mutate({
-                employee_id: formData.get("employee_id"),
-                absence_date: formData.get("date"),
-                reason: formData.get("reason"),
-                description,
-              });
-            }}>
-              <DialogHeader className="p-8 pb-4">
-                <DialogTitle className="text-2xl font-bold text-primary flex items-center gap-2">
-                  <FileCheck className="h-6 w-6" /> Registrar Abono
-                </DialogTitle>
-                <DialogDescription>Preencha os dados da falta justificada ou abono.</DialogDescription>
-              </DialogHeader>
-              <div className="p-8 pt-4 space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="employee_id">Colaborador</Label>
-                  <Select name="employee_id" required>
-                    <SelectTrigger className="rounded-xl h-11 border-border/40 bg-background/50">
-                      <SelectValue placeholder="Selecione o funcionário" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {employees?.map(emp => (
-                        <SelectItem key={emp.id} value={emp.id}>{emp.full_name}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="date">Data</Label>
-                    <Input id="date" name="date" type="date" required className="rounded-xl h-11 border-border/40 bg-background/50" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="reason">Motivo</Label>
-                    <Select name="reason" defaultValue="atestado" required>
-                      <SelectTrigger className="rounded-xl h-11 border-border/40 bg-background/50">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {REASONS.map(r => (
-                          <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="description">Justificativa *</Label>
-                  <Textarea id="description" name="description" required minLength={3} maxLength={500} rows={3} placeholder="Ex: Atestado médico de 2 dias" className="rounded-xl border-border/40 bg-background/50" aria-describedby="desc-hint" />
-                  <p id="desc-hint" className="text-[11px] text-muted-foreground">Descreva o motivo do abono. Mínimo 3 caracteres.</p>
-                </div>
-              </div>
-              <DialogFooter className="p-8 bg-muted/20 border-t border-border/40">
-                <Button type="button" variant="ghost" onClick={() => setIsAddOpen(false)} className="rounded-xl">Cancelar</Button>
-                <Button type="submit" disabled={addMutation.isPending} className="rounded-xl px-8 font-bold">
-                  {addMutation.isPending ? "Salvando..." : "Salvar Abono"}
-                </Button>
-              </DialogFooter>
-            </form>
+          <DialogContent className="sm:max-w-[560px] rounded-[2rem] border-none glass-card p-0 overflow-hidden shadow-2xl max-h-[90dvh] overflow-y-auto">
+            <BatchAbonoForm
+              employees={employees || []}
+              isPending={addMutation.isPending}
+              onCancel={() => setIsAddOpen(false)}
+              onSubmit={(payload) => addMutation.mutate(payload)}
+            />
           </DialogContent>
+
         </Dialog>
       </div>
 
@@ -300,6 +241,187 @@ function AbonosPage() {
     </div>
   );
 }
+
+type BatchPayload = { employee_ids: string[]; dates: string[]; reason: string; description: string };
+
+function buildDateRange(start: string, end: string, skipWeekends: boolean): string[] {
+  if (!start) return [];
+  const finish = end && end >= start ? end : start;
+  const dates: string[] = [];
+  const cursor = new Date(start + "T12:00:00");
+  const last = new Date(finish + "T12:00:00");
+  while (cursor <= last && dates.length < 366) {
+    const day = cursor.getDay();
+    if (!skipWeekends || (day !== 0 && day !== 6)) {
+      dates.push(format(cursor, "yyyy-MM-dd"));
+    }
+    cursor.setDate(cursor.getDate() + 1);
+  }
+  return dates;
+}
+
+function BatchAbonoForm({
+  employees,
+  isPending,
+  onCancel,
+  onSubmit,
+}: {
+  employees: { id: string; full_name: string }[];
+  isPending: boolean;
+  onCancel: () => void;
+  onSubmit: (payload: BatchPayload) => void;
+}) {
+  const [selected, setSelected] = useState<string[]>([]);
+  const [empSearch, setEmpSearch] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [skipWeekends, setSkipWeekends] = useState(true);
+  const [reason, setReason] = useState("atestado");
+  const [description, setDescription] = useState("");
+
+  const filteredEmployees = employees.filter((e) =>
+    e.full_name.toLowerCase().includes(empSearch.toLowerCase())
+  );
+  const allSelected = filteredEmployees.length > 0 && filteredEmployees.every((e) => selected.includes(e.id));
+  const dates = buildDateRange(startDate, endDate, skipWeekends);
+  const total = selected.length * dates.length;
+
+  const toggle = (id: string) =>
+    setSelected((prev) => (prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]));
+
+  const toggleAll = () =>
+    setSelected((prev) =>
+      allSelected
+        ? prev.filter((id) => !filteredEmployees.some((e) => e.id === id))
+        : Array.from(new Set([...prev, ...filteredEmployees.map((e) => e.id)]))
+    );
+
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        if (!selected.length) return toast.error("Selecione ao menos um colaborador.");
+        if (!dates.length) return toast.error("Selecione ao menos uma data válida.");
+        if (description.trim().length < 3) return toast.error("Informe uma justificativa de pelo menos 3 caracteres.");
+        onSubmit({ employee_ids: selected, dates, reason, description: description.trim() });
+      }}
+    >
+      <DialogHeader className="p-6 md:p-8 pb-4">
+        <DialogTitle className="text-2xl font-bold text-primary flex items-center gap-2">
+          <FileCheck className="h-6 w-6" /> Registrar Abono
+        </DialogTitle>
+        <DialogDescription>Abone um ou vários dias para um ou vários colaboradores.</DialogDescription>
+      </DialogHeader>
+
+      <div className="p-6 md:p-8 pt-4 space-y-5">
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <Label>Colaboradores ({selected.length} selecionados)</Label>
+            <Button type="button" variant="ghost" size="sm" className="h-8 rounded-lg text-xs font-bold" onClick={toggleAll}>
+              {allSelected ? "Limpar seleção" : "Selecionar todos"}
+            </Button>
+          </div>
+          <Input
+            placeholder="Buscar colaborador..."
+            value={empSearch}
+            onChange={(e) => setEmpSearch(e.target.value)}
+            className="rounded-xl h-11 border-border/40 bg-background/50"
+          />
+          <div className="max-h-52 overflow-y-auto rounded-xl border border-border/40 bg-background/40 divide-y divide-border/20">
+            {filteredEmployees.length === 0 ? (
+              <p className="p-4 text-sm text-muted-foreground">Nenhum colaborador encontrado.</p>
+            ) : (
+              filteredEmployees.map((emp) => (
+                <label
+                  key={emp.id}
+                  className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-muted/20 transition-colors"
+                >
+                  <Checkbox checked={selected.includes(emp.id)} onCheckedChange={() => toggle(emp.id)} />
+                  <span className="text-sm font-medium">{emp.full_name}</span>
+                </label>
+              ))
+            )}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="start-date">Data inicial</Label>
+            <Input
+              id="start-date"
+              type="date"
+              required
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="rounded-xl h-11 border-border/40 bg-background/50"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="end-date">Data final (opcional)</Label>
+            <Input
+              id="end-date"
+              type="date"
+              min={startDate || undefined}
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              className="rounded-xl h-11 border-border/40 bg-background/50"
+            />
+          </div>
+        </div>
+
+        <label className="flex items-center gap-3 cursor-pointer">
+          <Checkbox checked={skipWeekends} onCheckedChange={(v) => setSkipWeekends(v === true)} />
+          <span className="text-sm text-muted-foreground">Ignorar sábados e domingos</span>
+        </label>
+
+        <div className="space-y-2">
+          <Label htmlFor="reason">Motivo</Label>
+          <Select value={reason} onValueChange={setReason}>
+            <SelectTrigger className="rounded-xl h-11 border-border/40 bg-background/50">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {REASONS.map((r) => (
+                <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="description">Justificativa *</Label>
+          <Textarea
+            id="description"
+            required
+            minLength={3}
+            maxLength={500}
+            rows={3}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Ex: Atestado médico de 2 dias"
+            className="rounded-xl border-border/40 bg-background/50"
+          />
+        </div>
+
+        {total > 0 && (
+          <div className="rounded-xl bg-primary/5 border border-primary/20 px-4 py-3 text-sm">
+            <span className="font-bold text-primary">{total}</span> abono(s) serão criados —{" "}
+            {selected.length} colaborador(es) × {dates.length} dia(s).
+          </div>
+        )}
+      </div>
+
+      <DialogFooter className="p-6 md:p-8 bg-muted/20 border-t border-border/40">
+        <Button type="button" variant="ghost" onClick={onCancel} className="rounded-xl">Cancelar</Button>
+        <Button type="submit" disabled={isPending || total === 0} className="rounded-xl px-8 font-bold">
+          {isPending ? "Salvando..." : total > 1 ? `Salvar ${total} abonos` : "Salvar Abono"}
+        </Button>
+      </DialogFooter>
+    </form>
+  );
+}
+
+
 
 function EditAbonoDialog({ abono, employees, onSave, isPending }: { abono: any, employees: any[], onSave: (data: any) => void, isPending: boolean }) {
   const [open, setOpen] = useState(false);
