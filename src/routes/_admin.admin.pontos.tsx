@@ -145,6 +145,42 @@ function PontosPage() {
     },
   });
 
+  const batchMutation = useMutation({
+    mutationFn: async (payload: BatchPontoPayload) => {
+      const rows: any[] = [];
+      for (const emp of payload.employees) {
+        for (const d of payload.dates) {
+          for (const [type, time] of Object.entries(emp.times)) {
+            if (!time) continue;
+            const timePart = time.length === 5 ? `${time}:00` : time;
+            rows.push({
+              employee_id: emp.id,
+              tenant_id: profile!.tenant_id,
+              entry_date: d,
+              entry_at: new Date(`${d}T${timePart}`).toISOString(),
+              entry_type: type,
+              notes: payload.notes,
+              source: "manual_admin",
+              is_adjustment: true,
+              created_by: profile!.id,
+            });
+          }
+        }
+      }
+      if (!rows.length) throw new Error("Nenhum registro para salvar.");
+      const { error } = await supabase.from("time_entries").insert(rows);
+      if (error) throw error;
+      return rows.length;
+    },
+    onSuccess: (count) => {
+      queryClient.invalidateQueries({ queryKey: ["time-entries"] });
+      setIsBatchOpen(false);
+      toast.success(count === 1 ? "Ponto registrado!" : `${count} registros criados!`);
+    },
+    onError: (error: any) => toast.error("Erro ao registrar: " + error.message),
+  });
+
+
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase.from("time_entries").delete().eq("id", id);
