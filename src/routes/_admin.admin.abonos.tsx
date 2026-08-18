@@ -63,52 +63,52 @@ function AbonosPage() {
   });
 
   const addMutation = useMutation({
-    mutationFn: async (newData: any) => {
-      // 1. Insert into absences
-      const { data: absence, error: absenceError } = await supabase
-        .from("absences")
-        .insert([{
-          ...newData,
+    mutationFn: async (payload: { employee_ids: string[]; dates: string[]; reason: string; description: string }) => {
+      const { employee_ids, dates, reason, description } = payload;
+      const reasonLabel = REASONS.find((r) => r.value === reason)?.label || reason;
+
+      const absenceRows = employee_ids.flatMap((employee_id) =>
+        dates.map((absence_date) => ({
+          employee_id,
+          absence_date,
+          reason: reason as any,
+          description,
           tenant_id: profile!.tenant_id,
-          approved_by: profile!.id
-        }])
-        .select()
-        .single();
-      
+          approved_by: profile!.id,
+        }))
+      );
+
+      const { error: absenceError } = await supabase.from("absences").insert(absenceRows);
       if (absenceError) throw absenceError;
 
-      // 2. Insert into time_entries to show in the point sheet
-      // We create a special entry for the absence
-      const { error: entryError } = await supabase
-        .from("time_entries")
-        .insert([{
-          employee_id: newData.employee_id,
-          tenant_id: profile!.tenant_id,
-          entry_date: newData.absence_date,
-          entry_at: `${newData.absence_date}T00:00:00Z`,
-          entry_type: "entrada", // Use entrada as fallback since abono isn't in types yet, but notes will explain it
-          notes: `ABONO: ${REASONS.find(r => r.value === newData.reason)?.label || newData.reason}. ${newData.description || ""}`,
-          source: "manual_admin",
-          is_adjustment: true,
-          created_by: profile!.id
-        }]);
+      const entryRows = absenceRows.map((a) => ({
+        employee_id: a.employee_id,
+        tenant_id: profile!.tenant_id,
+        entry_date: a.absence_date,
+        entry_at: `${a.absence_date}T00:00:00Z`,
+        entry_type: "entrada" as any,
+        notes: `ABONO: ${reasonLabel}. ${description || ""}`,
+        source: "manual_admin" as any,
+        is_adjustment: true,
+        created_by: profile!.id,
+      }));
 
-      if (entryError) {
-        console.error("Erro ao criar entrada de ponto para abono:", entryError);
-        // We don't throw here to not revert the absence creation, 
-        // but it would be better to use a transaction if possible or handle it gracefully
-      }
+      const { error: entryError } = await supabase.from("time_entries").insert(entryRows);
+      if (entryError) console.error("Erro ao criar entradas de ponto para abono:", entryError);
+
+      return absenceRows.length;
     },
-    onSuccess: () => {
+    onSuccess: (count) => {
       queryClient.invalidateQueries({ queryKey: ["absences"] });
       queryClient.invalidateQueries({ queryKey: ["time-entries"] });
       setIsAddOpen(false);
-      toast.success("Abono registrado com sucesso!");
+      toast.success(count === 1 ? "Abono registrado com sucesso!" : `${count} abonos registrados com sucesso!`);
     },
     onError: (error) => {
       toast.error("Erro ao registrar abono: " + error.message);
     },
   });
+
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
