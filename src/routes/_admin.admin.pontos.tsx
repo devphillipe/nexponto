@@ -8,7 +8,9 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Clock, Calendar, Plus, Trash2, Edit2, History, User, ChevronDown, ChevronRight } from "lucide-react";
+import { Clock, Calendar, Plus, Trash2, Edit2, History, User, ChevronDown, ChevronRight, Users } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
 import { useState, useMemo, memo } from "react";
 import { format } from "date-fns";
 
@@ -29,7 +31,9 @@ function PontosPage() {
   const queryClient = useQueryClient();
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [isBatchOpen, setIsBatchOpen] = useState(false);
   const [editingEntry, setEditingEntry] = useState<any>(null);
+
   const [expandedEmployees, setExpandedEmployees] = useState<Set<string>>(new Set());
 
   const toggleEmployee = (name: string) => {
@@ -45,13 +49,15 @@ function PontosPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("employees")
-        .select("id, full_name")
+        .select("id, full_name, daily_hours")
         .eq("tenant_id", profile!.tenant_id)
-        .eq("active", true);
+        .eq("active", true)
+        .order("full_name");
       if (error) throw error;
       return data;
     },
   });
+
 
   const { data, isLoading } = useQuery({
     queryKey: ["time-entries", date, profile?.tenant_id],
@@ -141,6 +147,42 @@ function PontosPage() {
     },
   });
 
+  const batchMutation = useMutation({
+    mutationFn: async (payload: BatchPontoPayload) => {
+      const rows: any[] = [];
+      for (const emp of payload.employees) {
+        for (const d of payload.dates) {
+          for (const [type, time] of Object.entries(emp.times)) {
+            if (!time) continue;
+            const timePart = time.length === 5 ? `${time}:00` : time;
+            rows.push({
+              employee_id: emp.id,
+              tenant_id: profile!.tenant_id,
+              entry_date: d,
+              entry_at: new Date(`${d}T${timePart}`).toISOString(),
+              entry_type: type,
+              notes: payload.notes,
+              source: "manual_admin",
+              is_adjustment: true,
+              created_by: profile!.id,
+            });
+          }
+        }
+      }
+      if (!rows.length) throw new Error("Nenhum registro para salvar.");
+      const { error } = await supabase.from("time_entries").insert(rows);
+      if (error) throw error;
+      return rows.length;
+    },
+    onSuccess: (count) => {
+      queryClient.invalidateQueries({ queryKey: ["time-entries"] });
+      setIsBatchOpen(false);
+      toast.success(count === 1 ? "Ponto registrado!" : `${count} registros criados!`);
+    },
+    onError: (error: any) => toast.error("Erro ao registrar: " + error.message),
+  });
+
+
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase.from("time_entries").delete().eq("id", id);
@@ -176,16 +218,29 @@ function PontosPage() {
             />
           </div>
 
-          <Dialog open={isAddOpen} onOpenChange={(open) => {
-            setIsAddOpen(open);
-            if (!open) setEditingEntry(null);
-          }}>
+          <Dialog open={isBatchOpen} onOpenChange={setIsBatchOpen}>
             <DialogTrigger asChild>
               <Button size="lg" className="rounded-xl md:rounded-2xl shadow-xl shadow-primary/20 font-black uppercase tracking-widest text-[10px] md:text-xs px-6 md:px-8 h-12 md:h-14 w-full sm:w-auto">
                 <Plus className="h-5 w-5" /> Novo Registro
               </Button>
             </DialogTrigger>
+            <DialogContent className="sm:max-w-[640px] rounded-[2rem] border-none glass-card p-0 overflow-hidden max-h-[90dvh] overflow-y-auto">
+              <BatchPontoForm
+                employees={(employees as any) || []}
+                defaultDate={date}
+                isPending={batchMutation.isPending}
+                onCancel={() => setIsBatchOpen(false)}
+                onSubmit={(p) => batchMutation.mutate(p)}
+              />
+            </DialogContent>
+          </Dialog>
+
+          <Dialog open={isAddOpen} onOpenChange={(open) => {
+            setIsAddOpen(open);
+            if (!open) setEditingEntry(null);
+          }}>
             <DialogContent className="sm:max-w-[500px] rounded-[2rem] border-none glass-card p-0 overflow-hidden">
+
               <form onSubmit={(e) => {
                 e.preventDefault();
                 const formData = new FormData(e.currentTarget);
@@ -336,6 +391,271 @@ function PontosPage() {
     </div>
   );
 }
+
+type EmpOption = { id: string; full_name: string; daily_hours: number | null };
+type TimesMap = Record<string, string>;
+type BatchPontoPayload = {
+  employees: { id: string; times: TimesMap }[];
+  dates: string[];
+  notes: string;
+};
+
+const FULL_SEQUENCE = ["entrada", "saida_almoco", "retorno_almoco", "saida"];
+const SHORT_SEQUENCE = ["entrada", "saida"];
+
+const DEFAULT_TIMES: TimesMap = {
+  entrada: "08:00",
+  saida_almoco: "12:00",
+  retorno_almoco: "13:00",
+  saida: "17:00",
+};
+
+function sequenceFor(emp: EmpOption) {
+  return emp.daily_hours != null && Number(emp.daily_hours) < 8 ? SHORT_SEQUENCE : FULL_SEQUENCE;
+}
+
+function buildDateRange(start: string, end: string, skipWeekends: boolean): string[] {
+  if (!start) return [];
+  const finish = end && end >= start ? end : start;
+  const dates: string[] = [];
+  const cursor = new Date(start + "T12:00:00");
+  const last = new Date(finish + "T12:00:00");
+  while (cursor <= last && dates.length < 366) {
+    const day = cursor.getDay();
+    if (!skipWeekends || (day !== 0 && day !== 6)) dates.push(format(cursor, "yyyy-MM-dd"));
+    cursor.setDate(cursor.getDate() + 1);
+  }
+  return dates;
+}
+
+function BatchPontoForm({
+  employees,
+  defaultDate,
+  isPending,
+  onCancel,
+  onSubmit,
+}: {
+  employees: EmpOption[];
+  defaultDate: string;
+  isPending: boolean;
+  onCancel: () => void;
+  onSubmit: (payload: BatchPontoPayload) => void;
+}) {
+  const [selected, setSelected] = useState<string[]>([]);
+  const [times, setTimes] = useState<Record<string, TimesMap>>({});
+  const [empSearch, setEmpSearch] = useState("");
+  const [startDate, setStartDate] = useState(defaultDate);
+  const [endDate, setEndDate] = useState("");
+  const [skipWeekends, setSkipWeekends] = useState(true);
+  const [standard, setStandard] = useState<TimesMap>({ ...DEFAULT_TIMES });
+  const [notes, setNotes] = useState("");
+
+  const filtered = employees.filter((e) => e.full_name.toLowerCase().includes(empSearch.toLowerCase()));
+  const allSelected = filtered.length > 0 && filtered.every((e) => selected.includes(e.id));
+  const dates = buildDateRange(startDate, endDate, skipWeekends);
+
+  const defaultsFor = (emp: EmpOption): TimesMap => {
+    const seq = sequenceFor(emp);
+    const map: TimesMap = {};
+    seq.forEach((t) => (map[t] = standard[t] || ""));
+    return map;
+  };
+
+  const select = (emp: EmpOption) => {
+    setSelected((prev) => [...prev, emp.id]);
+    setTimes((prev) => ({ ...prev, [emp.id]: prev[emp.id] || defaultsFor(emp) }));
+  };
+
+  const toggle = (emp: EmpOption) => {
+    if (selected.includes(emp.id)) setSelected((prev) => prev.filter((i) => i !== emp.id));
+    else select(emp);
+  };
+
+  const toggleAll = () => {
+    if (allSelected) {
+      setSelected((prev) => prev.filter((id) => !filtered.some((e) => e.id === id)));
+    } else {
+      const add = filtered.filter((e) => !selected.includes(e.id));
+      setSelected((prev) => Array.from(new Set([...prev, ...add.map((e) => e.id)])));
+      setTimes((prev) => {
+        const next = { ...prev };
+        add.forEach((e) => (next[e.id] = next[e.id] || defaultsFor(e)));
+        return next;
+      });
+    }
+  };
+
+  const applyStandardToAll = () => {
+    setTimes((prev) => {
+      const next = { ...prev };
+      employees.filter((e) => selected.includes(e.id)).forEach((e) => (next[e.id] = defaultsFor(e)));
+      return next;
+    });
+    toast.success("Horário padrão aplicado a todos os selecionados.");
+  };
+
+  const selectedEmployees = employees.filter((e) => selected.includes(e.id));
+  const punchesPerDay = selectedEmployees.reduce(
+    (acc, e) => acc + Object.values(times[e.id] || {}).filter(Boolean).length,
+    0
+  );
+  const total = punchesPerDay * dates.length;
+
+  return (
+    <form
+      onSubmit={(ev) => {
+        ev.preventDefault();
+        if (!selectedEmployees.length) return toast.error("Selecione ao menos um colaborador.");
+        if (!dates.length) return toast.error("Selecione ao menos uma data válida.");
+        if (notes.trim().length < 3) return toast.error("Informe uma justificativa de pelo menos 3 caracteres.");
+        if (!total) return toast.error("Informe ao menos um horário.");
+        onSubmit({
+          employees: selectedEmployees.map((e) => ({ id: e.id, times: times[e.id] || {} })),
+          dates,
+          notes: notes.trim(),
+        });
+      }}
+    >
+      <DialogHeader className="p-6 md:p-8 pb-4">
+        <DialogTitle className="text-2xl font-bold text-primary flex items-center gap-2">
+          <Users className="h-6 w-6" /> Registrar Ponto em Lote
+        </DialogTitle>
+        <DialogDescription>
+          Registre um ou vários dias para um ou vários colaboradores, com horários individuais.
+        </DialogDescription>
+      </DialogHeader>
+
+      <div className="p-6 md:p-8 pt-4 space-y-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="batch-start">Data inicial *</Label>
+            <Input id="batch-start" type="date" required value={startDate} onChange={(e) => setStartDate(e.target.value)} className="rounded-xl h-11 border-border/40 bg-background/50" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="batch-end">Data final (opcional)</Label>
+            <Input id="batch-end" type="date" min={startDate || undefined} value={endDate} onChange={(e) => setEndDate(e.target.value)} className="rounded-xl h-11 border-border/40 bg-background/50" />
+          </div>
+        </div>
+
+        <label className="flex items-center gap-3 cursor-pointer">
+          <Checkbox checked={skipWeekends} onCheckedChange={(v) => setSkipWeekends(v === true)} />
+          <span className="text-sm text-muted-foreground">Ignorar sábados e domingos</span>
+        </label>
+
+        <div className="space-y-3 rounded-2xl border border-border/40 bg-background/40 p-4">
+          <div className="flex items-center justify-between gap-2">
+            <Label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Horário padrão</Label>
+            <Button type="button" variant="ghost" size="sm" className="h-8 rounded-lg text-xs font-bold" onClick={applyStandardToAll}>
+              Aplicar a todos
+            </Button>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {FULL_SEQUENCE.map((t) => (
+              <div key={t} className="space-y-1">
+                <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">{TYPE_LABEL[t]}</span>
+                <Input
+                  type="time"
+                  value={standard[t] || ""}
+                  onChange={(e) => setStandard((prev) => ({ ...prev, [t]: e.target.value }))}
+                  className="rounded-xl h-10 border-border/40 bg-background/50"
+                />
+              </div>
+            ))}
+          </div>
+          <p className="text-[11px] text-muted-foreground">
+            Colaboradores com jornada menor que 8h recebem apenas entrada e saída.
+          </p>
+        </div>
+
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <Label>Colaboradores ({selected.length} selecionados)</Label>
+            <Button type="button" variant="ghost" size="sm" className="h-8 rounded-lg text-xs font-bold" onClick={toggleAll}>
+              {allSelected ? "Limpar seleção" : "Selecionar todos"}
+            </Button>
+          </div>
+          <Input
+            placeholder="Buscar colaborador..."
+            value={empSearch}
+            onChange={(e) => setEmpSearch(e.target.value)}
+            className="rounded-xl h-11 border-border/40 bg-background/50"
+          />
+          <div className="max-h-72 overflow-y-auto rounded-xl border border-border/40 bg-background/40 divide-y divide-border/20">
+            {filtered.length === 0 ? (
+              <p className="p-4 text-sm text-muted-foreground">Nenhum colaborador encontrado.</p>
+            ) : (
+              filtered.map((emp) => {
+                const isOn = selected.includes(emp.id);
+                const seq = sequenceFor(emp);
+                return (
+                  <div key={emp.id} className="px-4 py-3">
+                    <label className="flex items-center gap-3 cursor-pointer">
+                      <Checkbox checked={isOn} onCheckedChange={() => toggle(emp)} />
+                      <span className="text-sm font-medium flex-1">{emp.full_name}</span>
+                      <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
+                        {emp.daily_hours ? `${Number(emp.daily_hours)}h` : "—"}
+                      </span>
+                    </label>
+                    {isOn && (
+                      <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-2 pl-7">
+                        {seq.map((t) => (
+                          <div key={t} className="space-y-1">
+                            <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">{TYPE_LABEL[t]}</span>
+                            <Input
+                              type="time"
+                              value={times[emp.id]?.[t] || ""}
+                              onChange={(e) =>
+                                setTimes((prev) => ({
+                                  ...prev,
+                                  [emp.id]: { ...(prev[emp.id] || {}), [t]: e.target.value },
+                                }))
+                              }
+                              className="rounded-lg h-10 border-border/40 bg-background/50 text-sm"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="batch-notes">Justificativa *</Label>
+          <Textarea
+            id="batch-notes"
+            required
+            minLength={3}
+            maxLength={500}
+            rows={2}
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            placeholder="Ex: Ajuste de ponto por falha no aplicativo"
+            className="rounded-xl border-border/40 bg-background/50"
+          />
+        </div>
+
+        {total > 0 && (
+          <div className="rounded-xl bg-primary/5 border border-primary/20 px-4 py-3 text-sm">
+            <span className="font-bold text-primary">{total}</span> batida(s) serão criadas —{" "}
+            {selectedEmployees.length} colaborador(es) × {dates.length} dia(s).
+          </div>
+        )}
+      </div>
+
+      <DialogFooter className="p-6 md:p-8 bg-muted/20 border-t border-border/40">
+        <Button type="button" variant="ghost" onClick={onCancel} className="rounded-xl">Cancelar</Button>
+        <Button type="submit" disabled={isPending || total === 0} className="rounded-xl px-8 font-bold">
+          {isPending ? "Salvando..." : total > 1 ? `Salvar ${total} batidas` : "Salvar Registro"}
+        </Button>
+      </DialogFooter>
+    </form>
+  );
+}
+
 
 const PointEntryRow = memo(({ e, TYPE_LABEL, handleEdit, deleteMutation }: any) => (
   <tr className="hover:bg-muted/10 transition-colors group">
