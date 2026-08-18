@@ -1,7 +1,7 @@
 import { createFileRoute, Link, Outlet, redirect, useNavigate, useLocation } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useProfile } from "@/lib/auth";
-import { Clock, History, LogOut, User } from "lucide-react";
+import { Clock, History, LogOut, User, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { memo } from "react";
 
@@ -23,8 +23,9 @@ export const Route = createFileRoute("/_func")({
 });
 
 const nav = [
-  { to: "/funcionario/meu-ponto", label: "Registrar Ponto", icon: Clock },
-  { to: "/funcionario/historico", label: "Meu Histórico", icon: History },
+  { to: "/funcionario/meu-ponto", label: "Ponto", icon: Clock },
+  { to: "/funcionario/resumo", label: "Resumo", icon: BarChart3 },
+  { to: "/funcionario/historico", label: "Histórico", icon: History },
   { to: "/funcionario/perfil", label: "Perfil", icon: User },
 ] as const;
 
@@ -86,7 +87,7 @@ function FuncLayout() {
               key={item.to}
               to={item.to}
               aria-current={active ? "page" : undefined}
-              className={`flex min-h-[3rem] flex-1 min-w-0 items-center justify-center gap-2 rounded-xl px-2 py-3 text-xs sm:text-sm font-bold transition-all active:scale-[0.97] ${
+              className={`flex min-h-[3rem] flex-1 min-w-0 flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-2 rounded-xl px-1.5 py-2 text-[10px] sm:text-sm font-bold transition-all active:scale-[0.97] ${
                 active
                   ? "bg-primary text-primary-foreground shadow-[var(--shadow-glow)]"
                   : "text-muted-foreground hover:text-foreground hover:bg-white/5"

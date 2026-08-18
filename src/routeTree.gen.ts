@@ -18,6 +18,7 @@ import { Route as FuncionarioLoginRouteImport } from './routes/funcionario.login
 import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-password'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AdminCadastroRouteImport } from './routes/admin.cadastro'
+import { Route as FuncFuncionarioResumoRouteImport } from './routes/_func.funcionario.resumo'
 import { Route as FuncFuncionarioPerfilRouteImport } from './routes/_func.funcionario.perfil'
 import { Route as FuncFuncionarioMeuPontoRouteImport } from './routes/_func.funcionario.meu-ponto'
 import { Route as FuncFuncionarioHistoricoRouteImport } from './routes/_func.funcionario.historico'
@@ -70,6 +71,11 @@ const AdminCadastroRoute = AdminCadastroRouteImport.update({
   id: '/admin/cadastro',
   path: '/admin/cadastro',
   getParentRoute: () => rootRouteImport,
+} as any)
+const FuncFuncionarioResumoRoute = FuncFuncionarioResumoRouteImport.update({
+  id: '/funcionario/resumo',
+  path: '/funcionario/resumo',
+  getParentRoute: () => FuncRoute,
 } as any)
 const FuncFuncionarioPerfilRoute = FuncFuncionarioPerfilRouteImport.update({
   id: '/funcionario/perfil',
@@ -135,6 +141,7 @@ export interface FileRoutesByFullPath {
   '/funcionario/historico': typeof FuncFuncionarioHistoricoRoute
   '/funcionario/meu-ponto': typeof FuncFuncionarioMeuPontoRoute
   '/funcionario/perfil': typeof FuncFuncionarioPerfilRoute
+  '/funcionario/resumo': typeof FuncFuncionarioResumoRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -153,6 +160,7 @@ export interface FileRoutesByTo {
   '/funcionario/historico': typeof FuncFuncionarioHistoricoRoute
   '/funcionario/meu-ponto': typeof FuncFuncionarioMeuPontoRoute
   '/funcionario/perfil': typeof FuncFuncionarioPerfilRoute
+  '/funcionario/resumo': typeof FuncFuncionarioResumoRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -174,6 +182,7 @@ export interface FileRoutesById {
   '/_func/funcionario/historico': typeof FuncFuncionarioHistoricoRoute
   '/_func/funcionario/meu-ponto': typeof FuncFuncionarioMeuPontoRoute
   '/_func/funcionario/perfil': typeof FuncFuncionarioPerfilRoute
+  '/_func/funcionario/resumo': typeof FuncFuncionarioResumoRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -194,6 +203,7 @@ export interface FileRouteTypes {
     | '/funcionario/historico'
     | '/funcionario/meu-ponto'
     | '/funcionario/perfil'
+    | '/funcionario/resumo'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -212,6 +222,7 @@ export interface FileRouteTypes {
     | '/funcionario/historico'
     | '/funcionario/meu-ponto'
     | '/funcionario/perfil'
+    | '/funcionario/resumo'
   id:
     | '__root__'
     | '/'
@@ -232,6 +243,7 @@ export interface FileRouteTypes {
     | '/_func/funcionario/historico'
     | '/_func/funcionario/meu-ponto'
     | '/_func/funcionario/perfil'
+    | '/_func/funcionario/resumo'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -310,6 +322,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/cadastro'
       preLoaderRoute: typeof AdminCadastroRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_func/funcionario/resumo': {
+      id: '/_func/funcionario/resumo'
+      path: '/funcionario/resumo'
+      fullPath: '/funcionario/resumo'
+      preLoaderRoute: typeof FuncFuncionarioResumoRouteImport
+      parentRoute: typeof FuncRoute
     }
     '/_func/funcionario/perfil': {
       id: '/_func/funcionario/perfil'
@@ -401,12 +420,14 @@ interface FuncRouteChildren {
   FuncFuncionarioHistoricoRoute: typeof FuncFuncionarioHistoricoRoute
   FuncFuncionarioMeuPontoRoute: typeof FuncFuncionarioMeuPontoRoute
   FuncFuncionarioPerfilRoute: typeof FuncFuncionarioPerfilRoute
+  FuncFuncionarioResumoRoute: typeof FuncFuncionarioResumoRoute
 }
 
 const FuncRouteChildren: FuncRouteChildren = {
   FuncFuncionarioHistoricoRoute: FuncFuncionarioHistoricoRoute,
   FuncFuncionarioMeuPontoRoute: FuncFuncionarioMeuPontoRoute,
   FuncFuncionarioPerfilRoute: FuncFuncionarioPerfilRoute,
+  FuncFuncionarioResumoRoute: FuncFuncionarioResumoRoute,
 }
 
 const FuncRouteWithChildren = FuncRoute._addFileChildren(FuncRouteChildren)
@@ -425,3 +446,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
