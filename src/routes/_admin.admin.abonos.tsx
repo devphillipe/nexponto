@@ -177,75 +177,15 @@ function AbonosPage() {
               <Plus className="h-5 w-5" /> Novo Abono
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[500px] rounded-[2rem] border-none glass-card p-0 overflow-hidden shadow-2xl">
-            <form onSubmit={(e) => {
-              e.preventDefault();
-              const formData = new FormData(e.currentTarget);
-              const description = String(formData.get("description") || "").trim();
-              if (description.length < 3) {
-                toast.error("Informe uma justificativa de pelo menos 3 caracteres.");
-                return;
-              }
-              addMutation.mutate({
-                employee_id: formData.get("employee_id"),
-                absence_date: formData.get("date"),
-                reason: formData.get("reason"),
-                description,
-              });
-            }}>
-              <DialogHeader className="p-8 pb-4">
-                <DialogTitle className="text-2xl font-bold text-primary flex items-center gap-2">
-                  <FileCheck className="h-6 w-6" /> Registrar Abono
-                </DialogTitle>
-                <DialogDescription>Preencha os dados da falta justificada ou abono.</DialogDescription>
-              </DialogHeader>
-              <div className="p-8 pt-4 space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="employee_id">Colaborador</Label>
-                  <Select name="employee_id" required>
-                    <SelectTrigger className="rounded-xl h-11 border-border/40 bg-background/50">
-                      <SelectValue placeholder="Selecione o funcionário" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {employees?.map(emp => (
-                        <SelectItem key={emp.id} value={emp.id}>{emp.full_name}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="date">Data</Label>
-                    <Input id="date" name="date" type="date" required className="rounded-xl h-11 border-border/40 bg-background/50" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="reason">Motivo</Label>
-                    <Select name="reason" defaultValue="atestado" required>
-                      <SelectTrigger className="rounded-xl h-11 border-border/40 bg-background/50">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {REASONS.map(r => (
-                          <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="description">Justificativa *</Label>
-                  <Textarea id="description" name="description" required minLength={3} maxLength={500} rows={3} placeholder="Ex: Atestado médico de 2 dias" className="rounded-xl border-border/40 bg-background/50" aria-describedby="desc-hint" />
-                  <p id="desc-hint" className="text-[11px] text-muted-foreground">Descreva o motivo do abono. Mínimo 3 caracteres.</p>
-                </div>
-              </div>
-              <DialogFooter className="p-8 bg-muted/20 border-t border-border/40">
-                <Button type="button" variant="ghost" onClick={() => setIsAddOpen(false)} className="rounded-xl">Cancelar</Button>
-                <Button type="submit" disabled={addMutation.isPending} className="rounded-xl px-8 font-bold">
-                  {addMutation.isPending ? "Salvando..." : "Salvar Abono"}
-                </Button>
-              </DialogFooter>
-            </form>
+          <DialogContent className="sm:max-w-[560px] rounded-[2rem] border-none glass-card p-0 overflow-hidden shadow-2xl max-h-[90dvh] overflow-y-auto">
+            <BatchAbonoForm
+              employees={employees || []}
+              isPending={addMutation.isPending}
+              onCancel={() => setIsAddOpen(false)}
+              onSubmit={(payload) => addMutation.mutate(payload)}
+            />
           </DialogContent>
+
         </Dialog>
       </div>
 
