@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useProfile } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, Clock, LogIn, Coffee, Sunrise, LogOut, MapPin, Smartphone } from "lucide-react";
+import { getCurrentCoords } from "@/lib/geolocation";
 
 export const Route = createFileRoute("/_func/funcionario/meu-ponto")({
   head: () => ({ meta: [{ title: "Registrar Ponto — NexPonto" }] }),
