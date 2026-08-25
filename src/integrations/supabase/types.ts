@@ -209,6 +209,8 @@ export type Database = {
           id: string
           ip: string | null
           is_adjustment: boolean | null
+          latitude: number | null
+          longitude: number | null
           notes: string | null
           original_entry_at: string | null
           source: Database["public"]["Enums"]["entry_source"]
@@ -225,6 +227,8 @@ export type Database = {
           id?: string
           ip?: string | null
           is_adjustment?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
           notes?: string | null
           original_entry_at?: string | null
           source?: Database["public"]["Enums"]["entry_source"]
@@ -241,6 +245,8 @@ export type Database = {
           id?: string
           ip?: string | null
           is_adjustment?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
           notes?: string | null
           original_entry_at?: string | null
           source?: Database["public"]["Enums"]["entry_source"]
