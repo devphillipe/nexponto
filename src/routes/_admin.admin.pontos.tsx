@@ -13,6 +13,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { useState, useMemo, memo } from "react";
 import { format } from "date-fns";
+import { LocationDialog } from "@/components/LocationDialog";
 
 export const Route = createFileRoute("/_admin/admin/pontos")({
   head: () => ({ meta: [{ title: "Pontos — NexPonto Admin" }] }),
@@ -65,7 +66,7 @@ function PontosPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("time_entries")
-        .select("id, entry_date, entry_at, entry_type, source, is_adjustment, notes, employee_id, employees(id, full_name)")
+        .select("id, entry_date, entry_at, entry_type, source, is_adjustment, notes, employee_id, latitude, longitude, employees(id, full_name)")
         .eq("tenant_id", profile!.tenant_id)
         .eq("entry_date", date)
         .order("entry_at", { ascending: false });
