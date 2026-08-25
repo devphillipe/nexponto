@@ -9,7 +9,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface LocationDialogProps {
   latitude: number;
@@ -34,6 +34,7 @@ export const LocationDialog = memo(function LocationDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
+      <TooltipProvider delayDuration={300}>
       <Tooltip>
         <TooltipTrigger asChild>
           <DialogTrigger asChild>
