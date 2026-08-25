@@ -51,6 +51,7 @@ export const LocationDialog = memo(function LocationDialog({
         </TooltipTrigger>
         <TooltipContent>Ver localização</TooltipContent>
       </Tooltip>
+      </TooltipProvider>
 
       <DialogContent className="sm:max-w-lg p-4 sm:p-6">
         <DialogHeader>
