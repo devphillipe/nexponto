@@ -5,6 +5,7 @@ import { useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useProfile } from "@/lib/auth";
 import { Calendar, Clock, ChevronDown, History } from "lucide-react";
+import { LocationDialog } from "@/components/LocationDialog";
 
 export const Route = createFileRoute("/_func/funcionario/historico")({
   head: () => ({ meta: [{ title: "Meu Histórico — NexPonto" }] }),
@@ -41,7 +42,7 @@ function HistoryPage() {
       if (!emp) return [];
       const { data, error } = await supabase
         .from("time_entries")
-        .select("id, entry_date, entry_at, entry_type, source")
+        .select("id, entry_date, entry_at, entry_type, source, latitude, longitude")
         .eq("employee_id", emp.id)
         .order("entry_at", { ascending: false })
         .limit(100);
@@ -134,7 +135,14 @@ function HistoryPage() {
                             </span>
                           )}
                         </div>
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2 sm:gap-4">
+                          {e.latitude != null && e.longitude != null && (
+                            <LocationDialog
+                              latitude={Number(e.latitude)}
+                              longitude={Number(e.longitude)}
+                              label={`${TYPE_LABEL[e.entry_type]} — ${new Date(e.entry_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}`}
+                            />
+                          )}
                           <span className="font-mono font-bold text-sm sm:text-base text-primary/80">
                             {new Date(e.entry_at).toLocaleTimeString("pt-BR", {
                               hour: "2-digit",

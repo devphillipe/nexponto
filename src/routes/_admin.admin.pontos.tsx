@@ -13,6 +13,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { useState, useMemo, memo } from "react";
 import { format } from "date-fns";
+import { LocationDialog } from "@/components/LocationDialog";
 
 export const Route = createFileRoute("/_admin/admin/pontos")({
   head: () => ({ meta: [{ title: "Pontos — NexPonto Admin" }] }),
@@ -65,7 +66,7 @@ function PontosPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("time_entries")
-        .select("id, entry_date, entry_at, entry_type, source, is_adjustment, notes, employee_id, employees(id, full_name)")
+        .select("id, entry_date, entry_at, entry_type, source, is_adjustment, notes, employee_id, latitude, longitude, employees(id, full_name)")
         .eq("tenant_id", profile!.tenant_id)
         .eq("entry_date", date)
         .order("entry_at", { ascending: false });
@@ -686,6 +687,13 @@ const PointEntryRow = memo(({ e, TYPE_LABEL, handleEdit, deleteMutation }: any) 
       </span>
     </td>
     <td className="px-6 py-5 text-right space-x-2 whitespace-nowrap">
+      {e.latitude != null && e.longitude != null && (
+        <LocationDialog
+          latitude={Number(e.latitude)}
+          longitude={Number(e.longitude)}
+          label={`${TYPE_LABEL[e.entry_type]} — ${new Date(e.entry_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}`}
+        />
+      )}
       <Button variant="ghost" size="icon" onClick={() => handleEdit(e)} className="h-8 w-8 rounded-lg text-primary/60 hover:text-primary hover:bg-primary/10">
         <Edit2 className="h-3.5 w-3.5" />
       </Button>

@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useProfile } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, Clock, LogIn, Coffee, Sunrise, LogOut, MapPin, Smartphone } from "lucide-react";
+import { getCurrentCoords } from "@/lib/geolocation";
 
 export const Route = createFileRoute("/_func/funcionario/meu-ponto")({
   head: () => ({ meta: [{ title: "Registrar Ponto — NexPonto" }] }),
@@ -81,12 +82,16 @@ function MyClockPage() {
   async function punch() {
     if (!employee || !nextType) return;
     setPunching(true);
+    // Captura a localização sem bloquear a batida: se o GPS for negado
+    // ou der timeout, o ponto é registrado normalmente sem coordenadas.
+    const coords = await getCurrentCoords();
     const { error } = await supabase.from("time_entries").insert({
       tenant_id: employee.tenant_id,
       employee_id: employee.id,
       entry_type: nextType,
       source: "automatico",
       user_agent: navigator.userAgent,
+      ...(coords ? { latitude: coords.latitude, longitude: coords.longitude } : {}),
     });
     setPunching(false);
     if (error) {
