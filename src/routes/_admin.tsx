@@ -188,14 +188,22 @@ function AdminLayout() {
                  <CommandMenu />
               </div>
               <div className="h-8 w-[1px] bg-border mx-1 md:mx-2 hidden sm:block"></div>
-              <div className="flex items-center gap-2 md:gap-4">
-                <div className="text-right hidden sm:block">
-                  <div className="text-xs md:text-sm font-bold text-foreground leading-none mb-1">{profile?.full_name?.split(' ')[0]}</div>
-                  <div className="text-[8px] md:text-[10px] font-black uppercase tracking-widest text-primary/70">Admin</div>
+              <div className="flex items-center gap-2 md:gap-3">
+                <div className="text-right hidden sm:block min-w-0 max-w-40 md:max-w-52">
+                  <div className="truncate text-[11px] md:text-xs font-semibold text-foreground leading-tight">{profile?.tenant_name}</div>
+                  <div className="truncate text-[9px] md:text-[10px] font-medium text-muted-foreground leading-tight">{profile?.full_name}</div>
                 </div>
-                <div className="h-9 w-9 md:h-11 md:w-11 rounded-xl md:rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 flex items-center justify-center font-bold text-primary shadow-sm text-xs md:text-base">
-                  {profile?.full_name?.charAt(0)}
-                </div>
+                {profile?.tenant_logo_url ? (
+                  <img
+                    src={profile.tenant_logo_url}
+                    alt={`Logo ${profile.tenant_name}`}
+                    className="h-9 w-9 md:h-10 md:w-10 rounded-xl md:rounded-2xl border border-border/40 object-contain bg-background/60 shadow-sm p-1"
+                  />
+                ) : (
+                  <div className="h-9 w-9 md:h-10 md:w-10 rounded-xl md:rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 flex items-center justify-center font-bold text-primary shadow-sm text-xs md:text-sm">
+                    {profile?.tenant_name?.charAt(0) ?? profile?.full_name?.charAt(0)}
+                  </div>
+                )}
               </div>
             </div>
         </header>
