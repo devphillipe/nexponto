@@ -33,7 +33,8 @@ function Dashboard() {
     staleTime: 1000 * 60 * 5, // 5 minutes
     queryFn: async () => {
       const today = new Date().toISOString().slice(0, 10);
-      const [emps, actives, todayEntries, recentActivities] = await Promise.all([
+      const monthStart = today.slice(0, 8) + "01";
+      const [emps, actives, todayEntries, recentActivities, monthHires, todayEntradas] = await Promise.all([
         supabase.from("employees").select("id", { count: "exact", head: true }).eq("tenant_id", profile!.tenant_id),
         supabase
           .from("employees")
@@ -51,22 +52,59 @@ function Dashboard() {
           .eq("tenant_id", profile!.tenant_id)
           .order("entry_at", { ascending: false })
           .limit(10),
+        supabase
+          .from("employees")
+          .select("id", { count: "exact", head: true })
+          .eq("tenant_id", profile!.tenant_id)
+          .gte("hire_date", monthStart),
+        supabase
+          .from("time_entries")
+          .select("employee_id")
+          .eq("tenant_id", profile!.tenant_id)
+          .eq("entry_date", today)
+          .eq("entry_type", "entrada"),
       ]);
+      const activeCount = actives.count ?? 0;
+      const withEntrada = new Set((todayEntradas.data ?? []).map((e: any) => e.employee_id));
+      const pendencias = Math.max(0, activeCount - withEntrada.size);
       return {
         total: emps.count ?? 0,
-        active: actives.count ?? 0,
+        active: activeCount,
         todayPunches: todayEntries.count ?? 0,
         recentActivities: recentActivities.data ?? [],
+        monthHires: monthHires.count ?? 0,
+        pendencias,
       };
     },
   });
 
-  const cards = useMemo(() => [
-    { label: "Total Equipe", value: stats?.total ?? "—", icon: Users, trend: "+2 este mês", color: "text-primary" },
-    { label: "Colaboradores Ativos", value: stats?.active ?? "—", icon: CheckCircle2, trend: "Status: OK", color: "text-success" },
-    { label: "Batidas Hoje", value: stats?.todayPunches ?? "—", icon: Clock, trend: "Tempo real", color: "text-primary" },
-    { label: "Pendências", value: "0", icon: AlertCircle, trend: "Tudo em dia", color: "text-muted-foreground" },
-  ], [stats]);
+  const cards = useMemo(() => {
+    const pend = stats?.pendencias ?? 0;
+    return [
+      {
+        label: "Total Equipe",
+        value: stats?.total ?? "—",
+        icon: Users,
+        trend: (stats?.monthHires ?? 0) > 0 ? `+${stats!.monthHires} este mês` : "Sem admissões no mês",
+        color: "text-primary",
+      },
+      {
+        label: "Colaboradores Ativos",
+        value: stats?.active ?? "—",
+        icon: CheckCircle2,
+        trend: (stats?.total ?? 0) > (stats?.active ?? 0) ? `${(stats?.total ?? 0) - (stats?.active ?? 0)} inativo(s)` : "Todos ativos",
+        color: "text-success",
+      },
+      { label: "Batidas Hoje", value: stats?.todayPunches ?? "—", icon: Clock, trend: "Tempo real", color: "text-primary" },
+      {
+        label: "Pendências",
+        value: pend,
+        icon: AlertCircle,
+        trend: pend > 0 ? "Sem entrada hoje" : "Tudo em dia",
+        color: pend > 0 ? "text-warning" : "text-muted-foreground",
+      },
+    ];
+  }, [stats]);
 
   const productivity = useMemo(() => {
     const active = stats?.active ?? 0;
