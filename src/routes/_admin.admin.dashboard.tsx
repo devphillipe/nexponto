@@ -78,12 +78,33 @@ function Dashboard() {
     },
   });
 
-  const cards = useMemo(() => [
-    { label: "Total Equipe", value: stats?.total ?? "—", icon: Users, trend: "+2 este mês", color: "text-primary" },
-    { label: "Colaboradores Ativos", value: stats?.active ?? "—", icon: CheckCircle2, trend: "Status: OK", color: "text-success" },
-    { label: "Batidas Hoje", value: stats?.todayPunches ?? "—", icon: Clock, trend: "Tempo real", color: "text-primary" },
-    { label: "Pendências", value: "0", icon: AlertCircle, trend: "Tudo em dia", color: "text-muted-foreground" },
-  ], [stats]);
+  const cards = useMemo(() => {
+    const pend = stats?.pendencias ?? 0;
+    return [
+      {
+        label: "Total Equipe",
+        value: stats?.total ?? "—",
+        icon: Users,
+        trend: (stats?.monthHires ?? 0) > 0 ? `+${stats!.monthHires} este mês` : "Sem admissões no mês",
+        color: "text-primary",
+      },
+      {
+        label: "Colaboradores Ativos",
+        value: stats?.active ?? "—",
+        icon: CheckCircle2,
+        trend: (stats?.total ?? 0) > (stats?.active ?? 0) ? `${(stats?.total ?? 0) - (stats?.active ?? 0)} inativo(s)` : "Todos ativos",
+        color: "text-success",
+      },
+      { label: "Batidas Hoje", value: stats?.todayPunches ?? "—", icon: Clock, trend: "Tempo real", color: "text-primary" },
+      {
+        label: "Pendências",
+        value: pend,
+        icon: AlertCircle,
+        trend: pend > 0 ? "Sem entrada hoje" : "Tudo em dia",
+        color: pend > 0 ? "text-warning" : "text-muted-foreground",
+      },
+    ];
+  }, [stats]);
 
   const productivity = useMemo(() => {
     const active = stats?.active ?? 0;
