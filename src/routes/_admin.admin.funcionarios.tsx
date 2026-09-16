@@ -539,9 +539,14 @@ const EmployeeTableRow = memo(({ e, handleToggle, qc }: { e: any, handleToggle: 
       </div>
     </td>
     <td className="px-6 py-5">
-        <span className="px-3 py-1 bg-muted/50 rounded-lg text-xs font-bold border border-border/20 whitespace-nowrap">
-          {e.daily_hours ? `${e.daily_hours} horas` : "Padrão (8h)"}
-        </span>
+        <div className="space-y-1">
+          <span className="inline-block px-3 py-1 bg-muted/50 rounded-lg text-xs font-bold border border-border/20 whitespace-nowrap">
+            {e.daily_hours ? `${e.daily_hours} horas` : "Padrão (8h)"}
+          </span>
+          <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+            {formatWorkDays(e.work_days)}
+          </div>
+        </div>
     </td>
     <td className="px-8 py-5 text-right">
       <div className="flex items-center justify-end gap-3">
