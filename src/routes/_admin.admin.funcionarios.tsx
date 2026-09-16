@@ -230,6 +230,7 @@ function NewEmployeeForm({ onDone }: { onDone: () => void }) {
   const createFn = useServerFn(createEmployee);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [workDays, setWorkDays] = useState<number[]>([...DEFAULT_WORK_DAYS]);
   const [form, setForm] = useState({
     full_name: "",
     email: "",
@@ -272,6 +273,7 @@ function NewEmployeeForm({ onDone }: { onDone: () => void }) {
           department: form.department || null,
           hire_date: form.hire_date_br ? dateBrToIso(form.hire_date_br) : null,
           daily_hours: form.daily_hours ? Number(form.daily_hours) : null,
+          work_days: workDays,
         },
       });
       toast.success("Funcionário cadastrado! Compartilhe e-mail e senha com ele.");
@@ -346,7 +348,8 @@ function NewEmployeeForm({ onDone }: { onDone: () => void }) {
           <Input id="dh" type="number" inputMode="decimal" step="0.5" min="1" max="24" placeholder="Padrão do escritório" value={form.daily_hours} onChange={(e) => up("daily_hours", e.target.value)} />
         </div>
       </div>
-      <Button type="submit" disabled={loading} className="w-full" aria-busy={loading}>
+      <WorkDaysPicker idPrefix="new" value={workDays} onChange={setWorkDays} />
+      <Button type="submit" disabled={loading || workDays.length === 0} className="w-full" aria-busy={loading}>
         {loading ? "Cadastrando..." : "Cadastrar funcionário"}
       </Button>
     </form>
@@ -375,6 +378,7 @@ function EditEmployeeDialog({ employee, onDone }: { employee: any, onDone: () =>
   const updateFn = useServerFn(updateEmployee);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [workDays, setWorkDays] = useState<number[]>(normalizeWorkDays(employee.work_days));
   const [form, setForm] = useState({
     full_name: employee.full_name || "",
     email: employee.email || "",
@@ -416,6 +420,7 @@ function EditEmployeeDialog({ employee, onDone }: { employee: any, onDone: () =>
           department: form.department || null,
           hire_date: form.hire_date_br ? dateBrToIso(form.hire_date_br) : null,
           daily_hours: form.daily_hours ? Number(form.daily_hours) : null,
+          work_days: workDays,
         },
       });
       toast.success("Dados do funcionário atualizados!");
@@ -498,7 +503,8 @@ function EditEmployeeDialog({ employee, onDone }: { employee: any, onDone: () =>
                 <Input id="edit-dh" type="number" inputMode="decimal" step="0.5" min="1" max="24" placeholder="Padrão do escritório" value={form.daily_hours} onChange={(e) => up("daily_hours", e.target.value)} />
               </div>
             </div>
-            <Button type="submit" disabled={loading} className="w-full mt-4" aria-busy={loading}>
+            <WorkDaysPicker idPrefix={`edit-${employee.id}`} value={workDays} onChange={setWorkDays} />
+            <Button type="submit" disabled={loading || workDays.length === 0} className="w-full mt-4" aria-busy={loading}>
               {loading ? "Salvando..." : "Salvar Alterações"}
             </Button>
           </form>
