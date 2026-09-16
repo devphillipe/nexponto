@@ -22,7 +22,72 @@ import { CpfInput, PhoneInput, DateBrInput } from "@/components/forms/Specialize
 import { PasswordInput } from "@/components/forms/PasswordInput";
 import { cpfSchema, phoneSchema, emailSchema, strongPasswordSchema } from "@/lib/validators";
 import { dateBrToIso, dateIsoToBr, isValidDateBr } from "@/lib/masks";
+import {
+  DEFAULT_WORK_DAYS,
+  WEEK_DAYS,
+  formatWorkDays,
+  normalizeWorkDays,
+} from "@/lib/work-days";
 import { z } from "zod";
+
+function WorkDaysPicker({
+  idPrefix,
+  value,
+  onChange,
+}: {
+  idPrefix: string;
+  value: number[];
+  onChange: (days: number[]) => void;
+}) {
+  const toggle = (d: number) =>
+    onChange(value.includes(d) ? value.filter((x) => x !== d) : [...value, d].sort((a, b) => a - b));
+
+  return (
+    <fieldset className="space-y-2 rounded-2xl border border-border/40 bg-muted/10 p-4">
+      <legend className="px-1 text-xs font-bold uppercase tracking-widest text-muted-foreground">
+        Dias de trabalho
+      </legend>
+      <div className="flex flex-wrap gap-2" role="group" aria-label="Dias de trabalho">
+        {WEEK_DAYS.map((d) => {
+          const on = value.includes(d.value);
+          return (
+            <button
+              key={d.value}
+              type="button"
+              id={`${idPrefix}-wd-${d.value}`}
+              aria-pressed={on}
+              aria-label={d.long}
+              onClick={() => toggle(d.value)}
+              className={`h-10 min-w-[3rem] rounded-xl border px-3 text-xs font-bold uppercase tracking-wide transition-all ${
+                on
+                  ? "border-primary/40 bg-primary text-primary-foreground shadow-sm"
+                  : "border-border/40 bg-background/60 text-muted-foreground hover:border-primary/30"
+              }`}
+            >
+              {d.short}
+            </button>
+          );
+        })}
+      </div>
+      <div className="flex flex-wrap items-center gap-2 pt-1">
+        <Button type="button" variant="ghost" size="sm" className="h-7 rounded-lg text-[11px] font-bold" onClick={() => onChange([...DEFAULT_WORK_DAYS])}>
+          Seg a Sex
+        </Button>
+        <Button type="button" variant="ghost" size="sm" className="h-7 rounded-lg text-[11px] font-bold" onClick={() => onChange([0, 1, 2, 3, 4, 5, 6])}>
+          Todos os dias
+        </Button>
+        <Button type="button" variant="ghost" size="sm" className="h-7 rounded-lg text-[11px] font-bold" onClick={() => onChange([])}>
+          Limpar
+        </Button>
+        {value.length === 0 && (
+          <span className="text-xs font-medium text-destructive" role="alert">
+            Selecione ao menos um dia.
+          </span>
+        )}
+      </div>
+    </fieldset>
+  );
+}
 
 export const Route = createFileRoute("/_admin/admin/funcionarios")({
   head: () => ({ meta: [{ title: "Funcionários — NexPonto Admin" }] }),
@@ -40,7 +105,7 @@ function EmployeesPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("employees")
-        .select("id, full_name, email, position, department, active, daily_hours, hire_date")
+        .select("id, full_name, email, cpf, phone, position, department, active, daily_hours, work_days, hire_date")
         .order("full_name");
       if (error) throw error;
       return data;
