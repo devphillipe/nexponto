@@ -129,6 +129,7 @@ export const updateEmployee = createServerFn({ method: "POST" })
       department: z.string().max(80).optional().nullable(),
       hire_date: z.string().optional().nullable(),
       daily_hours: z.number().min(1).max(24).optional().nullable(),
+      work_days: workDaysSchema.optional(),
     }).parse(data),
   )
   .handler(async ({ data, context }) => {
@@ -193,6 +194,7 @@ export const updateEmployee = createServerFn({ method: "POST" })
       department: data.department,
       hire_date: data.hire_date || null,
       daily_hours: data.daily_hours ?? null,
+      ...(data.work_days ? { work_days: data.work_days } : {}),
     }).eq("id", data.id);
 
     if (finalErr) throw new Error(finalErr.message);
