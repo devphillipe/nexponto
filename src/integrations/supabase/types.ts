@@ -83,6 +83,7 @@ export type Database = {
           position: string | null
           tenant_id: string
           user_id: string
+          work_days: number[]
         }
         Insert: {
           active?: boolean
@@ -98,6 +99,7 @@ export type Database = {
           position?: string | null
           tenant_id: string
           user_id: string
+          work_days?: number[]
         }
         Update: {
           active?: boolean
@@ -113,6 +115,7 @@ export type Database = {
           position?: string | null
           tenant_id?: string
           user_id?: string
+          work_days?: number[]
         }
         Relationships: [
           {
