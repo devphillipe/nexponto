@@ -71,7 +71,7 @@ function SummaryPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("employees")
-        .select("id, tenant_id, daily_hours")
+        .select("id, tenant_id, daily_hours, work_days")
         .eq("user_id", profile!.id)
         .maybeSingle();
       if (error) throw error;
@@ -127,18 +127,19 @@ function SummaryPage() {
     });
 
     const today = new Date();
-    const days: { date: string; worked: number; expected: number }[] = [];
+    const workDays = normalizeWorkDays((employee as any)?.work_days);
+    const days: { date: string; worked: number; expected: number; off: boolean }[] = [];
     for (
       let d = new Date(monthStart);
       d <= today;
       d = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1)
     ) {
       const key = ymd(d);
-      const isWeekend = d.getDay() === 0 || d.getDay() === 6;
+      const isOff = !workDays.includes(d.getDay());
       const worked = workedForDay(byDay.get(key) ?? []);
       const isToday = key === ymd(today);
-      const expected = isWeekend || absent.has(key) || isToday ? 0 : daily;
-      days.push({ date: key, worked, expected });
+      const expected = isOff || absent.has(key) || isToday ? 0 : daily;
+      days.push({ date: key, worked, expected, off: isOff });
     }
 
     const worked = days.reduce((s, d) => s + d.worked, 0);
@@ -158,6 +159,7 @@ function SummaryPage() {
         future: d > today,
         worked: found?.worked ?? 0,
         expected: found?.expected ?? 0,
+        off: found ? found.off : !workDays.includes(d.getDay()),
       };
     });
 
