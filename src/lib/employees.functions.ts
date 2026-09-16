@@ -3,7 +3,14 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
+const workDaysSchema = z
+  .array(z.number().int().min(0).max(6))
+  .min(1, "Selecione ao menos um dia de trabalho.")
+  .max(7)
+  .transform((v) => Array.from(new Set(v)).sort((a, b) => a - b));
+
 const CreateEmployeeSchema = z.object({
+  work_days: workDaysSchema.optional(),
   full_name: z.string().min(2).max(120),
   email: z.string().email().max(180),
   password: z.string().min(8).max(72),
@@ -81,6 +88,7 @@ export const createEmployee = createServerFn({ method: "POST" })
         department: data.department,
         hire_date: data.hire_date || null,
         daily_hours: data.daily_hours ?? null,
+        work_days: data.work_days ?? [1, 2, 3, 4, 5],
         active: true,
       });
       if (eErr) throw eErr;
@@ -121,6 +129,7 @@ export const updateEmployee = createServerFn({ method: "POST" })
       department: z.string().max(80).optional().nullable(),
       hire_date: z.string().optional().nullable(),
       daily_hours: z.number().min(1).max(24).optional().nullable(),
+      work_days: workDaysSchema.optional(),
     }).parse(data),
   )
   .handler(async ({ data, context }) => {
@@ -185,6 +194,7 @@ export const updateEmployee = createServerFn({ method: "POST" })
       department: data.department,
       hire_date: data.hire_date || null,
       daily_hours: data.daily_hours ?? null,
+      ...(data.work_days ? { work_days: data.work_days } : {}),
     }).eq("id", data.id);
 
     if (finalErr) throw new Error(finalErr.message);
