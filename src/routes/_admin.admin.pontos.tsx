@@ -589,8 +589,10 @@ function BatchPontoForm({
                     <label className="flex items-center gap-3 cursor-pointer">
                       <Checkbox checked={isOn} onCheckedChange={() => toggle(emp)} />
                       <span className="text-sm font-medium flex-1">{emp.full_name}</span>
-                      <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
+                      <span className="text-right text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
                         {emp.daily_hours ? `${Number(emp.daily_hours)}h` : "—"}
+                        <br />
+                        {formatWorkDays((emp as any).work_days)}
                       </span>
                     </label>
                     {isOn && (
