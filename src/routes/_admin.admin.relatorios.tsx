@@ -104,8 +104,9 @@ function RelatoriosPage() {
              }
           }
 
-          const isWeekend = day.getDay() === 0 || day.getDay() === 6;
-          const expectedMinutes = (isWeekend || absence) ? 0 : (emp.daily_hours || 8) * 60;
+          const empWorkDays = normalizeWorkDays((emp as any).work_days);
+          const isWorkDay = worksOn(empWorkDays, day);
+          const expectedMinutes = (!isWorkDay || absence) ? 0 : (emp.daily_hours || 8) * 60;
           
           totalWorkedMinutes += workedMinutes;
           totalExpectedMinutes += expectedMinutes;
@@ -126,7 +127,7 @@ function RelatoriosPage() {
             retornoAlmoco: formatTime(retornoAlmoco),
             saidaFinal: formatTime(saidaFinal),
             worked: Math.floor(workedMinutes / 60) + ":" + String(Math.floor(workedMinutes % 60)).padStart(2, "0"),
-            status: absence ? `Abono: ${absence.reason}` : (workedMinutes > 0 ? "Presente" : (isWeekend ? "Fim de Semana" : "Falta")),
+            status: absence ? `Abono: ${absence.reason}` : (workedMinutes > 0 ? "Presente" : (!isWorkDay ? "Folga (escala)" : "Falta")),
           };
         });
 
