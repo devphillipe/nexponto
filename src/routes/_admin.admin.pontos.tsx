@@ -13,7 +13,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { useState, useMemo, memo } from "react";
 import { format } from "date-fns";
-import { worksOn } from "@/lib/work-days";
+import { worksOn, formatWorkDays } from "@/lib/work-days";
 import { LocationDialog } from "@/components/LocationDialog";
 
 export const Route = createFileRoute("/_admin/admin/pontos")({
