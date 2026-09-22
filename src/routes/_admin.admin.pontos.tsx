@@ -534,9 +534,9 @@ function BatchPontoForm({
           </div>
         </div>
 
-        <label className="flex items-center gap-3 cursor-pointer">
-          <Checkbox checked={skipWeekends} onCheckedChange={(v) => setSkipWeekends(v === true)} />
-          <span className="text-sm text-muted-foreground">Ignorar sábados e domingos</span>
+        <label className="flex items-start gap-3 cursor-pointer">
+          <Checkbox checked={followScale} onCheckedChange={(v) => setFollowScale(v === true)} />
+          <span className="text-sm text-muted-foreground">Seguir a escala de cada colaborador — dias fora da escala não recebem registros</span>
         </label>
 
         <div className="space-y-3 rounded-2xl border border-border/40 bg-background/40 p-4">
