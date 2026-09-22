@@ -496,23 +496,19 @@ function BatchPontoForm({
   };
 
   const selectedEmployees = employees.filter((e) => selected.includes(e.id));
-  const punchesPerDay = selectedEmployees.reduce(
-    (acc, e) => acc + Object.values(times[e.id] || {}).filter(Boolean).length,
-    0
-  );
-  const total = punchesPerDay * dates.length;
+  const punchesPerDay = (e: EmpOption) => Object.values(times[e.id] || {}).filter(Boolean).length;
+  const total = selectedEmployees.reduce((acc, e) => acc + punchesPerDay(e) * datesFor(e).length, 0);
 
   return (
     <form
       onSubmit={(ev) => {
         ev.preventDefault();
         if (!selectedEmployees.length) return toast.error("Selecione ao menos um colaborador.");
-        if (!dates.length) return toast.error("Selecione ao menos uma data válida.");
+        if (!allDates.length) return toast.error("Selecione ao menos uma data válida.");
         if (notes.trim().length < 3) return toast.error("Informe uma justificativa de pelo menos 3 caracteres.");
         if (!total) return toast.error("Informe ao menos um horário.");
         onSubmit({
-          employees: selectedEmployees.map((e) => ({ id: e.id, times: times[e.id] || {} })),
-          dates,
+          employees: selectedEmployees.map((e) => ({ id: e.id, times: times[e.id] || {}, dates: datesFor(e) })),
           notes: notes.trim(),
         });
       }}
