@@ -367,13 +367,36 @@ function RelatoriosPage() {
           </CardHeader>
           <CardContent className="p-6 md:p-10 space-y-6 md:space-y-8">
             <div className="space-y-2 md:space-y-3">
-              <Label>Mês de Referência</Label>
-              <Input 
-                type="month" 
-                value={month} 
-                onChange={(ev) => setMonth(ev.target.value)} 
-                className="rounded-xl h-12 bg-muted/20 border-border/40"
-              />
+              <Label>Tipo de Relatório</Label>
+              <Select value={periodType} onValueChange={(v) => setPeriodType(v as "diario" | "semanal" | "mensal")}>
+                <SelectTrigger className="rounded-xl h-12 bg-muted/20 border-border/40">
+                  <SelectValue placeholder="Selecione o período" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="diario">Diário</SelectItem>
+                  <SelectItem value="semanal">Semanal</SelectItem>
+                  <SelectItem value="mensal">Mensal</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2 md:space-y-3">
+              <Label>{periodType === "mensal" ? "Mês de Referência" : periodType === "semanal" ? "Semana (qualquer dia da semana)" : "Data de Referência"}</Label>
+              {periodType === "mensal" ? (
+                <Input
+                  type="month"
+                  value={month}
+                  onChange={(ev) => setMonth(ev.target.value)}
+                  className="rounded-xl h-12 bg-muted/20 border-border/40"
+                />
+              ) : (
+                <Input
+                  type="date"
+                  value={referenceDate}
+                  onChange={(ev) => setReferenceDate(ev.target.value)}
+                  className="rounded-xl h-12 bg-muted/20 border-border/40"
+                />
+              )}
             </div>
             
             <div className="space-y-2">
