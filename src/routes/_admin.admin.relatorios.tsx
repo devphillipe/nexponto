@@ -26,7 +26,9 @@ export const Route = createFileRoute("/_admin/admin/relatorios")({
 function RelatoriosPage() {
   const { data: profile } = useProfile();
   const [loading, setLoading] = useState(false);
+  const [periodType, setPeriodType] = useState<"diario" | "semanal" | "mensal">("mensal");
   const [month, setMonth] = useState(format(new Date(), "yyyy-MM"));
+  const [referenceDate, setReferenceDate] = useState(format(new Date(), "yyyy-MM-dd"));
   const [employeeId, setEmployeeId] = useState("all");
 
   const { data: employees } = useQuery({
@@ -35,7 +37,7 @@ function RelatoriosPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("employees")
-        .select("id, full_name, daily_hours")
+        .select("id, full_name, daily_hours, work_days")
         .eq("tenant_id", profile!.tenant_id)
         .eq("active", true);
       if (error) throw error;
