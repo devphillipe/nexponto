@@ -167,7 +167,7 @@ function RelatoriosPage() {
 
           XLSX.utils.book_append_sheet(wb, ws, rd.employee.substring(0, 30));
         });
-        XLSX.writeFile(wb, `Relatorio_Ponto_${month}.xlsx`);
+        XLSX.writeFile(wb, `Relatorio_Ponto_${periodLabel}.xlsx`);
       } else {
         const { default: jsPDF } = await import("jspdf");
         const { default: autoTable } = await import("jspdf-autotable");
