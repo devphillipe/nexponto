@@ -14,6 +14,7 @@ import { FileText, Plus, Search, Calendar as CalendarIcon, User, Trash2, FileChe
 import { useState, memo } from "react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { worksOn } from "@/lib/work-days";
 
 export const Route = createFileRoute("/_admin/admin/abonos")({
   head: () => ({ meta: [{ title: "Abonos — NexPonto Admin" }] }),
