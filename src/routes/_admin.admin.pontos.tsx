@@ -446,13 +446,14 @@ function BatchPontoForm({
   const [empSearch, setEmpSearch] = useState("");
   const [startDate, setStartDate] = useState(defaultDate);
   const [endDate, setEndDate] = useState("");
-  const [skipWeekends, setSkipWeekends] = useState(true);
+  const [followScale, setFollowScale] = useState(true);
   const [standard, setStandard] = useState<TimesMap>({ ...DEFAULT_TIMES });
   const [notes, setNotes] = useState("");
 
   const filtered = employees.filter((e) => e.full_name.toLowerCase().includes(empSearch.toLowerCase()));
   const allSelected = filtered.length > 0 && filtered.every((e) => selected.includes(e.id));
-  const dates = buildDateRange(startDate, endDate, skipWeekends);
+  const allDates = buildDateRange(startDate, endDate);
+  const datesFor = (emp: EmpOption) => (followScale ? allDates.filter((d) => worksOn(emp.work_days, d)) : allDates);
 
   const defaultsFor = (emp: EmpOption): TimesMap => {
     const seq = sequenceFor(emp);
