@@ -304,9 +304,16 @@ function BatchAbonoForm({
       onSubmit={(e) => {
         e.preventDefault();
         if (!selected.length) return toast.error("Selecione ao menos um colaborador.");
-        if (!dates.length) return toast.error("Selecione ao menos uma data válida.");
+        if (!allDates.length) return toast.error("Selecione ao menos uma data válida.");
         if (description.trim().length < 3) return toast.error("Informe uma justificativa de pelo menos 3 caracteres.");
-        onSubmit({ employee_ids: selected, dates, reason, description: description.trim() });
+        onSubmit({
+          employees: selected.map((id) => ({
+            id,
+            dates: datesFor(employees.find((e) => e.id === id) || { work_days: null }),
+          })),
+          reason,
+          description: description.trim(),
+        });
       }}
     >
       <DialogHeader className="p-6 md:p-8 pb-4">
