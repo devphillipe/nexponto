@@ -639,8 +639,7 @@ function BatchPontoForm({
 
         {total > 0 && (
           <div className="rounded-xl bg-primary/5 border border-primary/20 px-4 py-3 text-sm">
-            <span className="font-bold text-primary">{total}</span> batida(s) serão criadas —{" "}
-            {selectedEmployees.length} colaborador(es) × {dates.length} dia(s).
+            <span className="font-bold text-primary">{total}</span> batida(s) serão criadas — já respeitando a escala de cada colaborador.
           </div>
         )}
       </div>
