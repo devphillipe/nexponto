@@ -398,6 +398,7 @@ type EmpOption = { id: string; full_name: string; daily_hours: number | null; wo
 type TimesMap = Record<string, string>;
 type BatchPontoPayload = {
   employees: { id: string; times: TimesMap; dates: string[] }[];
+  notes: string;
 };
 
 const FULL_SEQUENCE = ["entrada", "saida_almoco", "retorno_almoco", "saida"];
