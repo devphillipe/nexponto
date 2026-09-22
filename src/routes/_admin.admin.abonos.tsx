@@ -14,6 +14,7 @@ import { FileText, Plus, Search, Calendar as CalendarIcon, User, Trash2, FileChe
 import { useState, memo } from "react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { worksOn } from "@/lib/work-days";
 
 export const Route = createFileRoute("/_admin/admin/abonos")({
   head: () => ({ meta: [{ title: "Abonos — NexPonto Admin" }] }),
@@ -41,7 +42,7 @@ function AbonosPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("employees")
-        .select("id, full_name")
+        .select("id, full_name, work_days")
         .eq("tenant_id", profile!.tenant_id)
         .eq("active", true);
       if (error) throw error;
@@ -64,11 +65,11 @@ function AbonosPage() {
   });
 
   const addMutation = useMutation({
-    mutationFn: async (payload: { employee_ids: string[]; dates: string[]; reason: string; description: string }) => {
-      const { employee_ids, dates, reason, description } = payload;
+    mutationFn: async (payload: { employees: { id: string; dates: string[] }[]; reason: string; description: string }) => {
+      const { employees: selectedEmployees, reason, description } = payload;
       const reasonLabel = REASONS.find((r) => r.value === reason)?.label || reason;
 
-      const absenceRows = employee_ids.flatMap((employee_id) =>
+      const absenceRows = selectedEmployees.flatMap(({ id: employee_id, dates }) =>
         dates.map((absence_date) => ({
           employee_id,
           absence_date,
@@ -242,19 +243,16 @@ function AbonosPage() {
   );
 }
 
-type BatchPayload = { employee_ids: string[]; dates: string[]; reason: string; description: string };
+type BatchPayload = { employees: { id: string; dates: string[] }[]; reason: string; description: string };
 
-function buildDateRange(start: string, end: string, skipWeekends: boolean): string[] {
+function buildDateRange(start: string, end: string): string[] {
   if (!start) return [];
   const finish = end && end >= start ? end : start;
   const dates: string[] = [];
   const cursor = new Date(start + "T12:00:00");
   const last = new Date(finish + "T12:00:00");
   while (cursor <= last && dates.length < 366) {
-    const day = cursor.getDay();
-    if (!skipWeekends || (day !== 0 && day !== 6)) {
-      dates.push(format(cursor, "yyyy-MM-dd"));
-    }
+    dates.push(format(cursor, "yyyy-MM-dd"));
     cursor.setDate(cursor.getDate() + 1);
   }
   return dates;
@@ -266,7 +264,7 @@ function BatchAbonoForm({
   onCancel,
   onSubmit,
 }: {
-  employees: { id: string; full_name: string }[];
+  employees: { id: string; full_name: string; work_days?: number[] | null }[];
   isPending: boolean;
   onCancel: () => void;
   onSubmit: (payload: BatchPayload) => void;
@@ -275,7 +273,7 @@ function BatchAbonoForm({
   const [empSearch, setEmpSearch] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [skipWeekends, setSkipWeekends] = useState(true);
+  const [followScale, setFollowScale] = useState(true);
   const [reason, setReason] = useState("atestado");
   const [description, setDescription] = useState("");
 
@@ -283,8 +281,13 @@ function BatchAbonoForm({
     e.full_name.toLowerCase().includes(empSearch.toLowerCase())
   );
   const allSelected = filteredEmployees.length > 0 && filteredEmployees.every((e) => selected.includes(e.id));
-  const dates = buildDateRange(startDate, endDate, skipWeekends);
-  const total = selected.length * dates.length;
+  const allDates = buildDateRange(startDate, endDate);
+  const datesFor = (emp: { work_days?: number[] | null }) =>
+    followScale ? allDates.filter((d) => worksOn(emp.work_days, d)) : allDates;
+  const total = selected.reduce(
+    (acc, id) => acc + datesFor(employees.find((e) => e.id === id) || { work_days: null }).length,
+    0
+  );
 
   const toggle = (id: string) =>
     setSelected((prev) => (prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]));
@@ -301,9 +304,16 @@ function BatchAbonoForm({
       onSubmit={(e) => {
         e.preventDefault();
         if (!selected.length) return toast.error("Selecione ao menos um colaborador.");
-        if (!dates.length) return toast.error("Selecione ao menos uma data válida.");
+        if (!allDates.length) return toast.error("Selecione ao menos uma data válida.");
         if (description.trim().length < 3) return toast.error("Informe uma justificativa de pelo menos 3 caracteres.");
-        onSubmit({ employee_ids: selected, dates, reason, description: description.trim() });
+        onSubmit({
+          employees: selected.map((id) => ({
+            id,
+            dates: datesFor(employees.find((e) => e.id === id) || { work_days: null }),
+          })),
+          reason,
+          description: description.trim(),
+        });
       }}
     >
       <DialogHeader className="p-6 md:p-8 pb-4">
@@ -369,9 +379,9 @@ function BatchAbonoForm({
           </div>
         </div>
 
-        <label className="flex items-center gap-3 cursor-pointer">
-          <Checkbox checked={skipWeekends} onCheckedChange={(v) => setSkipWeekends(v === true)} />
-          <span className="text-sm text-muted-foreground">Ignorar sábados e domingos</span>
+        <label className="flex items-start gap-3 cursor-pointer">
+          <Checkbox checked={followScale} onCheckedChange={(v) => setFollowScale(v === true)} />
+          <span className="text-sm text-muted-foreground">Seguir a escala de cada colaborador — dias fora da escala não recebem abono</span>
         </label>
 
         <div className="space-y-2">

@@ -9,8 +9,9 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { FileDown, Loader2, FileSpreadsheet, File as FilePdf } from "lucide-react";
 import { useState } from "react";
-import { format, startOfMonth, endOfMonth, eachDayOfInterval } from "date-fns";
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, startOfWeek, endOfWeek } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { normalizeWorkDays, worksOn, formatWorkDays } from "@/lib/work-days";
 // Dynamically imported below for performance
 // import * as XLSX from "xlsx";
 // import jsPDF from "jspdf";
@@ -25,7 +26,9 @@ export const Route = createFileRoute("/_admin/admin/relatorios")({
 function RelatoriosPage() {
   const { data: profile } = useProfile();
   const [loading, setLoading] = useState(false);
+  const [periodType, setPeriodType] = useState<"diario" | "semanal" | "mensal">("mensal");
   const [month, setMonth] = useState(format(new Date(), "yyyy-MM"));
+  const [referenceDate, setReferenceDate] = useState(format(new Date(), "yyyy-MM-dd"));
   const [employeeId, setEmployeeId] = useState("all");
 
   const { data: employees } = useQuery({
@@ -34,7 +37,7 @@ function RelatoriosPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("employees")
-        .select("id, full_name, daily_hours")
+        .select("id, full_name, daily_hours, work_days")
         .eq("tenant_id", profile!.tenant_id)
         .eq("active", true);
       if (error) throw error;
@@ -45,8 +48,11 @@ function RelatoriosPage() {
   const generateReport = async (reportFormat: "xlsx" | "pdf") => {
     setLoading(true);
     try {
-      const startDate = startOfMonth(new Date(month + "-01T12:00:00"));
-      const endDate = endOfMonth(startDate);
+      const ref = new Date(referenceDate + "T12:00:00");
+      const startDate = periodType === "mensal" ? startOfMonth(ref) : periodType === "semanal" ? startOfWeek(ref, { weekStartsOn: 1 }) : ref;
+      const endDate = periodType === "mensal" ? endOfMonth(startDate) : periodType === "semanal" ? endOfWeek(ref, { weekStartsOn: 1 }) : ref;
+      const periodLabel = periodType === "mensal" ? month : periodType === "semanal" ? `Semana_${format(startDate, "dd-MM")}_a_${format(endDate, "dd-MM-yyyy")}` : format(referenceDate, "dd-MM-yyyy");
+
       
       const query = supabase
         .from("time_entries")
@@ -98,8 +104,9 @@ function RelatoriosPage() {
              }
           }
 
-          const isWeekend = day.getDay() === 0 || day.getDay() === 6;
-          const expectedMinutes = (isWeekend || absence) ? 0 : (emp.daily_hours || 8) * 60;
+          const empWorkDays = normalizeWorkDays((emp as any).work_days);
+          const isWorkDay = worksOn(empWorkDays, day);
+          const expectedMinutes = (!isWorkDay || absence) ? 0 : (emp.daily_hours || 8) * 60;
           
           totalWorkedMinutes += workedMinutes;
           totalExpectedMinutes += expectedMinutes;
@@ -120,7 +127,7 @@ function RelatoriosPage() {
             retornoAlmoco: formatTime(retornoAlmoco),
             saidaFinal: formatTime(saidaFinal),
             worked: Math.floor(workedMinutes / 60) + ":" + String(Math.floor(workedMinutes % 60)).padStart(2, "0"),
-            status: absence ? `Abono: ${absence.reason}` : (workedMinutes > 0 ? "Presente" : (isWeekend ? "Fim de Semana" : "Falta")),
+            status: absence ? `Abono: ${absence.reason}` : (workedMinutes > 0 ? "Presente" : (!isWorkDay ? "Folga (escala)" : "Falta")),
           };
         });
 
@@ -160,7 +167,7 @@ function RelatoriosPage() {
 
           XLSX.utils.book_append_sheet(wb, ws, rd.employee.substring(0, 30));
         });
-        XLSX.writeFile(wb, `Relatorio_Ponto_${month}.xlsx`);
+        XLSX.writeFile(wb, `Relatorio_Ponto_${periodLabel}.xlsx`);
       } else {
         const { default: jsPDF } = await import("jspdf");
         const { default: autoTable } = await import("jspdf-autotable");
@@ -237,7 +244,7 @@ function RelatoriosPage() {
           doc.setTextColor(60, 60, 60);
           doc.setFontSize(12);
           doc.text(`Colaborador: ${rd.employee}`, 14, 64);
-          doc.text(`Período: ${month}`, 14, 70);
+          doc.text(`Período: ${periodLabel}`, 14, 70);
 
           doc.setFillColor(245, 247, 250);
           doc.roundedRect(14, 76, 182, 25, 3, 3, "F");
@@ -331,7 +338,7 @@ function RelatoriosPage() {
           doc.setFontSize(8);
           doc.text(labelEmp, labelEmpX, signatureY + 11);
         });
-        doc.save(`Relatorio_Ponto_${month}.pdf`);
+        doc.save(`Relatorio_Ponto_${periodLabel}.pdf`);
       }
       toast.success("Relatório gerado com sucesso!");
     } catch (err: any) {
@@ -360,13 +367,36 @@ function RelatoriosPage() {
           </CardHeader>
           <CardContent className="p-6 md:p-10 space-y-6 md:space-y-8">
             <div className="space-y-2 md:space-y-3">
-              <Label>Mês de Referência</Label>
-              <Input 
-                type="month" 
-                value={month} 
-                onChange={(ev) => setMonth(ev.target.value)} 
-                className="rounded-xl h-12 bg-muted/20 border-border/40"
-              />
+              <Label>Tipo de Relatório</Label>
+              <Select value={periodType} onValueChange={(v) => setPeriodType(v as "diario" | "semanal" | "mensal")}>
+                <SelectTrigger className="rounded-xl h-12 bg-muted/20 border-border/40">
+                  <SelectValue placeholder="Selecione o período" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="diario">Diário</SelectItem>
+                  <SelectItem value="semanal">Semanal</SelectItem>
+                  <SelectItem value="mensal">Mensal</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2 md:space-y-3">
+              <Label>{periodType === "mensal" ? "Mês de Referência" : periodType === "semanal" ? "Semana (qualquer dia da semana)" : "Data de Referência"}</Label>
+              {periodType === "mensal" ? (
+                <Input
+                  type="month"
+                  value={month}
+                  onChange={(ev) => setMonth(ev.target.value)}
+                  className="rounded-xl h-12 bg-muted/20 border-border/40"
+                />
+              ) : (
+                <Input
+                  type="date"
+                  value={referenceDate}
+                  onChange={(ev) => setReferenceDate(ev.target.value)}
+                  className="rounded-xl h-12 bg-muted/20 border-border/40"
+                />
+              )}
             </div>
             
             <div className="space-y-2">
@@ -418,10 +448,14 @@ function RelatoriosPage() {
                  <div className="h-5 w-5 rounded-full bg-primary/20 flex items-center justify-center text-primary text-[10px] font-bold shrink-0">2</div>
                  Se o colaborador possuir menos ou mais registros, o sistema tentará encaixar os horários nos campos correspondentes por tipo.
                </li>
-               <li className="flex items-start gap-2">
-                 <div className="h-5 w-5 rounded-full bg-primary/20 flex items-center justify-center text-primary text-[10px] font-bold shrink-0">3</div>
-                 O logo do seu escritório (definido no perfil) será exibido automaticamente no cabeçalho do PDF.
-               </li>
+                <li className="flex items-start gap-2">
+                  <div className="h-5 w-5 rounded-full bg-primary/20 flex items-center justify-center text-primary text-[10px] font-bold shrink-0">3</div>
+                  O logo do seu escritório (definido no perfil) será exibido automaticamente no cabeçalho do PDF.
+                </li>
+                <li className="flex items-start gap-2">
+                  <div className="h-5 w-5 rounded-full bg-primary/20 flex items-center justify-center text-primary text-[10px] font-bold shrink-0">4</div>
+                  Os dias fora da escala de cada colaborador aparecem como "Folga (escala)" e não geram horas esperadas.
+                </li>
              </ul>
           </div>
         </div>

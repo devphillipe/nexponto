@@ -13,6 +13,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { useState, useMemo, memo } from "react";
 import { format } from "date-fns";
+import { worksOn, formatWorkDays } from "@/lib/work-days";
 import { LocationDialog } from "@/components/LocationDialog";
 
 export const Route = createFileRoute("/_admin/admin/pontos")({
@@ -50,7 +51,7 @@ function PontosPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("employees")
-        .select("id, full_name, daily_hours")
+        .select("id, full_name, daily_hours, work_days")
         .eq("tenant_id", profile!.tenant_id)
         .eq("active", true)
         .order("full_name");
@@ -152,7 +153,7 @@ function PontosPage() {
     mutationFn: async (payload: BatchPontoPayload) => {
       const rows: any[] = [];
       for (const emp of payload.employees) {
-        for (const d of payload.dates) {
+        for (const d of emp.dates) {
           for (const [type, time] of Object.entries(emp.times)) {
             if (!time) continue;
             const timePart = time.length === 5 ? `${time}:00` : time;
@@ -393,11 +394,10 @@ function PontosPage() {
   );
 }
 
-type EmpOption = { id: string; full_name: string; daily_hours: number | null };
+type EmpOption = { id: string; full_name: string; daily_hours: number | null; work_days?: number[] | null };
 type TimesMap = Record<string, string>;
 type BatchPontoPayload = {
-  employees: { id: string; times: TimesMap }[];
-  dates: string[];
+  employees: { id: string; times: TimesMap; dates: string[] }[];
   notes: string;
 };
 
@@ -415,15 +415,14 @@ function sequenceFor(emp: EmpOption) {
   return emp.daily_hours != null && Number(emp.daily_hours) < 8 ? SHORT_SEQUENCE : FULL_SEQUENCE;
 }
 
-function buildDateRange(start: string, end: string, skipWeekends: boolean): string[] {
+function buildDateRange(start: string, end: string): string[] {
   if (!start) return [];
   const finish = end && end >= start ? end : start;
   const dates: string[] = [];
   const cursor = new Date(start + "T12:00:00");
   const last = new Date(finish + "T12:00:00");
   while (cursor <= last && dates.length < 366) {
-    const day = cursor.getDay();
-    if (!skipWeekends || (day !== 0 && day !== 6)) dates.push(format(cursor, "yyyy-MM-dd"));
+    dates.push(format(cursor, "yyyy-MM-dd"));
     cursor.setDate(cursor.getDate() + 1);
   }
   return dates;
@@ -447,13 +446,14 @@ function BatchPontoForm({
   const [empSearch, setEmpSearch] = useState("");
   const [startDate, setStartDate] = useState(defaultDate);
   const [endDate, setEndDate] = useState("");
-  const [skipWeekends, setSkipWeekends] = useState(true);
+  const [followScale, setFollowScale] = useState(true);
   const [standard, setStandard] = useState<TimesMap>({ ...DEFAULT_TIMES });
   const [notes, setNotes] = useState("");
 
   const filtered = employees.filter((e) => e.full_name.toLowerCase().includes(empSearch.toLowerCase()));
   const allSelected = filtered.length > 0 && filtered.every((e) => selected.includes(e.id));
-  const dates = buildDateRange(startDate, endDate, skipWeekends);
+  const allDates = buildDateRange(startDate, endDate);
+  const datesFor = (emp: EmpOption) => (followScale ? allDates.filter((d) => worksOn(emp.work_days, d)) : allDates);
 
   const defaultsFor = (emp: EmpOption): TimesMap => {
     const seq = sequenceFor(emp);
@@ -496,23 +496,19 @@ function BatchPontoForm({
   };
 
   const selectedEmployees = employees.filter((e) => selected.includes(e.id));
-  const punchesPerDay = selectedEmployees.reduce(
-    (acc, e) => acc + Object.values(times[e.id] || {}).filter(Boolean).length,
-    0
-  );
-  const total = punchesPerDay * dates.length;
+  const punchesPerDay = (e: EmpOption) => Object.values(times[e.id] || {}).filter(Boolean).length;
+  const total = selectedEmployees.reduce((acc, e) => acc + punchesPerDay(e) * datesFor(e).length, 0);
 
   return (
     <form
       onSubmit={(ev) => {
         ev.preventDefault();
         if (!selectedEmployees.length) return toast.error("Selecione ao menos um colaborador.");
-        if (!dates.length) return toast.error("Selecione ao menos uma data válida.");
+        if (!allDates.length) return toast.error("Selecione ao menos uma data válida.");
         if (notes.trim().length < 3) return toast.error("Informe uma justificativa de pelo menos 3 caracteres.");
         if (!total) return toast.error("Informe ao menos um horário.");
         onSubmit({
-          employees: selectedEmployees.map((e) => ({ id: e.id, times: times[e.id] || {} })),
-          dates,
+          employees: selectedEmployees.map((e) => ({ id: e.id, times: times[e.id] || {}, dates: datesFor(e) })),
           notes: notes.trim(),
         });
       }}
@@ -538,9 +534,9 @@ function BatchPontoForm({
           </div>
         </div>
 
-        <label className="flex items-center gap-3 cursor-pointer">
-          <Checkbox checked={skipWeekends} onCheckedChange={(v) => setSkipWeekends(v === true)} />
-          <span className="text-sm text-muted-foreground">Ignorar sábados e domingos</span>
+        <label className="flex items-start gap-3 cursor-pointer">
+          <Checkbox checked={followScale} onCheckedChange={(v) => setFollowScale(v === true)} />
+          <span className="text-sm text-muted-foreground">Seguir a escala de cada colaborador — dias fora da escala não recebem registros</span>
         </label>
 
         <div className="space-y-3 rounded-2xl border border-border/40 bg-background/40 p-4">
@@ -593,8 +589,10 @@ function BatchPontoForm({
                     <label className="flex items-center gap-3 cursor-pointer">
                       <Checkbox checked={isOn} onCheckedChange={() => toggle(emp)} />
                       <span className="text-sm font-medium flex-1">{emp.full_name}</span>
-                      <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
+                      <span className="text-right text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
                         {emp.daily_hours ? `${Number(emp.daily_hours)}h` : "—"}
+                        <br />
+                        {formatWorkDays((emp as any).work_days)}
                       </span>
                     </label>
                     {isOn && (
@@ -641,8 +639,7 @@ function BatchPontoForm({
 
         {total > 0 && (
           <div className="rounded-xl bg-primary/5 border border-primary/20 px-4 py-3 text-sm">
-            <span className="font-bold text-primary">{total}</span> batida(s) serão criadas —{" "}
-            {selectedEmployees.length} colaborador(es) × {dates.length} dia(s).
+            <span className="font-bold text-primary">{total}</span> batida(s) serão criadas — já respeitando a escala de cada colaborador.
           </div>
         )}
       </div>
