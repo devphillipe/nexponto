@@ -448,10 +448,14 @@ function RelatoriosPage() {
                  <div className="h-5 w-5 rounded-full bg-primary/20 flex items-center justify-center text-primary text-[10px] font-bold shrink-0">2</div>
                  Se o colaborador possuir menos ou mais registros, o sistema tentará encaixar os horários nos campos correspondentes por tipo.
                </li>
-               <li className="flex items-start gap-2">
-                 <div className="h-5 w-5 rounded-full bg-primary/20 flex items-center justify-center text-primary text-[10px] font-bold shrink-0">3</div>
-                 O logo do seu escritório (definido no perfil) será exibido automaticamente no cabeçalho do PDF.
-               </li>
+                <li className="flex items-start gap-2">
+                  <div className="h-5 w-5 rounded-full bg-primary/20 flex items-center justify-center text-primary text-[10px] font-bold shrink-0">3</div>
+                  O logo do seu escritório (definido no perfil) será exibido automaticamente no cabeçalho do PDF.
+                </li>
+                <li className="flex items-start gap-2">
+                  <div className="h-5 w-5 rounded-full bg-primary/20 flex items-center justify-center text-primary text-[10px] font-bold shrink-0">4</div>
+                  Os dias fora da escala de cada colaborador aparecem como "Folga (escala)" e não geram horas esperadas.
+                </li>
              </ul>
           </div>
         </div>
