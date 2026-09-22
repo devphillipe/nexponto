@@ -153,7 +153,7 @@ function PontosPage() {
     mutationFn: async (payload: BatchPontoPayload) => {
       const rows: any[] = [];
       for (const emp of payload.employees) {
-        for (const d of payload.dates) {
+        for (const d of emp.dates) {
           for (const [type, time] of Object.entries(emp.times)) {
             if (!time) continue;
             const timePart = time.length === 5 ? `${time}:00` : time;
