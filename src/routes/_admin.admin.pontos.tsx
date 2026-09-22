@@ -394,12 +394,10 @@ function PontosPage() {
   );
 }
 
-type EmpOption = { id: string; full_name: string; daily_hours: number | null };
+type EmpOption = { id: string; full_name: string; daily_hours: number | null; work_days?: number[] | null };
 type TimesMap = Record<string, string>;
 type BatchPontoPayload = {
-  employees: { id: string; times: TimesMap }[];
-  dates: string[];
-  notes: string;
+  employees: { id: string; times: TimesMap; dates: string[] }[];
 };
 
 const FULL_SEQUENCE = ["entrada", "saida_almoco", "retorno_almoco", "saida"];
