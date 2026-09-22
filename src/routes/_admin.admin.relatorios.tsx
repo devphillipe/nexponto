@@ -338,7 +338,7 @@ function RelatoriosPage() {
           doc.setFontSize(8);
           doc.text(labelEmp, labelEmpX, signatureY + 11);
         });
-        doc.save(`Relatorio_Ponto_${month}.pdf`);
+        doc.save(`Relatorio_Ponto_${periodLabel}.pdf`);
       }
       toast.success("Relatório gerado com sucesso!");
     } catch (err: any) {
