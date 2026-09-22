@@ -65,11 +65,11 @@ function AbonosPage() {
   });
 
   const addMutation = useMutation({
-    mutationFn: async (payload: { employee_ids: string[]; dates: string[]; reason: string; description: string }) => {
-      const { employee_ids, dates, reason, description } = payload;
+    mutationFn: async (payload: { employees: { id: string; dates: string[] }[]; reason: string; description: string }) => {
+      const { employees: selectedEmployees, reason, description } = payload;
       const reasonLabel = REASONS.find((r) => r.value === reason)?.label || reason;
 
-      const absenceRows = employee_ids.flatMap((employee_id) =>
+      const absenceRows = selectedEmployees.flatMap(({ id: employee_id, dates }) =>
         dates.map((absence_date) => ({
           employee_id,
           absence_date,
