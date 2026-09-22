@@ -264,7 +264,7 @@ function BatchAbonoForm({
   onCancel,
   onSubmit,
 }: {
-  employees: { id: string; full_name: string }[];
+  employees: { id: string; full_name: string; work_days?: number[] | null }[];
   isPending: boolean;
   onCancel: () => void;
   onSubmit: (payload: BatchPayload) => void;
@@ -273,7 +273,7 @@ function BatchAbonoForm({
   const [empSearch, setEmpSearch] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [skipWeekends, setSkipWeekends] = useState(true);
+  const [followScale, setFollowScale] = useState(true);
   const [reason, setReason] = useState("atestado");
   const [description, setDescription] = useState("");
 
@@ -281,8 +281,13 @@ function BatchAbonoForm({
     e.full_name.toLowerCase().includes(empSearch.toLowerCase())
   );
   const allSelected = filteredEmployees.length > 0 && filteredEmployees.every((e) => selected.includes(e.id));
-  const dates = buildDateRange(startDate, endDate, skipWeekends);
-  const total = selected.length * dates.length;
+  const allDates = buildDateRange(startDate, endDate);
+  const datesFor = (emp: { work_days?: number[] | null }) =>
+    followScale ? allDates.filter((d) => worksOn(emp.work_days, d)) : allDates;
+  const total = selected.reduce(
+    (acc, id) => acc + datesFor(employees.find((e) => e.id === id) || { work_days: null }).length,
+    0
+  );
 
   const toggle = (id: string) =>
     setSelected((prev) => (prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]));
