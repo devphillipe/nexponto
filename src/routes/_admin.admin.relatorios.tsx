@@ -48,8 +48,11 @@ function RelatoriosPage() {
   const generateReport = async (reportFormat: "xlsx" | "pdf") => {
     setLoading(true);
     try {
-      const startDate = startOfMonth(new Date(month + "-01T12:00:00"));
-      const endDate = endOfMonth(startDate);
+      const ref = new Date(referenceDate + "T12:00:00");
+      const startDate = periodType === "mensal" ? startOfMonth(ref) : periodType === "semanal" ? startOfWeek(ref, { weekStartsOn: 1 }) : ref;
+      const endDate = periodType === "mensal" ? endOfMonth(startDate) : periodType === "semanal" ? endOfWeek(ref, { weekStartsOn: 1 }) : ref;
+      const periodLabel = periodType === "mensal" ? month : periodType === "semanal" ? `Semana_${format(startDate, "dd-MM")}_a_${format(endDate, "dd-MM-yyyy")}` : format(referenceDate, "dd-MM-yyyy");
+
       
       const query = supabase
         .from("time_entries")
