@@ -9,8 +9,9 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { FileDown, Loader2, FileSpreadsheet, File as FilePdf } from "lucide-react";
 import { useState } from "react";
-import { format, startOfMonth, endOfMonth, eachDayOfInterval } from "date-fns";
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, startOfWeek, endOfWeek } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { normalizeWorkDays, worksOn, formatWorkDays } from "@/lib/work-days";
 // Dynamically imported below for performance
 // import * as XLSX from "xlsx";
 // import jsPDF from "jspdf";
