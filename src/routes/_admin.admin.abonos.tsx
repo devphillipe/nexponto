@@ -243,19 +243,16 @@ function AbonosPage() {
   );
 }
 
-type BatchPayload = { employee_ids: string[]; dates: string[]; reason: string; description: string };
+type BatchPayload = { employees: { id: string; dates: string[] }[]; reason: string; description: string };
 
-function buildDateRange(start: string, end: string, skipWeekends: boolean): string[] {
+function buildDateRange(start: string, end: string): string[] {
   if (!start) return [];
   const finish = end && end >= start ? end : start;
   const dates: string[] = [];
   const cursor = new Date(start + "T12:00:00");
   const last = new Date(finish + "T12:00:00");
   while (cursor <= last && dates.length < 366) {
-    const day = cursor.getDay();
-    if (!skipWeekends || (day !== 0 && day !== 6)) {
-      dates.push(format(cursor, "yyyy-MM-dd"));
-    }
+    dates.push(format(cursor, "yyyy-MM-dd"));
     cursor.setDate(cursor.getDate() + 1);
   }
   return dates;
