@@ -42,7 +42,7 @@ function AbonosPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("employees")
-        .select("id, full_name")
+        .select("id, full_name, work_days")
         .eq("tenant_id", profile!.tenant_id)
         .eq("active", true);
       if (error) throw error;
