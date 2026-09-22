@@ -244,7 +244,7 @@ function RelatoriosPage() {
           doc.setTextColor(60, 60, 60);
           doc.setFontSize(12);
           doc.text(`Colaborador: ${rd.employee}`, 14, 64);
-          doc.text(`Período: ${month}`, 14, 70);
+          doc.text(`Período: ${periodLabel}`, 14, 70);
 
           doc.setFillColor(245, 247, 250);
           doc.roundedRect(14, 76, 182, 25, 3, 3, "F");
