@@ -134,6 +134,31 @@ function ConfiguracoesPage() {
     updateMutation.mutate(formData);
   };
 
+  async function changePassword(e: React.FormEvent) {
+    e.preventDefault();
+    const strength = getPasswordStrength(pw);
+    if (!strength.metAll) {
+      toast.error("A senha não atende a todos os requisitos.");
+      return;
+    }
+    if (pw !== pw2) {
+      toast.error("As senhas não coincidem.");
+      return;
+    }
+    setPwLoading(true);
+    try {
+      const { error } = await supabase.auth.updateUser({ password: pw });
+      if (error) throw error;
+      toast.success("Senha alterada com sucesso!");
+      setPw("");
+      setPw2("");
+    } catch (err) {
+      toast.error(translateAuthError(err, "Não foi possível alterar a senha."));
+    } finally {
+      setPwLoading(false);
+    }
+  }
+
   const fetchAddress = async (cep: string) => {
     const cleanCep = cep.replace(/\D/g, "");
     if (cleanCep.length === 8) {
