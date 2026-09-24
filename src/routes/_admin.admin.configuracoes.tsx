@@ -26,6 +26,9 @@ function ConfiguracoesPage() {
   const queryClient = useQueryClient();
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [pw, setPw] = useState("");
+  const [pw2, setPw2] = useState("");
+  const [pwLoading, setPwLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     document: "",
