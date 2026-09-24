@@ -7,9 +7,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Building2, Mail, Phone, MapPin, Clock, Globe, Upload, Loader2, Image as ImageIcon, Search as SearchIcon } from "lucide-react";
+import { Building2, Mail, Phone, MapPin, Clock, Globe, Upload, Loader2, Image as ImageIcon, Search as SearchIcon, Lock } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 import { CpfCnpjInput, PhoneInput, CepInput } from "@/components/forms/SpecializedInputs";
+import { PasswordInput } from "@/components/forms/PasswordInput";
+import { PasswordStrengthMeter } from "@/components/forms/PasswordStrengthMeter";
+import { getPasswordStrength } from "@/lib/validators";
+import { translateAuthError } from "@/lib/auth-errors";
 import { onlyDigits, formatCep } from "@/lib/masks";
 
 export const Route = createFileRoute("/_admin/admin/configuracoes")({
@@ -22,6 +26,9 @@ function ConfiguracoesPage() {
   const queryClient = useQueryClient();
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [pw, setPw] = useState("");
+  const [pw2, setPw2] = useState("");
+  const [pwLoading, setPwLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     document: "",
@@ -126,6 +133,31 @@ function ConfiguracoesPage() {
     e.preventDefault();
     updateMutation.mutate(formData);
   };
+
+  async function changePassword(e: React.FormEvent) {
+    e.preventDefault();
+    const strength = getPasswordStrength(pw);
+    if (!strength.metAll) {
+      toast.error("A senha não atende a todos os requisitos.");
+      return;
+    }
+    if (pw !== pw2) {
+      toast.error("As senhas não coincidem.");
+      return;
+    }
+    setPwLoading(true);
+    try {
+      const { error } = await supabase.auth.updateUser({ password: pw });
+      if (error) throw error;
+      toast.success("Senha alterada com sucesso!");
+      setPw("");
+      setPw2("");
+    } catch (err) {
+      toast.error(translateAuthError(err, "Não foi possível alterar a senha."));
+    } finally {
+      setPwLoading(false);
+    }
+  }
 
   const fetchAddress = async (cep: string) => {
     const cleanCep = cep.replace(/\D/g, "");
@@ -332,6 +364,56 @@ function ConfiguracoesPage() {
           </Button>
         </div>
       </form>
+
+      <Card className="glass-card border-border/40 shadow-sm rounded-2xl md:rounded-[2.5rem] overflow-hidden transition-all hover:shadow-md">
+        <CardHeader className="p-8 pb-4">
+          <CardTitle className="text-xl flex items-center gap-2 text-primary">
+            <Lock className="h-5 w-5" />
+            Segurança da Conta
+          </CardTitle>
+          <CardDescription>Altere a senha que você usa para acessar o painel do escritório.</CardDescription>
+        </CardHeader>
+        <CardContent className="p-6 md:p-8 pt-4">
+          <form onSubmit={changePassword} className="space-y-4 max-w-md" noValidate>
+            <div className="space-y-1.5">
+              <Label htmlFor="admin-new-pw">Nova senha</Label>
+              <PasswordInput
+                id="admin-new-pw"
+                value={pw}
+                onChange={(e) => setPw(e.target.value)}
+                minLength={8}
+                required
+                autoComplete="new-password"
+                placeholder="Crie uma senha forte"
+                aria-describedby="admin-new-pw-strength"
+              />
+              <div id="admin-new-pw-strength" className="pt-2">
+                <PasswordStrengthMeter password={pw} />
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="admin-new-pw2">Confirmar nova senha</Label>
+              <PasswordInput
+                id="admin-new-pw2"
+                value={pw2}
+                onChange={(e) => setPw2(e.target.value)}
+                minLength={8}
+                required
+                autoComplete="new-password"
+                placeholder="Repita a senha"
+                aria-invalid={pw2.length > 0 && pw2 !== pw}
+              />
+              {pw2.length > 0 && pw2 !== pw && (
+                <p className="text-xs text-destructive" role="alert">As senhas não coincidem.</p>
+              )}
+            </div>
+            <Button type="submit" disabled={pwLoading} className="w-full rounded-xl" aria-busy={pwLoading}>
+              {pwLoading ? <Loader2 className="h-5 w-5 mr-2 animate-spin" aria-hidden /> : null}
+              Alterar senha
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 }
