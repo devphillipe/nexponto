@@ -416,7 +416,8 @@ function BatchAbonoForm({
         {total > 0 && (
           <div className="rounded-xl bg-primary/5 border border-primary/20 px-4 py-3 text-sm">
             <span className="font-bold text-primary">{total}</span> abono(s) serão criados —{" "}
-            {selected.length} colaborador(es) × {dates.length} dia(s).
+            {selected.length} colaborador(es), {allDates.length} dia(s) no período
+            {followScale ? " (seguindo a escala de cada um)" : ""}.
           </div>
         )}
       </div>

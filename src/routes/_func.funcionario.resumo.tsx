@@ -3,6 +3,7 @@ import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useProfile } from "@/lib/auth";
+import { normalizeWorkDays, formatWorkDays } from "@/lib/work-days";
 import {
   TrendingUp,
   TrendingDown,
@@ -320,8 +321,9 @@ function SummaryPage() {
           </section>
 
           <p className="text-[11px] text-muted-foreground text-center leading-relaxed px-4">
-            Jornada diária prevista: <strong>{employee?.daily_hours ?? 8} horas</strong>. O dia de hoje
-            só entra no saldo após o fechamento. Divergências? Fale com seu supervisor.
+            Sua escala: <strong>{formatWorkDays((employee as any)?.work_days)}</strong> · Jornada diária
+            prevista: <strong>{employee?.daily_hours ?? 8} horas</strong>. O dia de hoje só entra no
+            saldo após o fechamento. Divergências? Fale com seu supervisor.
           </p>
         </>
       )}
