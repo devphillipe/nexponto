@@ -177,7 +177,7 @@ function SummaryPage() {
       weekWorked,
       weekBalance: weekWorked - weekExpected,
     };
-  }, [data, daily, monthStart]);
+  }, [data, daily, monthStart, employee]);
 
   const monthLabel = monthStart.toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
   const positive = stats.balance >= 0;
@@ -312,7 +312,7 @@ function SummaryPage() {
                         d.worked > 0 ? "text-foreground" : "text-muted-foreground/50"
                       }`}
                     >
-                      {d.worked > 0 ? formatDur(d.worked) : d.future ? "—" : "00h00"}
+                      {d.worked > 0 ? formatDur(d.worked) : d.off ? "Folga" : d.future ? "—" : "00h00"}
                     </span>
                   </li>
                 );
