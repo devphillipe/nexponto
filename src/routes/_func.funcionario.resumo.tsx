@@ -3,6 +3,7 @@ import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useProfile } from "@/lib/auth";
+import { normalizeWorkDays, formatWorkDays } from "@/lib/work-days";
 import {
   TrendingUp,
   TrendingDown,
@@ -176,7 +177,7 @@ function SummaryPage() {
       weekWorked,
       weekBalance: weekWorked - weekExpected,
     };
-  }, [data, daily, monthStart]);
+  }, [data, daily, monthStart, employee]);
 
   const monthLabel = monthStart.toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
   const positive = stats.balance >= 0;
@@ -311,7 +312,7 @@ function SummaryPage() {
                         d.worked > 0 ? "text-foreground" : "text-muted-foreground/50"
                       }`}
                     >
-                      {d.worked > 0 ? formatDur(d.worked) : d.future ? "—" : "00h00"}
+                      {d.worked > 0 ? formatDur(d.worked) : d.off ? "Folga" : d.future ? "—" : "00h00"}
                     </span>
                   </li>
                 );
@@ -320,8 +321,9 @@ function SummaryPage() {
           </section>
 
           <p className="text-[11px] text-muted-foreground text-center leading-relaxed px-4">
-            Jornada diária prevista: <strong>{employee?.daily_hours ?? 8} horas</strong>. O dia de hoje
-            só entra no saldo após o fechamento. Divergências? Fale com seu supervisor.
+            Sua escala: <strong>{formatWorkDays((employee as any)?.work_days)}</strong> · Jornada diária
+            prevista: <strong>{employee?.daily_hours ?? 8} horas</strong>. O dia de hoje só entra no
+            saldo após o fechamento. Divergências? Fale com seu supervisor.
           </p>
         </>
       )}
