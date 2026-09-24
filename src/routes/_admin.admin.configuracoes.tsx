@@ -7,9 +7,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Building2, Mail, Phone, MapPin, Clock, Globe, Upload, Loader2, Image as ImageIcon, Search as SearchIcon } from "lucide-react";
+import { Building2, Mail, Phone, MapPin, Clock, Globe, Upload, Loader2, Image as ImageIcon, Search as SearchIcon, Lock } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 import { CpfCnpjInput, PhoneInput, CepInput } from "@/components/forms/SpecializedInputs";
+import { PasswordInput } from "@/components/forms/PasswordInput";
+import { PasswordStrengthMeter } from "@/components/forms/PasswordStrengthMeter";
+import { getPasswordStrength } from "@/lib/validators";
+import { translateAuthError } from "@/lib/auth-errors";
 import { onlyDigits, formatCep } from "@/lib/masks";
 
 export const Route = createFileRoute("/_admin/admin/configuracoes")({
