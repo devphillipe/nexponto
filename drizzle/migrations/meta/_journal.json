@@ -8,6 +8,13 @@
       "when": 1789554115154,
       "tag": "0000_add_work_days_to_employees",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1790535162491,
+      "tag": "0001_create_subscriptions",
+      "breakpoints": true
     }
   ]
 }

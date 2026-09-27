@@ -162,6 +162,62 @@ export type Database = {
           },
         ]
       }
+      subscriptions: {
+        Row: {
+          cancel_at_period_end: boolean
+          created_at: string
+          current_period_end: string | null
+          current_period_start: string | null
+          environment: string
+          id: string
+          plan: Database["public"]["Enums"]["subscription_plan"]
+          status: Database["public"]["Enums"]["subscription_status"]
+          stripe_customer_id: string | null
+          stripe_price_id: string | null
+          stripe_subscription_id: string | null
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          cancel_at_period_end?: boolean
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          environment?: string
+          id?: string
+          plan: Database["public"]["Enums"]["subscription_plan"]
+          status?: Database["public"]["Enums"]["subscription_status"]
+          stripe_customer_id?: string | null
+          stripe_price_id?: string | null
+          stripe_subscription_id?: string | null
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          cancel_at_period_end?: boolean
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          environment?: string
+          id?: string
+          plan?: Database["public"]["Enums"]["subscription_plan"]
+          status?: Database["public"]["Enums"]["subscription_status"]
+          stripe_customer_id?: string | null
+          stripe_price_id?: string | null
+          stripe_subscription_id?: string | null
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: true
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tenants: {
         Row: {
           address: string | null
@@ -320,6 +376,10 @@ export type Database = {
       }
       is_admin_of_tenant: { Args: { _tenant_id: string }; Returns: boolean }
       is_tenant_admin: { Args: { _tenant_id: string }; Returns: boolean }
+      tenant_has_active_subscription: {
+        Args: { _tenant_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       absence_reason:
@@ -332,6 +392,14 @@ export type Database = {
       app_role: "admin" | "employee"
       entry_source: "automatico" | "manual_admin"
       entry_type: "entrada" | "saida_almoco" | "retorno_almoco" | "saida"
+      subscription_plan: "mensal" | "anual" | "founder"
+      subscription_status:
+        | "trialing"
+        | "active"
+        | "past_due"
+        | "canceled"
+        | "incomplete"
+        | "expired"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -470,6 +538,15 @@ export const Constants = {
       app_role: ["admin", "employee"],
       entry_source: ["automatico", "manual_admin"],
       entry_type: ["entrada", "saida_almoco", "retorno_almoco", "saida"],
+      subscription_plan: ["mensal", "anual", "founder"],
+      subscription_status: [
+        "trialing",
+        "active",
+        "past_due",
+        "canceled",
+        "incomplete",
+        "expired",
+      ],
     },
   },
 } as const
