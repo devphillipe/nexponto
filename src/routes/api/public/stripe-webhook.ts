@@ -82,7 +82,7 @@ const STATUS_MAP: Record<string, string> = {
   incomplete_expired: "expired",
 };
 
-function planForPrice(priceId: string): string | null {
+function planForPrice(priceId: string): "mensal" | "anual" | null {
   if (priceId === process.env["STRIPE_PRICE_MONTHLY"]) return "mensal";
   if (priceId === process.env["STRIPE_PRICE_ANNUAL"]) return "anual";
   return null;
@@ -93,7 +93,7 @@ async function upsertSubscription(
   tenantId: string,
   sub: StripeSubscription,
   livemode: boolean,
-  knownPlan?: string,
+  knownPlan?: "mensal" | "anual" | "founder",
 ) {
   const priceId = sub.items?.data?.[0]?.price?.id ?? "";
   const plan = planForPrice(priceId) ?? knownPlan;
