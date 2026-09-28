@@ -18,6 +18,7 @@ import { Route as FuncionarioLoginRouteImport } from './routes/funcionario.login
 import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-password'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AdminCadastroRouteImport } from './routes/admin.cadastro'
+import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe-webhook'
 import { Route as FuncFuncionarioResumoRouteImport } from './routes/_func.funcionario.resumo'
 import { Route as FuncFuncionarioPerfilRouteImport } from './routes/_func.funcionario.perfil'
 import { Route as FuncFuncionarioMeuPontoRouteImport } from './routes/_func.funcionario.meu-ponto'
@@ -70,6 +71,11 @@ const AdminLoginRoute = AdminLoginRouteImport.update({
 const AdminCadastroRoute = AdminCadastroRouteImport.update({
   id: '/admin/cadastro',
   path: '/admin/cadastro',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicStripeWebhookRoute = ApiPublicStripeWebhookRouteImport.update({
+  id: '/api/public/stripe-webhook',
+  path: '/api/public/stripe-webhook',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FuncFuncionarioResumoRoute = FuncFuncionarioResumoRouteImport.update({
@@ -142,6 +148,7 @@ export interface FileRoutesByFullPath {
   '/funcionario/meu-ponto': typeof FuncFuncionarioMeuPontoRoute
   '/funcionario/perfil': typeof FuncFuncionarioPerfilRoute
   '/funcionario/resumo': typeof FuncFuncionarioResumoRoute
+  '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -161,6 +168,7 @@ export interface FileRoutesByTo {
   '/funcionario/meu-ponto': typeof FuncFuncionarioMeuPontoRoute
   '/funcionario/perfil': typeof FuncFuncionarioPerfilRoute
   '/funcionario/resumo': typeof FuncFuncionarioResumoRoute
+  '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -183,6 +191,7 @@ export interface FileRoutesById {
   '/_func/funcionario/meu-ponto': typeof FuncFuncionarioMeuPontoRoute
   '/_func/funcionario/perfil': typeof FuncFuncionarioPerfilRoute
   '/_func/funcionario/resumo': typeof FuncFuncionarioResumoRoute
+  '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -204,6 +213,7 @@ export interface FileRouteTypes {
     | '/funcionario/meu-ponto'
     | '/funcionario/perfil'
     | '/funcionario/resumo'
+    | '/api/public/stripe-webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -223,6 +233,7 @@ export interface FileRouteTypes {
     | '/funcionario/meu-ponto'
     | '/funcionario/perfil'
     | '/funcionario/resumo'
+    | '/api/public/stripe-webhook'
   id:
     | '__root__'
     | '/'
@@ -244,6 +255,7 @@ export interface FileRouteTypes {
     | '/_func/funcionario/meu-ponto'
     | '/_func/funcionario/perfil'
     | '/_func/funcionario/resumo'
+    | '/api/public/stripe-webhook'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -256,6 +268,7 @@ export interface RootRouteChildren {
   AdminLoginRoute: typeof AdminLoginRoute
   AuthResetPasswordRoute: typeof AuthResetPasswordRoute
   FuncionarioLoginRoute: typeof FuncionarioLoginRoute
+  ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -321,6 +334,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/cadastro'
       fullPath: '/admin/cadastro'
       preLoaderRoute: typeof AdminCadastroRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/stripe-webhook': {
+      id: '/api/public/stripe-webhook'
+      path: '/api/public/stripe-webhook'
+      fullPath: '/api/public/stripe-webhook'
+      preLoaderRoute: typeof ApiPublicStripeWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_func/funcionario/resumo': {
@@ -442,6 +462,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminLoginRoute: AdminLoginRoute,
   AuthResetPasswordRoute: AuthResetPasswordRoute,
   FuncionarioLoginRoute: FuncionarioLoginRoute,
+  ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
