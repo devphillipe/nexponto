@@ -72,7 +72,10 @@ export const Route = createFileRoute("/api/public/stripe-webhook")({
   },
 });
 
-const STATUS_MAP: Record<string, string> = {
+const STATUS_MAP: Record<
+  string,
+  "active" | "canceled" | "expired" | "incomplete" | "past_due" | "trialing"
+> = {
   active: "active",
   trialing: "trialing",
   past_due: "past_due",
