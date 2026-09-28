@@ -43,9 +43,9 @@ function AssinaturaPage() {
   const fetchInfo = useServerFn(getBillingInfo);
   const startCheckout = useServerFn(createCheckoutSession);
 
-  const { data, isLoading } = useQuery<BillingInfo>({
+  const { data, isLoading } = useQuery({
     queryKey: ["billing-info"],
-    queryFn: fetchInfo,
+    queryFn: async () => (await fetchInfo()) as BillingInfo,
     staleTime: 5 * 60 * 1000,
   });
 

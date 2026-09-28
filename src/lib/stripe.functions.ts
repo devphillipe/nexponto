@@ -24,7 +24,7 @@ async function getAdminTenant(supabase: Db, userId: string): Promise<ProfileRow>
   const { data: profile } = await supabase
     .from("profiles")
     .select("tenant_id, email")
-    .eq("user_id", userId)
+    .eq("id", userId)
     .single();
   if (!profile?.tenant_id) throw new Error("Escritório não encontrado.");
   return profile;
