@@ -52,8 +52,7 @@ function AssinaturaPage() {
   const checkout = useMutation({
     mutationFn: async (plan: "mensal" | "anual") => {
       const { url } = await startCheckout({
-        plan,
-        origin: window.location.origin,
+        data: { plan, origin: window.location.origin },
       });
       return url;
     },
