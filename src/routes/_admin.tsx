@@ -31,6 +31,7 @@ const nav = [
   { to: "/admin/pontos", label: "Pontos", icon: Clock },
   { to: "/admin/abonos", label: "Abonos", icon: FileText },
   { to: "/admin/relatorios", label: "Relatórios", icon: FileText },
+  { to: "/admin/assinatura", label: "Assinatura", icon: CreditCard },
 ] as const;
 
 function AdminLayout() {
