@@ -1,5 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/integrations/supabase/types";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { stripeApi, stripeConfigured, type StripePrice } from "./stripe.server";
 
@@ -8,22 +10,19 @@ const CheckoutSchema = z.object({
   origin: z.string().url().max(500),
 });
 
+type Db = SupabaseClient<Database>;
 type ProfileRow = { tenant_id: string; email: string | null };
 
-async function getAdminTenant(supabase: {
-  from: (t: string) => unknown;
-}, userId: string) {
-  const { data: roles } = await (supabase.from("user_roles") as ReturnType<typeof Object> as {
-    select: (s: string) => { eq: (c: string, v: string) => Promise<{ data: { role: string }[] | null }> };
-  })
+async function getAdminTenant(supabase: Db, userId: string): Promise<ProfileRow> {
+  const { data: roles } = await supabase
+    .from("user_roles")
     .select("role")
     .eq("user_id", userId);
   if (!roles?.some((r) => r.role === "admin")) {
     throw new Error("Apenas o administrador do escritório pode gerenciar a assinatura.");
   }
-  const { data: profile } = await (supabase.from("profiles") as ReturnType<typeof Object> as {
-    select: (s: string) => { eq: (c: string, v: string) => { single: () => Promise<{ data: ProfileRow | null }> } };
-  })
+  const { data: profile } = await supabase
+    .from("profiles")
     .select("tenant_id, email")
     .eq("user_id", userId)
     .single();
