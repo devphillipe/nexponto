@@ -18,6 +18,7 @@ import { Route as FuncionarioLoginRouteImport } from './routes/funcionario.login
 import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-password'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AdminCadastroRouteImport } from './routes/admin.cadastro'
+import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe-webhook'
 import { Route as FuncFuncionarioResumoRouteImport } from './routes/_func.funcionario.resumo'
 import { Route as FuncFuncionarioPerfilRouteImport } from './routes/_func.funcionario.perfil'
 import { Route as FuncFuncionarioMeuPontoRouteImport } from './routes/_func.funcionario.meu-ponto'
@@ -27,6 +28,7 @@ import { Route as AdminAdminPontosRouteImport } from './routes/_admin.admin.pont
 import { Route as AdminAdminFuncionariosRouteImport } from './routes/_admin.admin.funcionarios'
 import { Route as AdminAdminDashboardRouteImport } from './routes/_admin.admin.dashboard'
 import { Route as AdminAdminConfiguracoesRouteImport } from './routes/_admin.admin.configuracoes'
+import { Route as AdminAdminAssinaturaRouteImport } from './routes/_admin.admin.assinatura'
 import { Route as AdminAdminAbonosRouteImport } from './routes/_admin.admin.abonos'
 
 const TermosRoute = TermosRouteImport.update({
@@ -70,6 +72,11 @@ const AdminLoginRoute = AdminLoginRouteImport.update({
 const AdminCadastroRoute = AdminCadastroRouteImport.update({
   id: '/admin/cadastro',
   path: '/admin/cadastro',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicStripeWebhookRoute = ApiPublicStripeWebhookRouteImport.update({
+  id: '/api/public/stripe-webhook',
+  path: '/api/public/stripe-webhook',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FuncFuncionarioResumoRoute = FuncFuncionarioResumoRouteImport.update({
@@ -118,6 +125,11 @@ const AdminAdminConfiguracoesRoute = AdminAdminConfiguracoesRouteImport.update({
   path: '/admin/configuracoes',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminAdminAssinaturaRoute = AdminAdminAssinaturaRouteImport.update({
+  id: '/admin/assinatura',
+  path: '/admin/assinatura',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminAdminAbonosRoute = AdminAdminAbonosRouteImport.update({
   id: '/admin/abonos',
   path: '/admin/abonos',
@@ -133,6 +145,7 @@ export interface FileRoutesByFullPath {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/funcionario/login': typeof FuncionarioLoginRoute
   '/admin/abonos': typeof AdminAdminAbonosRoute
+  '/admin/assinatura': typeof AdminAdminAssinaturaRoute
   '/admin/configuracoes': typeof AdminAdminConfiguracoesRoute
   '/admin/dashboard': typeof AdminAdminDashboardRoute
   '/admin/funcionarios': typeof AdminAdminFuncionariosRoute
@@ -142,6 +155,7 @@ export interface FileRoutesByFullPath {
   '/funcionario/meu-ponto': typeof FuncFuncionarioMeuPontoRoute
   '/funcionario/perfil': typeof FuncFuncionarioPerfilRoute
   '/funcionario/resumo': typeof FuncFuncionarioResumoRoute
+  '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -152,6 +166,7 @@ export interface FileRoutesByTo {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/funcionario/login': typeof FuncionarioLoginRoute
   '/admin/abonos': typeof AdminAdminAbonosRoute
+  '/admin/assinatura': typeof AdminAdminAssinaturaRoute
   '/admin/configuracoes': typeof AdminAdminConfiguracoesRoute
   '/admin/dashboard': typeof AdminAdminDashboardRoute
   '/admin/funcionarios': typeof AdminAdminFuncionariosRoute
@@ -161,6 +176,7 @@ export interface FileRoutesByTo {
   '/funcionario/meu-ponto': typeof FuncFuncionarioMeuPontoRoute
   '/funcionario/perfil': typeof FuncFuncionarioPerfilRoute
   '/funcionario/resumo': typeof FuncFuncionarioResumoRoute
+  '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -174,6 +190,7 @@ export interface FileRoutesById {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/funcionario/login': typeof FuncionarioLoginRoute
   '/_admin/admin/abonos': typeof AdminAdminAbonosRoute
+  '/_admin/admin/assinatura': typeof AdminAdminAssinaturaRoute
   '/_admin/admin/configuracoes': typeof AdminAdminConfiguracoesRoute
   '/_admin/admin/dashboard': typeof AdminAdminDashboardRoute
   '/_admin/admin/funcionarios': typeof AdminAdminFuncionariosRoute
@@ -183,6 +200,7 @@ export interface FileRoutesById {
   '/_func/funcionario/meu-ponto': typeof FuncFuncionarioMeuPontoRoute
   '/_func/funcionario/perfil': typeof FuncFuncionarioPerfilRoute
   '/_func/funcionario/resumo': typeof FuncFuncionarioResumoRoute
+  '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -195,6 +213,7 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/funcionario/login'
     | '/admin/abonos'
+    | '/admin/assinatura'
     | '/admin/configuracoes'
     | '/admin/dashboard'
     | '/admin/funcionarios'
@@ -204,6 +223,7 @@ export interface FileRouteTypes {
     | '/funcionario/meu-ponto'
     | '/funcionario/perfil'
     | '/funcionario/resumo'
+    | '/api/public/stripe-webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -214,6 +234,7 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/funcionario/login'
     | '/admin/abonos'
+    | '/admin/assinatura'
     | '/admin/configuracoes'
     | '/admin/dashboard'
     | '/admin/funcionarios'
@@ -223,6 +244,7 @@ export interface FileRouteTypes {
     | '/funcionario/meu-ponto'
     | '/funcionario/perfil'
     | '/funcionario/resumo'
+    | '/api/public/stripe-webhook'
   id:
     | '__root__'
     | '/'
@@ -235,6 +257,7 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/funcionario/login'
     | '/_admin/admin/abonos'
+    | '/_admin/admin/assinatura'
     | '/_admin/admin/configuracoes'
     | '/_admin/admin/dashboard'
     | '/_admin/admin/funcionarios'
@@ -244,6 +267,7 @@ export interface FileRouteTypes {
     | '/_func/funcionario/meu-ponto'
     | '/_func/funcionario/perfil'
     | '/_func/funcionario/resumo'
+    | '/api/public/stripe-webhook'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -256,6 +280,7 @@ export interface RootRouteChildren {
   AdminLoginRoute: typeof AdminLoginRoute
   AuthResetPasswordRoute: typeof AuthResetPasswordRoute
   FuncionarioLoginRoute: typeof FuncionarioLoginRoute
+  ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -323,6 +348,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCadastroRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/stripe-webhook': {
+      id: '/api/public/stripe-webhook'
+      path: '/api/public/stripe-webhook'
+      fullPath: '/api/public/stripe-webhook'
+      preLoaderRoute: typeof ApiPublicStripeWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_func/funcionario/resumo': {
       id: '/_func/funcionario/resumo'
       path: '/funcionario/resumo'
@@ -386,6 +418,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAdminConfiguracoesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/_admin/admin/assinatura': {
+      id: '/_admin/admin/assinatura'
+      path: '/admin/assinatura'
+      fullPath: '/admin/assinatura'
+      preLoaderRoute: typeof AdminAdminAssinaturaRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/_admin/admin/abonos': {
       id: '/_admin/admin/abonos'
       path: '/admin/abonos'
@@ -398,6 +437,7 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteChildren {
   AdminAdminAbonosRoute: typeof AdminAdminAbonosRoute
+  AdminAdminAssinaturaRoute: typeof AdminAdminAssinaturaRoute
   AdminAdminConfiguracoesRoute: typeof AdminAdminConfiguracoesRoute
   AdminAdminDashboardRoute: typeof AdminAdminDashboardRoute
   AdminAdminFuncionariosRoute: typeof AdminAdminFuncionariosRoute
@@ -407,6 +447,7 @@ interface AdminRouteChildren {
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAdminAbonosRoute: AdminAdminAbonosRoute,
+  AdminAdminAssinaturaRoute: AdminAdminAssinaturaRoute,
   AdminAdminConfiguracoesRoute: AdminAdminConfiguracoesRoute,
   AdminAdminDashboardRoute: AdminAdminDashboardRoute,
   AdminAdminFuncionariosRoute: AdminAdminFuncionariosRoute,
@@ -442,6 +483,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminLoginRoute: AdminLoginRoute,
   AuthResetPasswordRoute: AuthResetPasswordRoute,
   FuncionarioLoginRoute: FuncionarioLoginRoute,
+  ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
