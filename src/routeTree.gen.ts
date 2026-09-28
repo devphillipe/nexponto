@@ -28,6 +28,7 @@ import { Route as AdminAdminPontosRouteImport } from './routes/_admin.admin.pont
 import { Route as AdminAdminFuncionariosRouteImport } from './routes/_admin.admin.funcionarios'
 import { Route as AdminAdminDashboardRouteImport } from './routes/_admin.admin.dashboard'
 import { Route as AdminAdminConfiguracoesRouteImport } from './routes/_admin.admin.configuracoes'
+import { Route as AdminAdminAssinaturaRouteImport } from './routes/_admin.admin.assinatura'
 import { Route as AdminAdminAbonosRouteImport } from './routes/_admin.admin.abonos'
 
 const TermosRoute = TermosRouteImport.update({
@@ -124,6 +125,11 @@ const AdminAdminConfiguracoesRoute = AdminAdminConfiguracoesRouteImport.update({
   path: '/admin/configuracoes',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminAdminAssinaturaRoute = AdminAdminAssinaturaRouteImport.update({
+  id: '/admin/assinatura',
+  path: '/admin/assinatura',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminAdminAbonosRoute = AdminAdminAbonosRouteImport.update({
   id: '/admin/abonos',
   path: '/admin/abonos',
@@ -139,6 +145,7 @@ export interface FileRoutesByFullPath {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/funcionario/login': typeof FuncionarioLoginRoute
   '/admin/abonos': typeof AdminAdminAbonosRoute
+  '/admin/assinatura': typeof AdminAdminAssinaturaRoute
   '/admin/configuracoes': typeof AdminAdminConfiguracoesRoute
   '/admin/dashboard': typeof AdminAdminDashboardRoute
   '/admin/funcionarios': typeof AdminAdminFuncionariosRoute
@@ -159,6 +166,7 @@ export interface FileRoutesByTo {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/funcionario/login': typeof FuncionarioLoginRoute
   '/admin/abonos': typeof AdminAdminAbonosRoute
+  '/admin/assinatura': typeof AdminAdminAssinaturaRoute
   '/admin/configuracoes': typeof AdminAdminConfiguracoesRoute
   '/admin/dashboard': typeof AdminAdminDashboardRoute
   '/admin/funcionarios': typeof AdminAdminFuncionariosRoute
@@ -182,6 +190,7 @@ export interface FileRoutesById {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/funcionario/login': typeof FuncionarioLoginRoute
   '/_admin/admin/abonos': typeof AdminAdminAbonosRoute
+  '/_admin/admin/assinatura': typeof AdminAdminAssinaturaRoute
   '/_admin/admin/configuracoes': typeof AdminAdminConfiguracoesRoute
   '/_admin/admin/dashboard': typeof AdminAdminDashboardRoute
   '/_admin/admin/funcionarios': typeof AdminAdminFuncionariosRoute
@@ -204,6 +213,7 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/funcionario/login'
     | '/admin/abonos'
+    | '/admin/assinatura'
     | '/admin/configuracoes'
     | '/admin/dashboard'
     | '/admin/funcionarios'
@@ -224,6 +234,7 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/funcionario/login'
     | '/admin/abonos'
+    | '/admin/assinatura'
     | '/admin/configuracoes'
     | '/admin/dashboard'
     | '/admin/funcionarios'
@@ -246,6 +257,7 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/funcionario/login'
     | '/_admin/admin/abonos'
+    | '/_admin/admin/assinatura'
     | '/_admin/admin/configuracoes'
     | '/_admin/admin/dashboard'
     | '/_admin/admin/funcionarios'
@@ -406,6 +418,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAdminConfiguracoesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/_admin/admin/assinatura': {
+      id: '/_admin/admin/assinatura'
+      path: '/admin/assinatura'
+      fullPath: '/admin/assinatura'
+      preLoaderRoute: typeof AdminAdminAssinaturaRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/_admin/admin/abonos': {
       id: '/_admin/admin/abonos'
       path: '/admin/abonos'
@@ -418,6 +437,7 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteChildren {
   AdminAdminAbonosRoute: typeof AdminAdminAbonosRoute
+  AdminAdminAssinaturaRoute: typeof AdminAdminAssinaturaRoute
   AdminAdminConfiguracoesRoute: typeof AdminAdminConfiguracoesRoute
   AdminAdminDashboardRoute: typeof AdminAdminDashboardRoute
   AdminAdminFuncionariosRoute: typeof AdminAdminFuncionariosRoute
@@ -427,6 +447,7 @@ interface AdminRouteChildren {
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAdminAbonosRoute: AdminAdminAbonosRoute,
+  AdminAdminAssinaturaRoute: AdminAdminAssinaturaRoute,
   AdminAdminConfiguracoesRoute: AdminAdminConfiguracoesRoute,
   AdminAdminDashboardRoute: AdminAdminDashboardRoute,
   AdminAdminFuncionariosRoute: AdminAdminFuncionariosRoute,
