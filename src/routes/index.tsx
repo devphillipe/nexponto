@@ -81,7 +81,7 @@ function Landing() {
               </p>
             </div>
             <div className="mt-6 flex items-center gap-2 text-sm font-black uppercase tracking-widest text-primary">
-              Criar conta gratuita <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              Assinar agora <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </div>
           </Link>
 
@@ -95,7 +95,7 @@ function Landing() {
             <div>
               <h3 className="font-display text-xl sm:text-3xl font-black mb-2 sm:mb-3 tracking-tighter text-foreground">Para o Funcionário</h3>
               <p className="text-sm sm:text-base text-muted-foreground leading-relaxed font-medium">
-                Bata seu ponto de forma rápida e segura. Acesse seu histórico de qualquer lugar, a qualquer hora.
+                Acesso 100% gratuito. Seu escritório cria e gerencia seu cadastro — você só bate o ponto e acompanha seu histórico.
               </p>
             </div>
             <div className="mt-6 flex items-center gap-2 text-sm font-black uppercase tracking-widest text-primary">
