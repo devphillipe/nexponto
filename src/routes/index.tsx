@@ -81,7 +81,7 @@ function Landing() {
               </p>
             </div>
             <div className="mt-6 flex items-center gap-2 text-sm font-black uppercase tracking-widest text-primary">
-              Criar conta gratuita <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              Assinar agora <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </div>
           </Link>
 
@@ -95,13 +95,68 @@ function Landing() {
             <div>
               <h3 className="font-display text-xl sm:text-3xl font-black mb-2 sm:mb-3 tracking-tighter text-foreground">Para o Funcionário</h3>
               <p className="text-sm sm:text-base text-muted-foreground leading-relaxed font-medium">
-                Bata seu ponto de forma rápida e segura. Acesse seu histórico de qualquer lugar, a qualquer hora.
+                Acesso 100% gratuito. Seu escritório cria e gerencia seu cadastro — você só bate o ponto e acompanha seu histórico.
               </p>
             </div>
             <div className="mt-6 flex items-center gap-2 text-sm font-black uppercase tracking-widest text-primary">
               Acessar portal <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </div>
           </Link>
+        </div>
+
+        {/* Planos */}
+        <div className="mt-14 sm:mt-20 w-full max-w-4xl px-4 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-500">
+          <h2 className="font-display text-2xl sm:text-4xl font-black tracking-tighter mb-2 sm:mb-3">
+            Planos para o seu escritório
+          </h2>
+          <p className="text-sm sm:text-base text-muted-foreground font-medium mb-8 sm:mb-10 max-w-xl mx-auto">
+            Uma assinatura por escritório. Funcionários inclusos sem custo adicional — você gerencia todos os cadastros.
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
+            <div className="glass-card flex flex-col items-start gap-4 rounded-2xl sm:rounded-[2rem] p-6 sm:p-8 text-left border-border/40">
+              <span className="text-xs font-black uppercase tracking-widest text-muted-foreground">Mensal</span>
+              <div className="flex items-baseline gap-1">
+                <span className="font-display text-4xl sm:text-5xl font-black tracking-tighter text-foreground">R$ 29,90</span>
+                <span className="text-sm text-muted-foreground font-medium">/mês</span>
+              </div>
+              <ul className="space-y-2 text-sm text-muted-foreground font-medium">
+                <li className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-success shrink-0" /> Funcionários ilimitados</li>
+                <li className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-success shrink-0" /> Relatórios diário, semanal e mensal</li>
+                <li className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-success shrink-0" /> Cancele quando quiser</li>
+              </ul>
+              <Link
+                to="/admin/cadastro"
+                className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-full border border-primary/30 bg-primary/5 px-5 py-2.5 text-sm font-bold text-primary transition-all hover:bg-primary/15"
+              >
+                Assinar mensal <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+
+            <div className="glass-card relative flex flex-col items-start gap-4 rounded-2xl sm:rounded-[2rem] p-6 sm:p-8 text-left border-primary/40 shadow-lg shadow-primary/10">
+              <span className="absolute -top-3 right-6 rounded-full bg-primary px-3 py-1 text-[11px] font-black uppercase tracking-widest text-primary-foreground">
+                Melhor valor
+              </span>
+              <span className="text-xs font-black uppercase tracking-widest text-muted-foreground">Anual</span>
+              <div className="flex items-baseline gap-1">
+                <span className="font-display text-4xl sm:text-5xl font-black tracking-tighter text-foreground">R$ 299</span>
+                <span className="text-sm text-muted-foreground font-medium">/ano</span>
+              </div>
+              <ul className="space-y-2 text-sm text-muted-foreground font-medium">
+                <li className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-success shrink-0" /> Tudo do plano mensal</li>
+                <li className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-success shrink-0" /> 2 meses grátis no ano</li>
+                <li className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-success shrink-0" /> Suporte prioritário</li>
+              </ul>
+              <Link
+                to="/admin/cadastro"
+                className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground transition-all hover:opacity-90"
+              >
+                Assinar anual <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+          </div>
+          <p className="mt-6 text-xs sm:text-sm text-muted-foreground font-medium">
+            O acesso do funcionário é sempre gratuito — quem assina é o escritório.
+          </p>
         </div>
 
         <div className="mt-12 sm:mt-16 flex flex-wrap justify-center gap-6 md:gap-12 opacity-50 grayscale transition-all hover:opacity-100 hover:grayscale-0">
