@@ -9,39 +9,31 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as AdminRouteImport } from './routes/_admin'
-import { Route as FuncRouteImport } from './routes/_func'
-import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as TermosRouteImport } from './routes/termos'
-import { Route as AdminCadastroRouteImport } from './routes/admin.cadastro'
-import { Route as AdminLoginRouteImport } from './routes/admin.login'
-import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-password'
+import { Route as PrivacidadeRouteImport } from './routes/privacidade'
+import { Route as FuncRouteImport } from './routes/_func'
+import { Route as AdminRouteImport } from './routes/_admin'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as FuncionarioLoginRouteImport } from './routes/funcionario.login'
-import { Route as AdminAdminAbonosRouteImport } from './routes/_admin.admin.abonos'
-import { Route as AdminAdminAssinaturaRouteImport } from './routes/_admin.admin.assinatura'
-import { Route as AdminAdminConfiguracoesRouteImport } from './routes/_admin.admin.configuracoes'
-import { Route as AdminAdminDashboardRouteImport } from './routes/_admin.admin.dashboard'
-import { Route as AdminAdminFuncionariosRouteImport } from './routes/_admin.admin.funcionarios'
-import { Route as AdminAdminPontosRouteImport } from './routes/_admin.admin.pontos'
-import { Route as AdminAdminRelatoriosRouteImport } from './routes/_admin.admin.relatorios'
-import { Route as FuncFuncionarioHistoricoRouteImport } from './routes/_func.funcionario.historico'
-import { Route as FuncFuncionarioMeuPontoRouteImport } from './routes/_func.funcionario.meu-ponto'
-import { Route as FuncFuncionarioPerfilRouteImport } from './routes/_func.funcionario.perfil'
-import { Route as FuncFuncionarioResumoRouteImport } from './routes/_func.funcionario.resumo'
+import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-password'
+import { Route as AdminLoginRouteImport } from './routes/admin.login'
+import { Route as AdminCadastroRouteImport } from './routes/admin.cadastro'
 import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe-webhook'
+import { Route as FuncFuncionarioResumoRouteImport } from './routes/_func.funcionario.resumo'
+import { Route as FuncFuncionarioPerfilRouteImport } from './routes/_func.funcionario.perfil'
+import { Route as FuncFuncionarioMeuPontoRouteImport } from './routes/_func.funcionario.meu-ponto'
+import { Route as FuncFuncionarioHistoricoRouteImport } from './routes/_func.funcionario.historico'
+import { Route as AdminAdminRelatoriosRouteImport } from './routes/_admin.admin.relatorios'
+import { Route as AdminAdminPontosRouteImport } from './routes/_admin.admin.pontos'
+import { Route as AdminAdminFuncionariosRouteImport } from './routes/_admin.admin.funcionarios'
+import { Route as AdminAdminDashboardRouteImport } from './routes/_admin.admin.dashboard'
+import { Route as AdminAdminConfiguracoesRouteImport } from './routes/_admin.admin.configuracoes'
+import { Route as AdminAdminAssinaturaRouteImport } from './routes/_admin.admin.assinatura'
+import { Route as AdminAdminAbonosRouteImport } from './routes/_admin.admin.abonos'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminRoute = AdminRouteImport.update({
-  id: '/_admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FuncRoute = FuncRouteImport.update({
-  id: '/_func',
+const TermosRoute = TermosRouteImport.update({
+  id: '/termos',
+  path: '/termos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacidadeRoute = PrivacidadeRouteImport.update({
@@ -49,24 +41,17 @@ const PrivacidadeRoute = PrivacidadeRouteImport.update({
   path: '/privacidade',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TermosRoute = TermosRouteImport.update({
-  id: '/termos',
-  path: '/termos',
+const FuncRoute = FuncRouteImport.update({
+  id: '/_func',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminCadastroRoute = AdminCadastroRouteImport.update({
-  id: '/admin/cadastro',
-  path: '/admin/cadastro',
+const AdminRoute = AdminRouteImport.update({
+  id: '/_admin',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminLoginRoute = AdminLoginRouteImport.update({
-  id: '/admin/login',
-  path: '/admin/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
-  id: '/auth/reset-password',
-  path: '/auth/reset-password',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FuncionarioLoginRoute = FuncionarioLoginRouteImport.update({
@@ -74,50 +59,29 @@ const FuncionarioLoginRoute = FuncionarioLoginRouteImport.update({
   path: '/funcionario/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminAdminAbonosRoute = AdminAdminAbonosRouteImport.update({
-  id: '/admin/abonos',
-  path: '/admin/abonos',
-  getParentRoute: () => AdminRoute,
+const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
+  id: '/auth/reset-password',
+  path: '/auth/reset-password',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AdminAdminAssinaturaRoute = AdminAdminAssinaturaRouteImport.update({
-  id: '/admin/assinatura',
-  path: '/admin/assinatura',
-  getParentRoute: () => AdminRoute,
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/admin/login',
+  path: '/admin/login',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AdminAdminConfiguracoesRoute = AdminAdminConfiguracoesRouteImport.update({
-  id: '/admin/configuracoes',
-  path: '/admin/configuracoes',
-  getParentRoute: () => AdminRoute,
+const AdminCadastroRoute = AdminCadastroRouteImport.update({
+  id: '/admin/cadastro',
+  path: '/admin/cadastro',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AdminAdminDashboardRoute = AdminAdminDashboardRouteImport.update({
-  id: '/admin/dashboard',
-  path: '/admin/dashboard',
-  getParentRoute: () => AdminRoute,
+const ApiPublicStripeWebhookRoute = ApiPublicStripeWebhookRouteImport.update({
+  id: '/api/public/stripe-webhook',
+  path: '/api/public/stripe-webhook',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AdminAdminFuncionariosRoute = AdminAdminFuncionariosRouteImport.update({
-  id: '/admin/funcionarios',
-  path: '/admin/funcionarios',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminAdminPontosRoute = AdminAdminPontosRouteImport.update({
-  id: '/admin/pontos',
-  path: '/admin/pontos',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminAdminRelatoriosRoute = AdminAdminRelatoriosRouteImport.update({
-  id: '/admin/relatorios',
-  path: '/admin/relatorios',
-  getParentRoute: () => AdminRoute,
-} as any)
-const FuncFuncionarioHistoricoRoute =
-  FuncFuncionarioHistoricoRouteImport.update({
-    id: '/funcionario/historico',
-    path: '/funcionario/historico',
-    getParentRoute: () => FuncRoute,
-  } as any)
-const FuncFuncionarioMeuPontoRoute = FuncFuncionarioMeuPontoRouteImport.update({
-  id: '/funcionario/meu-ponto',
-  path: '/funcionario/meu-ponto',
+const FuncFuncionarioResumoRoute = FuncFuncionarioResumoRouteImport.update({
+  id: '/funcionario/resumo',
+  path: '/funcionario/resumo',
   getParentRoute: () => FuncRoute,
 } as any)
 const FuncFuncionarioPerfilRoute = FuncFuncionarioPerfilRouteImport.update({
@@ -125,15 +89,51 @@ const FuncFuncionarioPerfilRoute = FuncFuncionarioPerfilRouteImport.update({
   path: '/funcionario/perfil',
   getParentRoute: () => FuncRoute,
 } as any)
-const FuncFuncionarioResumoRoute = FuncFuncionarioResumoRouteImport.update({
-  id: '/funcionario/resumo',
-  path: '/funcionario/resumo',
+const FuncFuncionarioMeuPontoRoute = FuncFuncionarioMeuPontoRouteImport.update({
+  id: '/funcionario/meu-ponto',
+  path: '/funcionario/meu-ponto',
   getParentRoute: () => FuncRoute,
 } as any)
-const ApiPublicStripeWebhookRoute = ApiPublicStripeWebhookRouteImport.update({
-  id: '/api/public/stripe-webhook',
-  path: '/api/public/stripe-webhook',
-  getParentRoute: () => rootRouteImport,
+const FuncFuncionarioHistoricoRoute =
+  FuncFuncionarioHistoricoRouteImport.update({
+    id: '/funcionario/historico',
+    path: '/funcionario/historico',
+    getParentRoute: () => FuncRoute,
+  } as any)
+const AdminAdminRelatoriosRoute = AdminAdminRelatoriosRouteImport.update({
+  id: '/admin/relatorios',
+  path: '/admin/relatorios',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAdminPontosRoute = AdminAdminPontosRouteImport.update({
+  id: '/admin/pontos',
+  path: '/admin/pontos',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAdminFuncionariosRoute = AdminAdminFuncionariosRouteImport.update({
+  id: '/admin/funcionarios',
+  path: '/admin/funcionarios',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAdminDashboardRoute = AdminAdminDashboardRouteImport.update({
+  id: '/admin/dashboard',
+  path: '/admin/dashboard',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAdminConfiguracoesRoute = AdminAdminConfiguracoesRouteImport.update({
+  id: '/admin/configuracoes',
+  path: '/admin/configuracoes',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAdminAssinaturaRoute = AdminAdminAssinaturaRouteImport.update({
+  id: '/admin/assinatura',
+  path: '/admin/assinatura',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAdminAbonosRoute = AdminAdminAbonosRouteImport.update({
+  id: '/admin/abonos',
+  path: '/admin/abonos',
+  getParentRoute: () => AdminRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -285,25 +285,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_admin': {
-      id: '/_admin'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof AdminRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_func': {
-      id: '/_func'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof FuncRouteImport
+    '/termos': {
+      id: '/termos'
+      path: '/termos'
+      fullPath: '/termos'
+      preLoaderRoute: typeof TermosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacidade': {
@@ -313,32 +299,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivacidadeRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/termos': {
-      id: '/termos'
-      path: '/termos'
-      fullPath: '/termos'
-      preLoaderRoute: typeof TermosRouteImport
+    '/_func': {
+      id: '/_func'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof FuncRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin/cadastro': {
-      id: '/admin/cadastro'
-      path: '/admin/cadastro'
-      fullPath: '/admin/cadastro'
-      preLoaderRoute: typeof AdminCadastroRouteImport
+    '/_admin': {
+      id: '/_admin'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin/login': {
-      id: '/admin/login'
-      path: '/admin/login'
-      fullPath: '/admin/login'
-      preLoaderRoute: typeof AdminLoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth/reset-password': {
-      id: '/auth/reset-password'
-      path: '/auth/reset-password'
-      fullPath: '/auth/reset-password'
-      preLoaderRoute: typeof AuthResetPasswordRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/funcionario/login': {
@@ -348,67 +327,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FuncionarioLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_admin/admin/abonos': {
-      id: '/_admin/admin/abonos'
-      path: '/admin/abonos'
-      fullPath: '/admin/abonos'
-      preLoaderRoute: typeof AdminAdminAbonosRouteImport
-      parentRoute: typeof AdminRoute
+    '/auth/reset-password': {
+      id: '/auth/reset-password'
+      path: '/auth/reset-password'
+      fullPath: '/auth/reset-password'
+      preLoaderRoute: typeof AuthResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_admin/admin/assinatura': {
-      id: '/_admin/admin/assinatura'
-      path: '/admin/assinatura'
-      fullPath: '/admin/assinatura'
-      preLoaderRoute: typeof AdminAdminAssinaturaRouteImport
-      parentRoute: typeof AdminRoute
+    '/admin/login': {
+      id: '/admin/login'
+      path: '/admin/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_admin/admin/configuracoes': {
-      id: '/_admin/admin/configuracoes'
-      path: '/admin/configuracoes'
-      fullPath: '/admin/configuracoes'
-      preLoaderRoute: typeof AdminAdminConfiguracoesRouteImport
-      parentRoute: typeof AdminRoute
+    '/admin/cadastro': {
+      id: '/admin/cadastro'
+      path: '/admin/cadastro'
+      fullPath: '/admin/cadastro'
+      preLoaderRoute: typeof AdminCadastroRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_admin/admin/dashboard': {
-      id: '/_admin/admin/dashboard'
-      path: '/admin/dashboard'
-      fullPath: '/admin/dashboard'
-      preLoaderRoute: typeof AdminAdminDashboardRouteImport
-      parentRoute: typeof AdminRoute
+    '/api/public/stripe-webhook': {
+      id: '/api/public/stripe-webhook'
+      path: '/api/public/stripe-webhook'
+      fullPath: '/api/public/stripe-webhook'
+      preLoaderRoute: typeof ApiPublicStripeWebhookRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_admin/admin/funcionarios': {
-      id: '/_admin/admin/funcionarios'
-      path: '/admin/funcionarios'
-      fullPath: '/admin/funcionarios'
-      preLoaderRoute: typeof AdminAdminFuncionariosRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/_admin/admin/pontos': {
-      id: '/_admin/admin/pontos'
-      path: '/admin/pontos'
-      fullPath: '/admin/pontos'
-      preLoaderRoute: typeof AdminAdminPontosRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/_admin/admin/relatorios': {
-      id: '/_admin/admin/relatorios'
-      path: '/admin/relatorios'
-      fullPath: '/admin/relatorios'
-      preLoaderRoute: typeof AdminAdminRelatoriosRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/_func/funcionario/historico': {
-      id: '/_func/funcionario/historico'
-      path: '/funcionario/historico'
-      fullPath: '/funcionario/historico'
-      preLoaderRoute: typeof FuncFuncionarioHistoricoRouteImport
-      parentRoute: typeof FuncRoute
-    }
-    '/_func/funcionario/meu-ponto': {
-      id: '/_func/funcionario/meu-ponto'
-      path: '/funcionario/meu-ponto'
-      fullPath: '/funcionario/meu-ponto'
-      preLoaderRoute: typeof FuncFuncionarioMeuPontoRouteImport
+    '/_func/funcionario/resumo': {
+      id: '/_func/funcionario/resumo'
+      path: '/funcionario/resumo'
+      fullPath: '/funcionario/resumo'
+      preLoaderRoute: typeof FuncFuncionarioResumoRouteImport
       parentRoute: typeof FuncRoute
     }
     '/_func/funcionario/perfil': {
@@ -418,19 +369,68 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FuncFuncionarioPerfilRouteImport
       parentRoute: typeof FuncRoute
     }
-    '/_func/funcionario/resumo': {
-      id: '/_func/funcionario/resumo'
-      path: '/funcionario/resumo'
-      fullPath: '/funcionario/resumo'
-      preLoaderRoute: typeof FuncFuncionarioResumoRouteImport
+    '/_func/funcionario/meu-ponto': {
+      id: '/_func/funcionario/meu-ponto'
+      path: '/funcionario/meu-ponto'
+      fullPath: '/funcionario/meu-ponto'
+      preLoaderRoute: typeof FuncFuncionarioMeuPontoRouteImport
       parentRoute: typeof FuncRoute
     }
-    '/api/public/stripe-webhook': {
-      id: '/api/public/stripe-webhook'
-      path: '/api/public/stripe-webhook'
-      fullPath: '/api/public/stripe-webhook'
-      preLoaderRoute: typeof ApiPublicStripeWebhookRouteImport
-      parentRoute: typeof rootRouteImport
+    '/_func/funcionario/historico': {
+      id: '/_func/funcionario/historico'
+      path: '/funcionario/historico'
+      fullPath: '/funcionario/historico'
+      preLoaderRoute: typeof FuncFuncionarioHistoricoRouteImport
+      parentRoute: typeof FuncRoute
+    }
+    '/_admin/admin/relatorios': {
+      id: '/_admin/admin/relatorios'
+      path: '/admin/relatorios'
+      fullPath: '/admin/relatorios'
+      preLoaderRoute: typeof AdminAdminRelatoriosRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/_admin/admin/pontos': {
+      id: '/_admin/admin/pontos'
+      path: '/admin/pontos'
+      fullPath: '/admin/pontos'
+      preLoaderRoute: typeof AdminAdminPontosRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/_admin/admin/funcionarios': {
+      id: '/_admin/admin/funcionarios'
+      path: '/admin/funcionarios'
+      fullPath: '/admin/funcionarios'
+      preLoaderRoute: typeof AdminAdminFuncionariosRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/_admin/admin/dashboard': {
+      id: '/_admin/admin/dashboard'
+      path: '/admin/dashboard'
+      fullPath: '/admin/dashboard'
+      preLoaderRoute: typeof AdminAdminDashboardRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/_admin/admin/configuracoes': {
+      id: '/_admin/admin/configuracoes'
+      path: '/admin/configuracoes'
+      fullPath: '/admin/configuracoes'
+      preLoaderRoute: typeof AdminAdminConfiguracoesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/_admin/admin/assinatura': {
+      id: '/_admin/admin/assinatura'
+      path: '/admin/assinatura'
+      fullPath: '/admin/assinatura'
+      preLoaderRoute: typeof AdminAdminAssinaturaRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/_admin/admin/abonos': {
+      id: '/_admin/admin/abonos'
+      path: '/admin/abonos'
+      fullPath: '/admin/abonos'
+      preLoaderRoute: typeof AdminAdminAbonosRouteImport
+      parentRoute: typeof AdminRoute
     }
   }
 }
