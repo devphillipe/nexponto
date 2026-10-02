@@ -68,7 +68,8 @@ function Landing() {
 
         <div className="mt-10 sm:mt-12 grid w-full max-w-4xl gap-6 sm:gap-8 grid-cols-1 sm:grid-cols-2 px-4 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-300">
           <Link
-            to="/admin/cadastro"
+            to="/"
+            hash="planos"
             className="glass-card group flex flex-col items-start gap-4 sm:gap-5 rounded-2xl sm:rounded-[2.5rem] p-6 sm:p-10 text-left transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary/10 border-border/40 hover:border-primary/30"
           >
             <div className="grid h-12 w-12 sm:h-16 sm:w-16 place-items-center rounded-xl sm:rounded-2xl bg-gradient-to-br from-primary to-primary/80 text-primary-foreground transition-all duration-500 group-hover:scale-110 shadow-lg shadow-primary/20">
@@ -105,7 +106,7 @@ function Landing() {
         </div>
 
         {/* Planos */}
-        <div className="mt-14 sm:mt-20 w-full max-w-4xl px-4 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-500">
+        <div id="planos" className="mt-14 sm:mt-20 w-full max-w-4xl px-4 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-500 scroll-mt-24">
           <h2 className="font-display text-2xl sm:text-4xl font-black tracking-tighter mb-2 sm:mb-3">
             Planos para o seu escritório
           </h2>
