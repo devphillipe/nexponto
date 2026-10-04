@@ -37,9 +37,9 @@ function RelatoriosPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("employees")
-        .select("id, full_name, daily_hours, work_days, hire_date")
+        .select("id, full_name, daily_hours, work_days, hire_date, active")
         .eq("tenant_id", profile!.tenant_id)
-        .eq("active", true);
+        .order("full_name");
       if (error) throw error;
       return data;
     },
@@ -76,8 +76,8 @@ function RelatoriosPage() {
         .gte("absence_date", startDate.toISOString().split("T")[0])
         .lte("absence_date", endDate.toISOString().split("T")[0]);
 
-      const employeesToReport = employeeId === "all" 
-        ? employees || []
+      const employeesToReport = employeeId === "all"
+        ? (employees || []).filter(e => e.active)
         : employees?.filter(e => e.id === employeeId) || [];
 
       const reportData = employeesToReport.map(emp => {
@@ -88,7 +88,10 @@ function RelatoriosPage() {
         
         let totalWorkedMinutes = 0;
         let totalExpectedMinutes = 0;
+        let totalPlannedMinutes = 0;
         let expectedWorkDays = 0;
+        let expectedWorkDaysToDate = 0;
+        const todayStr = format(new Date(), "yyyy-MM-dd");
 
         const dailyReports = days.map(day => {
           const dateStr = format(day, "yyyy-MM-dd");
@@ -126,12 +129,17 @@ function RelatoriosPage() {
           const isWorkDay = worksOn(empWorkDays, day);
           const hiredOnOrBefore =
             !emp.hire_date || dateStr >= String(emp.hire_date).slice(0, 10);
-          const expectedMinutes = (!isWorkDay || !hiredOnOrBefore || absence)
+          const plannedMinutes = (!isWorkDay || !hiredOnOrBefore || absence)
             ? 0
             : (emp.daily_hours || 8) * 60;
-          if (expectedMinutes > 0) expectedWorkDays += 1;
-          
+          const isFutureDay = dateStr > todayStr;
+          const expectedMinutes = isFutureDay ? 0 : plannedMinutes;
+
+          if (plannedMinutes > 0) expectedWorkDays += 1;
+          if (expectedMinutes > 0) expectedWorkDaysToDate += 1;
+
           totalWorkedMinutes += workedMinutes;
+          totalPlannedMinutes += plannedMinutes;
           totalExpectedMinutes += expectedMinutes;
 
           const entrada = entradaEntry?.entry_at;
@@ -159,11 +167,13 @@ function RelatoriosPage() {
                 ? "Fora do vínculo"
                 : !isWorkDay
                   ? "Folga (escala)"
-                  : hasIncompletePunches
-                    ? "Marcações incompletas"
-                    : workedMinutes > 0
-                      ? "Presente"
-                      : "Falta",
+                  : isFutureDay
+                    ? "Previsto"
+                    : hasIncompletePunches
+                      ? "Marcações incompletas"
+                      : workedMinutes > 0
+                        ? "Presente"
+                        : "Falta",
           };
         });
 
@@ -173,10 +183,12 @@ function RelatoriosPage() {
           employee: emp.full_name,
           totalWorked: Math.floor(totalWorkedMinutes / 60) + ":" + String(Math.floor(totalWorkedMinutes % 60)).padStart(2, "0"),
           totalExpected: Math.floor(totalExpectedMinutes / 60) + ":" + String(Math.floor(totalExpectedMinutes % 60)).padStart(2, "0"),
+          totalPlanned: Math.floor(totalPlannedMinutes / 60) + ":" + String(Math.floor(totalPlannedMinutes % 60)).padStart(2, "0"),
           balance: (diff >= 0 ? "+" : "-") + Math.floor(Math.abs(diff) / 60) + ":" + String(Math.floor(Math.abs(diff) % 60)).padStart(2, "0"),
           dailyHours: emp.daily_hours || 8,
           weeklyHours: (emp.daily_hours || 8) * normalizeWorkDays((emp as any).work_days).length,
           expectedWorkDays,
+          expectedWorkDaysToDate,
           workDaysLabel: formatWorkDays((emp as any).work_days),
           dailyReports
         };
@@ -203,10 +215,12 @@ function RelatoriosPage() {
             ["Escala", rd.workDaysLabel],
             ["Carga Diária", `${rd.dailyHours}h`],
             ["Jornada Semanal", `${rd.weeklyHours}h`],
-            ["Dias Previstos", rd.expectedWorkDays],
+            ["Dias Previstos no Período", rd.expectedWorkDays],
+            ["Dias Esperados até Hoje", rd.expectedWorkDaysToDate],
+            ["Carga Prevista no Período", rd.totalPlanned],
             ["Total Trabalhado", rd.totalWorked],
-            ["Total Esperado", rd.totalExpected],
-            ["Saldo", rd.balance]
+            ["Esperado até Hoje", rd.totalExpected],
+            ["Saldo Apurado", rd.balance]
           ], { origin: -1 });
 
           XLSX.utils.book_append_sheet(wb, ws, rd.employee.substring(0, 30));
@@ -299,6 +313,8 @@ function RelatoriosPage() {
           doc.text(`Carga diária: ${rd.dailyHours}h`, 80, 84);
           doc.text(`Jornada semanal: ${rd.weeklyHours}h`, 140, 84);
           doc.text(`Dias previstos: ${rd.expectedWorkDays}`, 20, 92);
+          doc.text(`Até hoje: ${rd.expectedWorkDaysToDate}`, 80, 92);
+          doc.text(`Previsto período: ${rd.totalPlanned}`, 140, 92);
 
           doc.setFontSize(10);
           doc.text("Total Trabalhado", 20, 101);
@@ -306,12 +322,12 @@ function RelatoriosPage() {
           doc.text(rd.totalWorked, 20, 109);
 
           doc.setFontSize(10);
-          doc.text("Total Esperado", 80, 101);
+          doc.text("Esperado até Hoje", 80, 101);
           doc.setFontSize(12);
           doc.text(rd.totalExpected, 80, 109);
 
           doc.setFontSize(10);
-          doc.text("Saldo de Horas", 140, 101);
+          doc.text("Saldo Apurado", 140, 101);
           doc.setFontSize(14);
           const isNegative = rd.balance.startsWith("-");
           doc.setTextColor(isNegative ? 244 : 76, isNegative ? 67 : 175, isNegative ? 54 : 80);
@@ -349,6 +365,10 @@ function RelatoriosPage() {
               }
               if (data.column.index === 6 && data.cell.text[0] === "Marcações incompletas") {
                 data.cell.styles.textColor = [245, 158, 11];
+                data.cell.styles.fontStyle = "bold";
+              }
+              if (data.column.index === 6 && data.cell.text[0] === "Previsto") {
+                data.cell.styles.textColor = [100, 116, 139];
                 data.cell.styles.fontStyle = "bold";
               }
               if (data.column.index === 6 && data.cell.text[0] === "Presente") {
@@ -463,7 +483,9 @@ function RelatoriosPage() {
                 <SelectContent>
                   <SelectItem value="all">Todos os Funcionários</SelectItem>
                   {employees?.map(emp => (
-                    <SelectItem key={emp.id} value={emp.id}>{emp.full_name}</SelectItem>
+                    <SelectItem key={emp.id} value={emp.id}>
+                      {emp.full_name}{emp.active ? "" : " (inativo)"}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
