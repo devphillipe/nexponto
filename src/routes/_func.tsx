@@ -70,7 +70,20 @@ function FuncLayout() {
             <div className="flex min-w-0 items-center gap-3">
               <div className="hidden min-w-0 text-right sm:block">
                 <div className="truncate text-xs font-bold text-[#071A2B]">{profile?.full_name}</div>
-                <div className="truncate text-[10px] font-medium text-muted-foreground">{selected?.tenant_name ?? (memberships.length > 1 ? "Selecione o escritório" : profile?.tenant_name)}</div>
+                {memberships.length > 1 ? (
+                  <button
+                    type="button"
+                    onClick={() => navigate({ to: "/funcionario/selecionar-empresa" })}
+                    className="max-w-48 truncate text-[10px] font-bold text-primary hover:underline"
+                    title="Trocar escritório"
+                  >
+                    {selected?.tenant_name ?? "Selecionar escritório"}
+                  </button>
+                ) : (
+                  <div className="truncate text-[10px] font-medium text-muted-foreground">
+                    {selected?.tenant_name ?? profile?.tenant_name}
+                  </div>
+                )}
               </div>
               <div className="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-xl bg-blue-50 text-sm font-extrabold text-primary">
                 {profile?.avatar_url ? (
