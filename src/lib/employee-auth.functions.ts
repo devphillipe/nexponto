@@ -17,13 +17,6 @@ const ResetSchema = z.object({
   redirectTo: z.string().url().max(500),
 });
 
-function maskEmail(email: string) {
-  const [user, domain] = email.split("@");
-  if (!user || !domain) return "seu e-mail";
-  const visible = user.slice(0, 2);
-  return `${visible}${"*".repeat(Math.max(user.length - 2, 2))}@${domain}`;
-}
-
 /** Resolve the employee's account email from CPF using admin access (never returned raw). */
 async function findEmployeeByCpf(cpf: string) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -79,5 +72,6 @@ export const requestEmployeePasswordResetByCpf = createServerFn({ method: "POST"
     await client.auth.resetPasswordForEmail(employee.email, {
       redirectTo: data.redirectTo,
     });
-    return { sent: true, email: maskEmail(employee.email) };
+    // Keep the response indistinguishable from an unknown CPF.
+    return { sent: true, email: null as string | null };
   });
