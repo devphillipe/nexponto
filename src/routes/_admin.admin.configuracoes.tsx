@@ -99,6 +99,18 @@ function ConfiguracoesPage() {
     const file = e.target.files?.[0];
     if (!file || !profile?.tenant_id) return;
 
+    const allowedTypes = new Set(["image/png", "image/jpeg", "image/webp"]);
+    if (!allowedTypes.has(file.type)) {
+      toast.error("Use uma imagem PNG, JPG ou WebP.");
+      e.target.value = "";
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("A logo deve ter no máximo 5 MB.");
+      e.target.value = "";
+      return;
+    }
+
     setUploading(true);
     try {
       const fileExt = file.name.split(".").pop();
@@ -131,7 +143,32 @@ function ConfiguracoesPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    updateMutation.mutate(formData);
+
+    if (!formData.name.trim()) {
+      toast.error("Informe o nome da empresa.");
+      return;
+    }
+
+    if (!Number.isFinite(formData.default_daily_hours) || formData.default_daily_hours < 1 || formData.default_daily_hours > 24) {
+      toast.error("A carga horária padrão deve estar entre 1 e 24 horas.");
+      return;
+    }
+
+    try {
+      new Intl.DateTimeFormat("pt-BR", { timeZone: formData.timezone }).format(new Date());
+    } catch {
+      toast.error("Informe um fuso horário válido, por exemplo America/Sao_Paulo.");
+      return;
+    }
+
+    updateMutation.mutate({
+      ...formData,
+      name: formData.name.trim(),
+      email: formData.email.trim(),
+      phone: formData.phone.trim(),
+      address: formData.address.trim(),
+      timezone: formData.timezone.trim(),
+    });
   };
 
   async function changePassword(e: React.FormEvent) {
@@ -222,7 +259,7 @@ function ConfiguracoesPage() {
                   type="file" 
                   ref={fileInputRef} 
                   className="hidden" 
-                  accept="image/*" 
+                  accept="image/png,image/jpeg,image/webp" 
                   onChange={handleLogoUpload}
                 />
              </div>
@@ -350,7 +387,10 @@ function ConfiguracoesPage() {
                   id="default_hours" 
                   type="number"
                   value={formData.default_daily_hours} 
-                  onChange={e => setFormData(prev => ({ ...prev, default_daily_hours: parseInt(e.target.value) }))}
+                  min="1"
+                  max="24"
+                  step="0.5"
+                  onChange={e => setFormData(prev => ({ ...prev, default_daily_hours: Number(e.target.value) }))}
                   className="pl-10"
                 />
               </div>
