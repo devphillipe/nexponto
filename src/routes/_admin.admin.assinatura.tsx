@@ -85,7 +85,7 @@ function AssinaturaPage() {
     return (
       <div className="space-y-8">
         <PageHeader />
-        <Card className="glass-card border-primary/20">
+        <Card className="border-amber-200 bg-amber-50/60">
           <CardContent className="flex flex-col items-center gap-4 p-10 text-center">
             <AlertTriangle className="h-10 w-10 text-yellow-500" />
             <div>
@@ -109,7 +109,7 @@ function AssinaturaPage() {
       <PageHeader />
 
       {checkoutStatus === "sucesso" && (
-        <Card className="glass-card border-green-500/30 bg-green-500/5">
+        <Card className="border-green-200 bg-green-50">
           <CardContent className="flex items-center gap-3 p-4">
             <Check className="h-5 w-5 text-green-500 shrink-0" />
             <p className="text-sm font-semibold text-foreground">
@@ -120,9 +120,9 @@ function AssinaturaPage() {
       )}
 
       {/* Status atual */}
-      <Card className="glass-card border-primary/20">
+      <Card className="border-border bg-white">
         <CardHeader className="pb-3">
-          <CardDescription className="text-[10px] uppercase font-black tracking-widest text-primary/80">
+          <CardDescription className="text-[10px] uppercase font-bold tracking-[0.16em] text-primary">
             Situação atual
           </CardDescription>
         </CardHeader>
@@ -162,10 +162,10 @@ function AssinaturaPage() {
 
       {/* Planos */}
       {isFounder ? (
-        <Card className="glass-card border-primary/30">
+        <Card className="border-blue-200 bg-blue-50/60">
           <CardContent className="flex flex-col items-center gap-3 p-10 text-center">
             <Sparkles className="h-8 w-8 text-primary" />
-            <p className="font-display text-lg font-bold text-foreground">
+            <p className="font-display text-lg font-extrabold text-[#071A2B]">
               Você tem acesso vitalício ao NexPonto
             </p>
             <p className="max-w-md text-sm text-muted-foreground">
@@ -178,17 +178,17 @@ function AssinaturaPage() {
           {data.plans.map((plan) => (
             <Card
               key={plan.plan}
-              className={`glass-card flex flex-col transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 ${
-                plan.plan === "anual" ? "border-primary/40" : "border-border/40"
+              className={`flex flex-col bg-white transition-all duration-200 ${
+                plan.plan === "anual" ? "border-primary shadow-lg shadow-blue-100" : "border-border shadow-sm"
               }`}
             >
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="font-display text-xl font-bold">
+                  <CardTitle className="font-display text-xl font-extrabold text-[#071A2B]">
                     Plano {plan.plan === "anual" ? "Anual" : "Mensal"}
                   </CardTitle>
                   {plan.plan === "anual" && (
-                    <Badge className="bg-primary/15 text-primary border-primary/20">Melhor valor</Badge>
+                    <Badge className="bg-blue-50 text-primary border-blue-200">Melhor valor</Badge>
                   )}
                 </div>
                 <CardDescription className="flex items-center gap-1.5">
@@ -198,7 +198,7 @@ function AssinaturaPage() {
               </CardHeader>
               <CardContent className="flex flex-1 flex-col gap-6">
                 <div>
-                  <span className="font-display text-4xl font-bold tracking-tight text-foreground">
+                  <span className="font-display text-4xl font-extrabold tracking-tight text-[#071A2B]">
                     {plan.label}
                   </span>
                 </div>
@@ -218,7 +218,7 @@ function AssinaturaPage() {
                 </ul>
                 <Button
                   size="lg"
-                  className="mt-auto min-h-[3rem] w-full rounded-2xl font-bold"
+                  className="mt-auto min-h-[3rem] w-full rounded-xl font-bold"
                   disabled={checkout.isPending}
                   onClick={() => checkout.mutate(plan.plan)}
                   aria-busy={checkout.isPending}
@@ -248,11 +248,11 @@ function AssinaturaPage() {
 function PageHeader() {
   return (
     <div>
-      <h1 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-foreground">
+      <h1 className="font-display text-2xl md:text-3xl font-extrabold tracking-tight text-[#071A2B]">
         Assinatura
       </h1>
       <p className="text-sm text-muted-foreground mt-1">
-        Gerencie o plano do seu escritório.
+        Escolha e gerencie o plano do seu escritório com pagamento seguro pelo Stripe.
       </p>
     </div>
   );
