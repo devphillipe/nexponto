@@ -12,6 +12,7 @@ import { useState } from "react";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, startOfWeek, endOfWeek } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { normalizeWorkDays, worksOn, formatWorkDays } from "@/lib/work-days";
+import { getBrazilNationalHoliday } from "@/lib/brazil-national-holidays";
 // Dynamically imported below for performance
 // import * as XLSX from "xlsx";
 // import jsPDF from "jspdf";
@@ -91,6 +92,7 @@ function RelatoriosPage() {
         let totalPlannedMinutes = 0;
         let expectedWorkDays = 0;
         let expectedWorkDaysToDate = 0;
+        let nationalHolidaysOnSchedule = 0;
         const todayStr = format(new Date(), "yyyy-MM-dd");
 
         const dailyReports = days.map(day => {
@@ -127,9 +129,15 @@ function RelatoriosPage() {
 
           const empWorkDays = normalizeWorkDays((emp as any).work_days);
           const isWorkDay = worksOn(empWorkDays, day);
+          const nationalHoliday = getBrazilNationalHoliday(dateStr);
           const hiredOnOrBefore =
             !emp.hire_date || dateStr >= String(emp.hire_date).slice(0, 10);
-          const plannedMinutes = (!isWorkDay || !hiredOnOrBefore || absence)
+
+          if (isWorkDay && hiredOnOrBefore && nationalHoliday) {
+            nationalHolidaysOnSchedule += 1;
+          }
+
+          const plannedMinutes = (!isWorkDay || !hiredOnOrBefore || absence || nationalHoliday)
             ? 0
             : (emp.daily_hours || 8) * 60;
           const isFutureDay = dateStr > todayStr;
@@ -167,8 +175,10 @@ function RelatoriosPage() {
                 ? "Fora do vínculo"
                 : !isWorkDay
                   ? "Folga (escala)"
-                  : isFutureDay
-                    ? "Previsto"
+                  : nationalHoliday
+                    ? `Feriado nacional: ${nationalHoliday.name}`
+                    : isFutureDay
+                      ? "Previsto"
                     : hasIncompletePunches
                       ? "Marcações incompletas"
                       : workedMinutes > 0
@@ -189,6 +199,7 @@ function RelatoriosPage() {
           weeklyHours: (emp.daily_hours || 8) * normalizeWorkDays((emp as any).work_days).length,
           expectedWorkDays,
           expectedWorkDaysToDate,
+          nationalHolidaysOnSchedule,
           workDaysLabel: formatWorkDays((emp as any).work_days),
           dailyReports
         };
@@ -216,6 +227,7 @@ function RelatoriosPage() {
             ["Carga Diária", `${rd.dailyHours}h`],
             ["Jornada Semanal", `${rd.weeklyHours}h`],
             ["Dias Previstos no Período", rd.expectedWorkDays],
+            ["Feriados Nacionais na Escala", rd.nationalHolidaysOnSchedule],
             ["Dias Esperados até Hoje", rd.expectedWorkDaysToDate],
             ["Carga Prevista no Período", rd.totalPlanned],
             ["Total Trabalhado", rd.totalWorked],
@@ -313,7 +325,7 @@ function RelatoriosPage() {
           doc.text(`Carga diária: ${rd.dailyHours}h`, 80, 84);
           doc.text(`Jornada semanal: ${rd.weeklyHours}h`, 140, 84);
           doc.text(`Dias previstos: ${rd.expectedWorkDays}`, 20, 92);
-          doc.text(`Até hoje: ${rd.expectedWorkDaysToDate}`, 80, 92);
+          doc.text(`Feriados nac.: ${rd.nationalHolidaysOnSchedule}`, 80, 92);
           doc.text(`Previsto período: ${rd.totalPlanned}`, 140, 92);
 
           doc.setFontSize(10);
@@ -369,6 +381,10 @@ function RelatoriosPage() {
               }
               if (data.column.index === 6 && data.cell.text[0] === "Previsto") {
                 data.cell.styles.textColor = [100, 116, 139];
+                data.cell.styles.fontStyle = "bold";
+              }
+              if (data.column.index === 6 && data.cell.text[0]?.startsWith("Feriado nacional:")) {
+                data.cell.styles.textColor = [37, 99, 235];
                 data.cell.styles.fontStyle = "bold";
               }
               if (data.column.index === 6 && data.cell.text[0] === "Presente") {
