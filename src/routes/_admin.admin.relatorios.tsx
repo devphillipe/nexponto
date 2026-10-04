@@ -37,7 +37,7 @@ function RelatoriosPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("employees")
-        .select("id, full_name, daily_hours, work_days")
+        .select("id, full_name, daily_hours, work_days, hire_date")
         .eq("tenant_id", profile!.tenant_id)
         .eq("active", true);
       if (error) throw error;
@@ -57,7 +57,7 @@ function RelatoriosPage() {
       
       const query = supabase
         .from("time_entries")
-        .select("id, entry_date, entry_at, entry_type, employee_id, employees(full_name, daily_hours)")
+        .select("id, entry_date, entry_at, entry_type, employee_id, notes, is_adjustment, employees(full_name, daily_hours)")
         .eq("tenant_id", profile!.tenant_id)
         .gte("entry_date", startDate.toISOString().split("T")[0])
         .lte("entry_date", endDate.toISOString().split("T")[0]);
@@ -92,35 +92,58 @@ function RelatoriosPage() {
 
         const dailyReports = days.map(day => {
           const dateStr = format(day, "yyyy-MM-dd");
-          const dayEntries = empEntries.filter(e => e.entry_date === dateStr)
+          const dayEntries = empEntries
+            .filter(e => e.entry_date === dateStr)
+            .filter(e => !(e.is_adjustment && e.notes?.startsWith("ABONO:")))
             .sort((a, b) => new Date(a.entry_at).getTime() - new Date(b.entry_at).getTime());
           
           const absence = absences?.filter(a => a.employee_id === emp.id).find(a => a.absence_date === dateStr);
           
+          const entradaEntry = dayEntries.find(e => e.entry_type === "entrada");
+          const saidaAlmocoEntry = dayEntries.find(e => e.entry_type === "saida_almoco");
+          const retornoAlmocoEntry = dayEntries.find(e => e.entry_type === "retorno_almoco");
+          const saidaEntry = [...dayEntries].reverse().find(e => e.entry_type === "saida");
+
+          const minutesBetween = (start?: string, end?: string) => {
+            if (!start || !end) return 0;
+            const diff = (new Date(end).getTime() - new Date(start).getTime()) / (1000 * 60);
+            return diff > 0 ? diff : 0;
+          };
+
           let workedMinutes = 0;
-          if (dayEntries.length >= 2) {
-             for(let i=0; i < dayEntries.length - 1; i += 2) {
-                const inTime = new Date(dayEntries[i].entry_at);
-                const outTime = new Date(dayEntries[i+1].entry_at);
-                workedMinutes += (outTime.getTime() - inTime.getTime()) / (1000 * 60);
-             }
+          if (entradaEntry && saidaAlmocoEntry) {
+            workedMinutes += minutesBetween(entradaEntry.entry_at, saidaAlmocoEntry.entry_at);
+          }
+          if (retornoAlmocoEntry && saidaEntry) {
+            workedMinutes += minutesBetween(retornoAlmocoEntry.entry_at, saidaEntry.entry_at);
+          }
+          // Short schedules commonly use only entrada + saída.
+          if (!saidaAlmocoEntry && !retornoAlmocoEntry && entradaEntry && saidaEntry) {
+            workedMinutes = minutesBetween(entradaEntry.entry_at, saidaEntry.entry_at);
           }
 
           const empWorkDays = normalizeWorkDays((emp as any).work_days);
           const isWorkDay = worksOn(empWorkDays, day);
-          const expectedMinutes = (!isWorkDay || absence) ? 0 : (emp.daily_hours || 8) * 60;
+          const hiredOnOrBefore =
+            !emp.hire_date || dateStr >= String(emp.hire_date).slice(0, 10);
+          const expectedMinutes = (!isWorkDay || !hiredOnOrBefore || absence)
+            ? 0
+            : (emp.daily_hours || 8) * 60;
           if (expectedMinutes > 0) expectedWorkDays += 1;
           
           totalWorkedMinutes += workedMinutes;
           totalExpectedMinutes += expectedMinutes;
 
-          // Split entries into 4 categories
-          const entrada = dayEntries.find(e => e.entry_type === 'entrada')?.entry_at;
-          const saidaAlmoco = dayEntries.find(e => e.entry_type === 'saida_almoco')?.entry_at;
-          const retornoAlmoco = dayEntries.find(e => e.entry_type === 'retorno_almoco')?.entry_at;
-          const saidaFinal = dayEntries.find(e => e.entry_type === 'saida')?.entry_at;
+          const entrada = entradaEntry?.entry_at;
+          const saidaAlmoco = saidaAlmocoEntry?.entry_at;
+          const retornoAlmoco = retornoAlmocoEntry?.entry_at;
+          const saidaFinal = saidaEntry?.entry_at;
 
           const formatTime = (iso: string | undefined) => iso ? format(new Date(iso), "HH:mm") : "-";
+          const hasAnyPunch = dayEntries.length > 0;
+          const hasCompleteShortSchedule = !!entradaEntry && !!saidaEntry && !saidaAlmocoEntry && !retornoAlmocoEntry;
+          const hasCompleteFullSchedule = !!entradaEntry && !!saidaAlmocoEntry && !!retornoAlmocoEntry && !!saidaEntry;
+          const hasIncompletePunches = hasAnyPunch && !hasCompleteShortSchedule && !hasCompleteFullSchedule;
 
           return {
             date: format(day, "dd/MM/yyyy"),
@@ -130,7 +153,17 @@ function RelatoriosPage() {
             retornoAlmoco: formatTime(retornoAlmoco),
             saidaFinal: formatTime(saidaFinal),
             worked: Math.floor(workedMinutes / 60) + ":" + String(Math.floor(workedMinutes % 60)).padStart(2, "0"),
-            status: absence ? `Abono: ${absence.reason}` : (workedMinutes > 0 ? "Presente" : (!isWorkDay ? "Folga (escala)" : "Falta")),
+            status: absence
+              ? `Abono: ${absence.reason}`
+              : !hiredOnOrBefore
+                ? "Fora do vínculo"
+                : !isWorkDay
+                  ? "Folga (escala)"
+                  : hasIncompletePunches
+                    ? "Marcações incompletas"
+                    : workedMinutes > 0
+                      ? "Presente"
+                      : "Falta",
           };
         });
 
@@ -312,6 +345,10 @@ function RelatoriosPage() {
               }
               if (data.column.index === 6 && data.cell.text[0] === "Falta") {
                 data.cell.styles.textColor = [244, 67, 54];
+                data.cell.styles.fontStyle = "bold";
+              }
+              if (data.column.index === 6 && data.cell.text[0] === "Marcações incompletas") {
+                data.cell.styles.textColor = [245, 158, 11];
                 data.cell.styles.fontStyle = "bold";
               }
               if (data.column.index === 6 && data.cell.text[0] === "Presente") {
