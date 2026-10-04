@@ -93,11 +93,13 @@ function PontosPage() {
   const groupedData = useMemo(() => {
     const acc: any = {};
     
-    data?.forEach((entry: any) => {
-      const name = entry.employees?.full_name || "Sem Nome";
-      if (!acc[name]) acc[name] = { entries: [], absences: [] };
-      acc[name].entries.push(entry);
-    });
+    data
+      ?.filter((entry: any) => !(entry.is_adjustment && entry.notes?.startsWith("ABONO:")))
+      .forEach((entry: any) => {
+        const name = entry.employees?.full_name || "Sem Nome";
+        if (!acc[name]) acc[name] = { entries: [], absences: [] };
+        acc[name].entries.push(entry);
+      });
 
     absencesData?.forEach((abs: any) => {
       const name = abs.employees?.full_name || "Sem Nome";
