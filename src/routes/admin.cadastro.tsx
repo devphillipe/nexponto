@@ -85,50 +85,50 @@ function AdminSignup() {
            <Link to="/" className="inline-flex mx-auto mb-4 sm:mb-6 hover:scale-105 transition-transform duration-500">
               <Logo size={28} wordmarkClassName="text-2xl sm:text-3xl" />
            </Link>
-           <h1 className="text-3xl sm:text-5xl font-black tracking-tighter text-foreground drop-shadow-sm">Comece sua gestão hoje</h1>
-           <p className="text-muted-foreground text-base sm:text-xl font-medium opacity-80">Revolucione o controle de ponto da sua equipe.</p>
+           <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tighter text-foreground ">Crie seu espaço no NexPonto</h1>
+           <p className="text-muted-foreground text-base sm:text-xl font-medium opacity-80">Configure seu escritório e comece a organizar a jornada da equipe.</p>
         </div>
 
-        <div className="glass-card rounded-3xl sm:rounded-[3rem] p-6 sm:p-12 border border-primary/10 shadow-2xl relative bg-background/40 backdrop-blur-2xl mx-4 sm:mx-0">
+        <div className="glass-card rounded-2xl p-6 sm:p-12 border border-border shadow-xl relative bg-white mx-4 sm:mx-0">
           <form onSubmit={onSubmit} className="space-y-8">
             <div className="space-y-6">
               <div className="grid md:grid-cols-2 gap-6">
                  <div className="space-y-2">
-                    <Label htmlFor="tn" className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">Nome do Escritório</Label>
+                    <Label htmlFor="tn" className="text-xs font-bold tracking-tight text-muted-foreground ml-1">Nome do Escritório</Label>
                     <Input 
                       id="tn" 
                       placeholder="Ex: Contabilidade Silva"
                       required 
                       value={form.tenant_name} 
                       onChange={(e) => up("tenant_name", e.target.value)}
-                      className="bg-muted/20 border-border/40 rounded-2xl h-14 px-5 focus-visible:ring-primary/20 transition-all font-medium"
+                      className="bg-white border-border rounded-2xl h-14 px-5 focus-visible:ring-primary/20 transition-all font-medium"
                     />
                  </div>
                  <div className="space-y-2">
-                    <Label htmlFor="td" className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">CPF/CNPJ (Opcional)</Label>
+                    <Label htmlFor="td" className="text-xs font-bold tracking-tight text-muted-foreground ml-1">CPF/CNPJ (Opcional)</Label>
                     <Input 
                       id="td" 
                       placeholder="00.000.000/0000-00"
                       value={form.tenant_document} 
                       onChange={(e) => up("tenant_document", e.target.value)}
-                      className="bg-muted/20 border-border/40 rounded-2xl h-14 px-5 focus-visible:ring-primary/20 transition-all font-medium"
+                      className="bg-white border-border rounded-2xl h-14 px-5 focus-visible:ring-primary/20 transition-all font-medium"
                     />
                  </div>
               </div>
 
               <div className="grid md:grid-cols-2 gap-6">
                  <div className="space-y-2">
-                    <Label htmlFor="tp" className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">Telefone de Contato</Label>
+                    <Label htmlFor="tp" className="text-xs font-bold tracking-tight text-muted-foreground ml-1">Telefone de Contato</Label>
                     <Input 
                       id="tp" 
                       placeholder="(00) 00000-0000"
                       value={form.tenant_phone} 
                       onChange={(e) => up("tenant_phone", e.target.value)}
-                      className="bg-muted/20 border-border/40 rounded-2xl h-14 px-5 focus-visible:ring-primary/20 transition-all font-medium"
+                      className="bg-white border-border rounded-2xl h-14 px-5 focus-visible:ring-primary/20 transition-all font-medium"
                     />
                  </div>
                  <div className="space-y-2">
-                    <Label htmlFor="ae" className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">E-mail Administrativo</Label>
+                    <Label htmlFor="ae" className="text-xs font-bold tracking-tight text-muted-foreground ml-1">E-mail Administrativo</Label>
                     <Input 
                       id="ae" 
                       type="email" 
@@ -136,14 +136,14 @@ function AdminSignup() {
                       required 
                       value={form.email} 
                       onChange={(e) => up("email", e.target.value)}
-                      className="bg-muted/20 border-border/40 rounded-2xl h-14 px-5 focus-visible:ring-primary/20 transition-all font-medium"
+                      className="bg-white border-border rounded-2xl h-14 px-5 focus-visible:ring-primary/20 transition-all font-medium"
                     />
                  </div>
               </div>
 
               <div className="grid md:grid-cols-2 gap-6">
                  <div className="space-y-2">
-                    <Label htmlFor="pw" className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">Criar Senha</Label>
+                    <Label htmlFor="pw" className="text-xs font-bold tracking-tight text-muted-foreground ml-1">Criar Senha</Label>
                     <Input 
                       id="pw" 
                       type="password" 
@@ -151,11 +151,11 @@ function AdminSignup() {
                       required 
                       value={form.password} 
                       onChange={(e) => up("password", e.target.value)}
-                      className="bg-muted/20 border-border/40 rounded-2xl h-14 px-5 focus-visible:ring-primary/20 transition-all font-medium"
+                      className="bg-white border-border rounded-2xl h-14 px-5 focus-visible:ring-primary/20 transition-all font-medium"
                     />
                  </div>
                  <div className="space-y-2">
-                    <Label htmlFor="pc" className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">Confirmar Senha</Label>
+                    <Label htmlFor="pc" className="text-xs font-bold tracking-tight text-muted-foreground ml-1">Confirmar Senha</Label>
                     <Input 
                       id="pc" 
                       type="password" 
@@ -163,7 +163,7 @@ function AdminSignup() {
                       required 
                       value={form.confirm} 
                       onChange={(e) => up("confirm", e.target.value)}
-                      className="bg-muted/20 border-border/40 rounded-2xl h-14 px-5 focus-visible:ring-primary/20 transition-all font-medium"
+                      className="bg-white border-border rounded-2xl h-14 px-5 focus-visible:ring-primary/20 transition-all font-medium"
                     />
                  </div>
               </div>
@@ -186,7 +186,7 @@ function AdminSignup() {
                 Fazer login
               </Link>
             </p>
-            <div className="flex flex-wrap justify-center gap-4 text-[10px] text-muted-foreground uppercase tracking-widest font-bold">
+            <div className="flex flex-wrap justify-center gap-4 text-[10px] text-muted-foreground tracking-tight font-bold">
                <span className="flex items-center gap-1"><CheckCircle2 className="h-3 w-3 text-success" /> Sem cartão</span>
                <span className="flex items-center gap-1"><CheckCircle2 className="h-3 w-3 text-success" /> Setup instantâneo</span>
                <span className="flex items-center gap-1"><CheckCircle2 className="h-3 w-3 text-success" /> LGPD Ready</span>
