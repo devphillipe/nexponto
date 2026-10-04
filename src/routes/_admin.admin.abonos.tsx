@@ -114,14 +114,35 @@ function AbonosPage() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
+      const { data: current, error: findError } = await supabase
+        .from("absences")
+        .select("employee_id, absence_date")
+        .eq("id", id)
+        .eq("tenant_id", profile!.tenant_id)
+        .single();
+      if (findError) throw findError;
+
       const { error } = await supabase
         .from("absences")
         .delete()
-        .eq("id", id);
+        .eq("id", id)
+        .eq("tenant_id", profile!.tenant_id);
       if (error) throw error;
+
+      // Remove the technical time-entry created together with the absence.
+      const { error: entryError } = await supabase
+        .from("time_entries")
+        .delete()
+        .eq("tenant_id", profile!.tenant_id)
+        .eq("employee_id", current.employee_id)
+        .eq("entry_date", current.absence_date)
+        .eq("is_adjustment", true)
+        .like("notes", "ABONO:%");
+      if (entryError) throw entryError;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["absences"] });
+      queryClient.invalidateQueries({ queryKey: ["time-entries"] });
       toast.success("Abono removido com sucesso!");
     },
   });
@@ -129,26 +150,38 @@ function AbonosPage() {
   const updateMutation = useMutation({
     mutationFn: async (updatedData: any) => {
       const { id, ...data } = updatedData;
+
+      const { data: current, error: findError } = await supabase
+        .from("absences")
+        .select("employee_id, absence_date")
+        .eq("id", id)
+        .eq("tenant_id", profile!.tenant_id)
+        .single();
+      if (findError) throw findError;
+
       const { error } = await supabase
         .from("absences")
         .update(data)
-        .eq("id", id);
+        .eq("id", id)
+        .eq("tenant_id", profile!.tenant_id);
       if (error) throw error;
 
-      // Update the special entry in time_entries
+      // Locate the technical entry by the OLD date, then move it with the absence.
       const { error: entryError } = await supabase
         .from("time_entries")
         .update({
+          employee_id: data.employee_id,
           entry_date: data.absence_date,
           entry_at: `${data.absence_date}T00:00:00Z`,
           notes: `ABONO: ${REASONS.find(r => r.value === data.reason)?.label || data.reason}. ${data.description || ""}`,
         })
-        .eq("employee_id", data.employee_id)
-        .eq("entry_date", data.absence_date) // This might be tricky if date changed, but let's assume one abono per day for now
+        .eq("tenant_id", profile!.tenant_id)
+        .eq("employee_id", current.employee_id)
+        .eq("entry_date", current.absence_date)
         .eq("is_adjustment", true)
         .like("notes", "ABONO:%");
       
-      if (entryError) console.error("Erro ao atualizar entrada de ponto:", entryError);
+      if (entryError) throw entryError;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["absences"] });
