@@ -261,20 +261,29 @@ export const updateEmployee = createServerFn({ method: "POST" })
       throw new Error("Acesso negado: o funcionário pertence a outro escritório.");
     }
 
-    // Update auth user (email only; password is managed by the employee in their profile)
-    const { error: authErr } = await supabaseAdmin.auth.admin.updateUserById(
-      employee.user_id,
-      { email: data.email },
-    );
-    if (authErr) throw new Error(authErr.message);
+    const { count: linkCount, error: linkCountError } = await supabaseAdmin
+      .from("employees")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", employee.user_id);
+    if (linkCountError) throw new Error(linkCountError.message);
 
+    // The auth/profile identity is global. A tenant admin must not change it
+    // when the person has vínculos with other offices.
+    if ((linkCount ?? 0) <= 1) {
+      const { error: authErr } = await supabaseAdmin.auth.admin.updateUserById(
+        employee.user_id,
+        { email: data.email },
+      );
+      if (authErr) throw new Error(authErr.message);
 
-    // Update profile
-    await supabaseAdmin.from("profiles").update({
-      full_name: data.full_name,
-      email: data.email,
-    }).eq("id", employee.user_id);
+      const { error: profileUpdateError } = await supabaseAdmin.from("profiles").update({
+        full_name: data.full_name,
+        email: data.email,
+      }).eq("id", employee.user_id);
+      if (profileUpdateError) throw new Error(profileUpdateError.message);
+    }
 
+    // The employee row is tenant-scoped and may differ between offices.
     // Update employee record
     const { error: finalErr } = await supabaseAdmin.from("employees").update({
       full_name: data.full_name,
