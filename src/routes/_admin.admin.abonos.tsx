@@ -175,11 +175,11 @@ function AbonosPage() {
         
         <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
           <DialogTrigger asChild>
-            <Button size="lg" className="rounded-xl md:rounded-2xl shadow-xl shadow-primary/20 font-black uppercase tracking-widest text-[10px] md:text-xs px-6 md:px-8 h-12 md:h-14 w-full lg:w-auto">
+            <Button size="lg" className="rounded-xl md:rounded-2xl shadow-sm shadow-primary/20 font-extrabold tracking-tight text-[10px] md:text-xs px-6 md:px-8 h-12 md:h-14 w-full lg:w-auto">
               <Plus className="h-5 w-5" /> Novo Abono
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[560px] rounded-[2rem] border-none glass-card p-0 overflow-hidden shadow-2xl max-h-[90dvh] overflow-y-auto">
+          <DialogContent className="sm:max-w-[560px] rounded-2xl border-none glass-card p-0 overflow-hidden shadow-2xl max-h-[90dvh] overflow-y-auto">
             <BatchAbonoForm
               employees={employees || []}
               isPending={addMutation.isPending}
@@ -191,7 +191,7 @@ function AbonosPage() {
         </Dialog>
       </div>
 
-      <div className="glass-card p-5 rounded-[2rem] flex items-center gap-5 border border-border/40 shadow-sm transition-all hover:border-primary/20">
+      <div className="glass-card p-5 rounded-2xl flex items-center gap-5 border border-border shadow-sm transition-all hover:border-primary/20">
         <Search className="h-6 w-6 text-primary ml-3" />
         <Input 
           placeholder="Pesquisar por colaborador ou motivo..." 
@@ -201,7 +201,7 @@ function AbonosPage() {
         />
       </div>
 
-      <div className="glass-card overflow-hidden rounded-2xl md:rounded-[2.5rem] border border-border/40 shadow-sm transition-all duration-500 hover:shadow-md">
+      <div className="glass-card overflow-hidden rounded-2xl md:rounded-2xl border border-border shadow-sm transition-all duration-500 hover:shadow-md">
         {isLoading ? (
           <div className="p-16 text-center text-sm text-muted-foreground animate-pulse">Carregando registros...</div>
         ) : !filteredAbsences?.length ? (
@@ -214,7 +214,7 @@ function AbonosPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm min-w-[700px]">
-            <thead className="border-b border-border/40 bg-muted/20 text-left text-[11px] uppercase font-bold tracking-widest text-muted-foreground">
+            <thead className="border-b border-border bg-muted/20 text-left text-[11px] uppercase font-bold tracking-widest text-muted-foreground">
               <tr>
                 <th className="px-8 py-4">Data</th>
                 <th className="px-6 py-4">Colaborador</th>
@@ -335,9 +335,9 @@ function BatchAbonoForm({
             placeholder="Buscar colaborador..."
             value={empSearch}
             onChange={(e) => setEmpSearch(e.target.value)}
-            className="rounded-xl h-11 border-border/40 bg-background/50"
+            className="rounded-xl h-11 border-border bg-background/50"
           />
-          <div className="max-h-52 overflow-y-auto rounded-xl border border-border/40 bg-background/40 divide-y divide-border/20">
+          <div className="max-h-52 overflow-y-auto rounded-xl border border-border bg-background/40 divide-y divide-border/20">
             {filteredEmployees.length === 0 ? (
               <p className="p-4 text-sm text-muted-foreground">Nenhum colaborador encontrado.</p>
             ) : (
@@ -363,7 +363,7 @@ function BatchAbonoForm({
               required
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              className="rounded-xl h-11 border-border/40 bg-background/50"
+              className="rounded-xl h-11 border-border bg-background/50"
             />
           </div>
           <div className="space-y-2">
@@ -374,7 +374,7 @@ function BatchAbonoForm({
               min={startDate || undefined}
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              className="rounded-xl h-11 border-border/40 bg-background/50"
+              className="rounded-xl h-11 border-border bg-background/50"
             />
           </div>
         </div>
@@ -387,7 +387,7 @@ function BatchAbonoForm({
         <div className="space-y-2">
           <Label htmlFor="reason">Motivo</Label>
           <Select value={reason} onValueChange={setReason}>
-            <SelectTrigger className="rounded-xl h-11 border-border/40 bg-background/50">
+            <SelectTrigger className="rounded-xl h-11 border-border bg-background/50">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -409,7 +409,7 @@ function BatchAbonoForm({
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Ex: Atestado médico de 2 dias"
-            className="rounded-xl border-border/40 bg-background/50"
+            className="rounded-xl border-border bg-background/50"
           />
         </div>
 
@@ -422,7 +422,7 @@ function BatchAbonoForm({
         )}
       </div>
 
-      <DialogFooter className="p-6 md:p-8 bg-muted/20 border-t border-border/40">
+      <DialogFooter className="p-6 md:p-8 bg-muted/20 border-t border-border">
         <Button type="button" variant="ghost" onClick={onCancel} className="rounded-xl">Cancelar</Button>
         <Button type="submit" disabled={isPending || total === 0} className="rounded-xl px-8 font-bold">
           {isPending ? "Salvando..." : total > 1 ? `Salvar ${total} abonos` : "Salvar Abono"}
@@ -444,7 +444,7 @@ function EditAbonoDialog({ abono, employees, onSave, isPending }: { abono: any, 
           <Edit2 className="h-4 w-4" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px] rounded-[2rem] border-none glass-card p-0 overflow-hidden shadow-2xl">
+      <DialogContent className="sm:max-w-[500px] rounded-2xl border-none glass-card p-0 overflow-hidden shadow-2xl">
         <form onSubmit={(e) => {
           e.preventDefault();
           const formData = new FormData(e.currentTarget);
@@ -471,7 +471,7 @@ function EditAbonoDialog({ abono, employees, onSave, isPending }: { abono: any, 
             <div className="space-y-2">
               <Label htmlFor="edit-employee_id">Colaborador</Label>
               <Select name="employee_id" defaultValue={abono.employee_id} required>
-                <SelectTrigger className="rounded-xl h-11 border-border/40 bg-background/50">
+                <SelectTrigger className="rounded-xl h-11 border-border bg-background/50">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -484,12 +484,12 @@ function EditAbonoDialog({ abono, employees, onSave, isPending }: { abono: any, 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="edit-date">Data</Label>
-                <Input id="edit-date" name="date" type="date" defaultValue={abono.absence_date} required className="rounded-xl h-11 border-border/40 bg-background/50" />
+                <Input id="edit-date" name="date" type="date" defaultValue={abono.absence_date} required className="rounded-xl h-11 border-border bg-background/50" />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="edit-reason">Motivo</Label>
                 <Select name="reason" defaultValue={abono.reason} required>
-                  <SelectTrigger className="rounded-xl h-11 border-border/40 bg-background/50">
+                  <SelectTrigger className="rounded-xl h-11 border-border bg-background/50">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -502,10 +502,10 @@ function EditAbonoDialog({ abono, employees, onSave, isPending }: { abono: any, 
             </div>
             <div className="space-y-2">
               <Label htmlFor="edit-description">Justificativa *</Label>
-              <Textarea id="edit-description" name="description" required minLength={3} maxLength={500} rows={3} defaultValue={abono.description} placeholder="Ex: Atestado médico de 2 dias" className="rounded-xl border-border/40 bg-background/50" />
+              <Textarea id="edit-description" name="description" required minLength={3} maxLength={500} rows={3} defaultValue={abono.description} placeholder="Ex: Atestado médico de 2 dias" className="rounded-xl border-border bg-background/50" />
             </div>
           </div>
-          <DialogFooter className="p-8 bg-muted/20 border-t border-border/40">
+          <DialogFooter className="p-8 bg-muted/20 border-t border-border">
             <Button type="button" variant="ghost" onClick={() => setOpen(false)} className="rounded-xl">Cancelar</Button>
             <Button type="submit" disabled={isPending} className="rounded-xl px-8 font-bold">
               {isPending ? "Salvando..." : "Salvar Alterações"}
