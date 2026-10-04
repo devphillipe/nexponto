@@ -205,11 +205,11 @@ function SummaryPage() {
           >
             <div className="flex items-center justify-between gap-4">
               <div className="min-w-0">
-                <div className="text-[9px] uppercase font-black tracking-[0.2em] text-muted-foreground mb-1">
+                <div className="text-[9px] uppercase font-extrabold tracking-[0.2em] text-muted-foreground mb-1">
                   Saldo do mês
                 </div>
                 <div
-                  className={`font-mono text-4xl font-black tracking-tighter ${
+                  className={`font-mono text-4xl font-extrabold tracking-tighter ${
                     positive ? "text-success" : "text-warning"
                   }`}
                 >
@@ -277,7 +277,7 @@ function SummaryPage() {
             <div className="flex items-baseline justify-between gap-3">
               <h2 className="font-display text-lg font-bold tracking-tight">Resumo da semana</h2>
               <span
-                className={`font-mono text-sm font-black ${
+                className={`font-mono text-sm font-extrabold ${
                   stats.weekBalance >= 0 ? "text-success" : "text-warning"
                 }`}
               >
@@ -296,7 +296,7 @@ function SummaryPage() {
                 const ok = d.worked >= d.expected && d.expected > 0;
                 return (
                   <li key={d.date} className="flex items-center gap-3">
-                    <span className="w-9 shrink-0 text-[11px] font-black uppercase tracking-wider text-muted-foreground">
+                    <span className="w-9 shrink-0 text-[11px] font-extrabold uppercase tracking-wider text-muted-foreground">
                       {d.label}
                     </span>
                     <div className="h-2.5 flex-1 rounded-full bg-muted/30 overflow-hidden">
@@ -343,10 +343,10 @@ function Stat({
   return (
     <div className="glass-card rounded-2xl p-4 flex items-center justify-between gap-2">
       <div className="min-w-0">
-        <div className="text-[8px] uppercase font-black tracking-[0.18em] text-muted-foreground mb-1">
+        <div className="text-[8px] uppercase font-extrabold tracking-[0.18em] text-muted-foreground mb-1">
           {label}
         </div>
-        <div className="font-mono text-xl font-black truncate">{value}</div>
+        <div className="font-mono text-xl font-extrabold truncate">{value}</div>
       </div>
       {icon ? (
         <div className="h-9 w-9 shrink-0 rounded-xl bg-primary/10 text-primary grid place-items-center">
