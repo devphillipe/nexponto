@@ -357,7 +357,7 @@ function RelatoriosPage() {
       </div>
 
       <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
-        <Card className="glass-card border-border/40 rounded-2xl md:rounded-[2.5rem] overflow-hidden shadow-sm">
+        <Card className="glass-card border-border rounded-2xl md:rounded-2xl overflow-hidden shadow-sm">
           <CardHeader className="p-6 md:p-10 pb-4 md:pb-6 border-b border-border/20">
             <CardTitle className="text-2xl font-bold flex items-center gap-2">
               <FileDown className="h-6 w-6 text-primary" />
@@ -369,7 +369,7 @@ function RelatoriosPage() {
             <div className="space-y-2 md:space-y-3">
               <Label>Tipo de Relatório</Label>
               <Select value={periodType} onValueChange={(v) => setPeriodType(v as "diario" | "semanal" | "mensal")}>
-                <SelectTrigger className="rounded-xl h-12 bg-muted/20 border-border/40">
+                <SelectTrigger className="rounded-xl h-12 bg-muted/20 border-border">
                   <SelectValue placeholder="Selecione o período" />
                 </SelectTrigger>
                 <SelectContent>
@@ -387,14 +387,14 @@ function RelatoriosPage() {
                   type="month"
                   value={month}
                   onChange={(ev) => setMonth(ev.target.value)}
-                  className="rounded-xl h-12 bg-muted/20 border-border/40"
+                  className="rounded-xl h-12 bg-muted/20 border-border"
                 />
               ) : (
                 <Input
                   type="date"
                   value={referenceDate}
                   onChange={(ev) => setReferenceDate(ev.target.value)}
-                  className="rounded-xl h-12 bg-muted/20 border-border/40"
+                  className="rounded-xl h-12 bg-muted/20 border-border"
                 />
               )}
             </div>
@@ -402,7 +402,7 @@ function RelatoriosPage() {
             <div className="space-y-2">
               <Label>Colaborador</Label>
               <Select value={employeeId} onValueChange={setEmployeeId}>
-                <SelectTrigger className="rounded-xl h-12 bg-muted/20 border-border/40">
+                <SelectTrigger className="rounded-xl h-12 bg-muted/20 border-border">
                   <SelectValue placeholder="Selecione o funcionário" />
                 </SelectTrigger>
                 <SelectContent>
@@ -419,7 +419,7 @@ function RelatoriosPage() {
                 onClick={() => generateReport("xlsx")} 
                 disabled={loading}
                 variant="outline"
-                className="rounded-2xl h-16 font-black uppercase tracking-widest text-[10px] border-2 gap-3"
+                className="rounded-2xl h-16 font-extrabold tracking-tight text-[10px] border-2 gap-3"
               >
                 {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <FileSpreadsheet className="h-5 w-5 text-success" />}
                 Exportar Excel
@@ -427,7 +427,7 @@ function RelatoriosPage() {
               <Button 
                 onClick={() => generateReport("pdf")} 
                 disabled={loading}
-                className="rounded-2xl h-16 font-black uppercase tracking-widest text-[10px] gap-3 shadow-lg shadow-primary/20"
+                className="rounded-2xl h-16 font-extrabold tracking-tight text-[10px] gap-3 shadow-lg shadow-primary/20"
               >
                 {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <FilePdf className="h-5 w-5" />}
                 Gerar PDF
@@ -437,7 +437,7 @@ function RelatoriosPage() {
         </Card>
 
         <div className="space-y-6">
-          <div className="glass-card p-6 md:p-10 rounded-2xl md:rounded-[2.5rem] border border-border/40 bg-gradient-to-br from-primary/5 to-transparent">
+          <div className="glass-card p-6 md:p-10 rounded-2xl md:rounded-2xl border border-border bg-gradient-to-br from-primary/5 to-transparent">
              <h3 className="font-display text-lg md:text-xl font-bold mb-4 tracking-tight">Informações Importantes</h3>
              <ul className="text-xs md:text-sm text-muted-foreground space-y-4 md:space-y-5">
                <li className="flex items-start gap-2">
