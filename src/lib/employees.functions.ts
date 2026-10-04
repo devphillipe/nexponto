@@ -56,41 +56,91 @@ export const createEmployee = createServerFn({ method: "POST" })
     if (tenantErr) throw new Error(tenantErr.message);
     const defaultDailyHours = tenant?.default_daily_hours ?? 8;
 
-    // Create auth user with provisional password (email auto-confirmed in config).
-    const { data: created, error: createErr } =
-      await supabaseAdmin.auth.admin.createUser({
-        email: data.email,
-        password: data.password,
-        email_confirm: true,
-        user_metadata: { signup_type: "employee", full_name: data.full_name },
-      });
-    if (createErr || !created.user) {
-      throw new Error(createErr?.message ?? "Falha ao criar usuário.");
+    const normalizedCpf = data.cpf?.replace(/\D+/g, "") || null;
+
+    // Prevent a duplicate vínculo inside the same office.
+    if (normalizedCpf) {
+      const { data: sameTenant } = await supabaseAdmin
+        .from("employees")
+        .select("id")
+        .eq("tenant_id", tenantId)
+        .eq("cpf", normalizedCpf)
+        .maybeSingle();
+      if (sameTenant) {
+        throw new Error("Já existe um funcionário com este CPF neste escritório.");
+      }
     }
-    const newUserId = created.user.id;
+
+    // One person = one auth identity. A CPF may have multiple employee rows,
+    // one per tenant, all pointing to the same Supabase auth user.
+    let targetUserId: string | null = null;
+    let createdNewAuthUser = false;
+
+    if (normalizedCpf) {
+      const { data: existingLinks, error: existingError } = await supabaseAdmin
+        .from("employees")
+        .select("user_id")
+        .eq("cpf", normalizedCpf);
+      if (existingError) throw new Error(existingError.message);
+
+      const existingUserIds = Array.from(new Set((existingLinks ?? []).map((row) => row.user_id)));
+      if (existingUserIds.length > 1) {
+        throw new Error("Este CPF possui cadastros antigos conflitantes. É necessário unificar os vínculos antes de adicionar outro escritório.");
+      }
+      if (existingUserIds.length === 1) {
+        targetUserId = existingUserIds[0]!;
+      }
+    }
+
+    if (!targetUserId) {
+      const { data: created, error: createErr } =
+        await supabaseAdmin.auth.admin.createUser({
+          email: data.email,
+          password: data.password,
+          email_confirm: true,
+          user_metadata: { signup_type: "employee", full_name: data.full_name },
+        });
+      if (createErr || !created.user) {
+        throw new Error(createErr?.message ?? "Falha ao criar usuário.");
+      }
+      targetUserId = created.user.id;
+      createdNewAuthUser = true;
+    }
 
     try {
-      const { error: pErr } = await supabaseAdmin.from("profiles").insert({
-        id: newUserId,
-        tenant_id: tenantId,
-        full_name: data.full_name,
-        email: data.email,
-      });
-      if (pErr) throw pErr;
+      if (createdNewAuthUser) {
+        const { error: pErr } = await supabaseAdmin.from("profiles").insert({
+          id: targetUserId,
+          tenant_id: tenantId,
+          full_name: data.full_name,
+          email: data.email,
+        });
+        if (pErr) throw pErr;
+      }
 
-      const { error: rErr } = await supabaseAdmin.from("user_roles").insert({
-        user_id: newUserId,
-        tenant_id: tenantId,
-        role: "employee",
-      });
-      if (rErr) throw rErr;
+      const { data: existingRole } = await supabaseAdmin
+        .from("user_roles")
+        .select("id")
+        .eq("user_id", targetUserId)
+        .eq("tenant_id", tenantId)
+        .eq("role", "employee")
+        .maybeSingle();
+
+      if (!existingRole) {
+        const { error: rErr } = await supabaseAdmin.from("user_roles").insert({
+          user_id: targetUserId,
+          tenant_id: tenantId,
+          role: "employee",
+        });
+        if (rErr) throw rErr;
+      }
 
       const { error: eErr } = await supabaseAdmin.from("employees").insert({
         tenant_id: tenantId,
-        user_id: newUserId,
+        user_id: targetUserId,
         full_name: data.full_name,
         email: data.email,
-        cpf: data.cpf,
+        cpf: normalizedCpf,
         phone: data.phone,
         position: data.position,
         department: data.department,
@@ -101,12 +151,18 @@ export const createEmployee = createServerFn({ method: "POST" })
       });
       if (eErr) throw eErr;
     } catch (e) {
-      // Roll back the auth user if downstream inserts failed.
-      await supabaseAdmin.auth.admin.deleteUser(newUserId).catch(() => {});
+      // Only remove the auth user when this request created it.
+      if (createdNewAuthUser && targetUserId) {
+        await supabaseAdmin.auth.admin.deleteUser(targetUserId).catch(() => {});
+      }
       throw e instanceof Error ? e : new Error("Falha ao cadastrar funcionário.");
     }
 
-    return { ok: true, user_id: newUserId };
+    return {
+      ok: true,
+      user_id: targetUserId,
+      linked_existing_identity: !createdNewAuthUser,
+    };
   });
 
 export const toggleEmployeeActive = createServerFn({ method: "POST" })
