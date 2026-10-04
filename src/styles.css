@@ -2,32 +2,49 @@
 @import "tw-animate-css";
 
 @theme {
-  --font-sans: "Inter", system-ui, sans-serif;
-  --font-display: "Space Grotesk", system-ui, sans-serif;
+  --font-sans: "Manrope", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-display: "Manrope", system-ui, sans-serif;
 
-  --color-primary: #00e5ff;
-  --color-primary-foreground: #000000;
-  --color-accent: #00e5ff;
-  --color-success: #00f2a9;
-  --color-warning: #ffb800;
-  --color-destructive: #ff3366;
-  --color-background: #020406;
-  --color-foreground: #ffffff;
-  --color-muted: #0a0e14;
-  --color-muted-foreground: #6b7c8a;
-  --color-border: #141a21;
-  --color-input: #141a21;
-  --color-ring: #00e5ff;
+  --color-primary: #2563eb;
+  --color-primary-foreground: #ffffff;
+  --color-accent: #eef5ff;
+  --color-accent-foreground: #1d4ed8;
+  --color-success: #22c55e;
+  --color-success-foreground: #052e16;
+  --color-warning: #f59e0b;
+  --color-warning-foreground: #451a03;
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #ffffff;
 
-  --radius-xl: 1.25rem;
-  --radius-2xl: 2rem;
-  --radius-3xl: 3rem;
+  --color-background: #f7f9fc;
+  --color-foreground: #0f172a;
+  --color-muted: #f1f5f9;
+  --color-muted-foreground: #64748b;
+  --color-border: #e2e8f0;
+  --color-input: #cbd5e1;
+  --color-ring: #2563eb;
+  --color-card: #ffffff;
+  --color-card-foreground: #0f172a;
+  --color-popover: #ffffff;
+  --color-popover-foreground: #0f172a;
+  --color-secondary: #eef2f7;
+  --color-secondary-foreground: #0f172a;
 
-  --animate-fade-in: fade-in 0.5s ease-out forwards;
-  
+  --color-sidebar: #071a2b;
+  --color-sidebar-foreground: #dbeafe;
+  --color-sidebar-accent: #0f2942;
+  --color-sidebar-accent-foreground: #ffffff;
+  --color-sidebar-border: #17324a;
+  --color-sidebar-ring: #60a5fa;
+
+  --radius-xl: 0.875rem;
+  --radius-2xl: 1rem;
+  --radius-3xl: 1.25rem;
+
+  --animate-fade-in: fade-in 0.4s ease-out forwards;
 
   @keyframes fade-in {
-    from { opacity: 0; transform: translateY(10px); }
+    from { opacity: 0; transform: translateY(8px); }
     to { opacity: 1; transform: translateY(0); }
   }
 }
@@ -38,18 +55,31 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+
+  html {
+    background: #f7f9fc;
+  }
+
   body {
-    @apply bg-background text-foreground font-sans selection:bg-primary/30;
+    @apply bg-background text-foreground font-sans selection:bg-primary/15;
     overflow-x: hidden;
     scroll-behavior: smooth;
+    min-height: 100dvh;
+    overscroll-behavior-y: none;
   }
+
+  h1, h2, h3, h4 {
+    @apply font-display;
+  }
+
   :focus-visible {
     @apply outline-2 outline-offset-2 outline-ring;
   }
+
   #lovable-badge {
     display: none !important;
   }
-  /* Respeitar usuários que pedem menos movimento */
+
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
       animation-duration: 0.01ms !important;
@@ -60,92 +90,86 @@
   }
 }
 
-.animate-in {
-  will-change: transform, opacity;
-}
-
-@layer components {
-  .glass-card {
-    @apply bg-muted/30 backdrop-blur-2xl border border-border/40;
-    will-change: transform, opacity;
-  }
-  
-  .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary via-primary/80 to-accent;
-  }
-  
-  .nav-link {
-    @apply relative font-bold tracking-tight transition-all duration-300 hover:text-primary after:absolute after:-bottom-1 after:left-0 after:h-[2px] after:w-0 after:bg-primary after:transition-all hover:after:w-full;
-  }
-
-  .premium-button {
-    @apply bg-gradient-to-r from-primary to-primary/80 text-primary-foreground font-black uppercase tracking-widest transition-all duration-500 hover:shadow-2xl hover:shadow-primary/30 hover:-translate-y-1 active:scale-[0.98] border border-primary/20 shadow-xl shadow-primary/20;
-  }
-}
-
 :root {
-  --gradient-primary: linear-gradient(135deg, #00e5ff 0%, #00a3ff 100%);
-  --shadow-glow: 0 12px 48px -12px rgba(0, 229, 255, 0.4);
-  --shadow-premium: 0 20px 80px -20px rgba(0, 0, 0, 0.6);
+  --brand-navy: #071a2b;
+  --brand-blue: #2563eb;
+  --brand-cyan: #22d3ee;
+  --brand-success: #22c55e;
+  --brand-surface: #ffffff;
+  --brand-canvas: #f7f9fc;
+  --brand-text: #0f172a;
+  --brand-muted: #64748b;
 
-  /* Safe area tokens — fonte única de verdade para notch / dynamic island / home indicator */
+  --gradient-primary: linear-gradient(135deg, #2563eb 0%, #22d3ee 100%);
+  --shadow-glow: 0 12px 40px -18px rgba(37, 99, 235, 0.28);
+  --shadow-premium: 0 18px 50px -24px rgba(15, 23, 42, 0.24);
+
   --sat: env(safe-area-inset-top, 0px);
   --sar: env(safe-area-inset-right, 0px);
   --sab: env(safe-area-inset-bottom, 0px);
   --sal: env(safe-area-inset-left, 0px);
 }
 
-html {
-  background-color: var(--color-background);
+.animate-in {
+  will-change: transform, opacity;
 }
 
+@layer components {
+  .glass-card {
+    @apply bg-card border border-border shadow-sm;
+  }
 
-body {
-  min-height: 100dvh;
-  overscroll-behavior-y: none;
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-cyan-500;
+  }
+
+  .nav-link {
+    @apply relative font-semibold text-muted-foreground transition-colors duration-200 hover:text-foreground;
+  }
+
+  .nav-link::after {
+    content: "";
+    @apply absolute -bottom-2 left-0 h-0.5 w-0 rounded-full bg-primary transition-all duration-200;
+  }
+
+  .nav-link:hover::after {
+    @apply w-full;
+  }
+
+  .premium-button {
+    @apply bg-primary text-primary-foreground font-bold transition-all duration-200 hover:bg-blue-700 active:scale-[0.99] shadow-sm hover:shadow-md;
+  }
+
+  .brand-card {
+    @apply rounded-2xl border border-border bg-white shadow-sm;
+  }
+
+  .brand-kicker {
+    @apply text-xs font-bold uppercase tracking-[0.16em] text-primary;
+  }
 }
 
 @utility no-scrollbar {
   scrollbar-width: none;
   -ms-overflow-style: none;
-  &::-webkit-scrollbar {
-    display: none;
-  }
+  &::-webkit-scrollbar { display: none; }
 }
 
-@utility safe-top {
-  padding-top: var(--sat);
-}
-
-@utility safe-bottom {
-  padding-bottom: var(--sab);
-}
-
+@utility safe-top { padding-top: var(--sat); }
+@utility safe-bottom { padding-bottom: var(--sab); }
 @utility safe-x {
   padding-left: var(--sal);
   padding-right: var(--sar);
 }
-
 @utility safe-area {
   padding-top: var(--sat);
   padding-bottom: var(--sab);
   padding-left: var(--sal);
   padding-right: var(--sar);
 }
-
-/* Margens seguras (para elementos flutuantes / sticky) */
-@utility safe-mt {
-  margin-top: var(--sat);
-}
-
-@utility safe-mb {
-  margin-bottom: var(--sab);
-}
-
-/* Alvo de toque mínimo recomendado (44x44) */
+@utility safe-mt { margin-top: var(--sat); }
+@utility safe-mb { margin-bottom: var(--sab); }
 @utility touch-target {
   min-width: 2.75rem;
   min-height: 2.75rem;
 }
-
-
