@@ -38,7 +38,7 @@ function RelatoriosPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("employees")
-        .select("id, full_name, daily_hours, work_days, hire_date, active")
+        .select("id, full_name, daily_hours, work_days, hire_date, active, tenants(default_daily_hours)")
         .eq("tenant_id", profile!.tenant_id)
         .order("full_name");
       if (error) throw error;
@@ -84,6 +84,8 @@ function RelatoriosPage() {
       const reportData = employeesToReport.map(emp => {
         const empEntries = entries?.filter(e => e.employee_id === emp.id) || [];
         const empAbsences = absences?.filter(a => a.employee_id === emp.id) || [];
+        const effectiveDailyHours =
+          emp.daily_hours ?? (emp as any).tenants?.default_daily_hours ?? 8;
         
         const days = eachDayOfInterval({ start: startDate, end: endDate });
         
@@ -139,7 +141,7 @@ function RelatoriosPage() {
 
           const plannedMinutes = (!isWorkDay || !hiredOnOrBefore || absence || nationalHoliday)
             ? 0
-            : (emp.daily_hours || 8) * 60;
+            : effectiveDailyHours * 60;
           const isFutureDay = dateStr > todayStr;
           const expectedMinutes = isFutureDay ? 0 : plannedMinutes;
 
@@ -195,8 +197,8 @@ function RelatoriosPage() {
           totalExpected: Math.floor(totalExpectedMinutes / 60) + ":" + String(Math.floor(totalExpectedMinutes % 60)).padStart(2, "0"),
           totalPlanned: Math.floor(totalPlannedMinutes / 60) + ":" + String(Math.floor(totalPlannedMinutes % 60)).padStart(2, "0"),
           balance: (diff >= 0 ? "+" : "-") + Math.floor(Math.abs(diff) / 60) + ":" + String(Math.floor(Math.abs(diff) % 60)).padStart(2, "0"),
-          dailyHours: emp.daily_hours || 8,
-          weeklyHours: (emp.daily_hours || 8) * normalizeWorkDays((emp as any).work_days).length,
+          dailyHours: effectiveDailyHours,
+          weeklyHours: effectiveDailyHours * normalizeWorkDays((emp as any).work_days).length,
           expectedWorkDays,
           expectedWorkDaysToDate,
           nationalHolidaysOnSchedule,
