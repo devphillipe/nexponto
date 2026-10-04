@@ -174,12 +174,12 @@ function ResetPassword() {
     return (
       <div className="min-h-dvh flex items-center justify-center p-6 [padding-top:calc(1.5rem+var(--sat))] [padding-bottom:calc(1.5rem+var(--sab))] [padding-left:calc(1.5rem+var(--sal))] [padding-right:calc(1.5rem+var(--sar))] relative overflow-hidden">
         <NextFlowBackground />
-        <div className="w-full max-w-md glass-card rounded-3xl p-10 border border-destructive/20 shadow-2xl bg-background/40 backdrop-blur-2xl text-center space-y-6 relative z-10">
+        <div className="w-full max-w-md glass-card rounded-2xl p-10 border border-destructive/20 shadow-2xl bg-background/40 backdrop-blur-2xl text-center space-y-6 relative z-10">
           <div className="mx-auto h-14 w-14 rounded-2xl bg-destructive/10 text-destructive grid place-items-center">
             <AlertCircle className="h-7 w-7" />
           </div>
           <div className="space-y-2">
-            <h1 className="text-2xl font-black tracking-tight">Link inválido</h1>
+            <h1 className="text-2xl font-extrabold tracking-tight">Link inválido</h1>
             <p className="text-muted-foreground text-sm">{errorMsg}</p>
           </div>
           <LoginButton label="Voltar para o login" className="w-full h-12 rounded-2xl font-bold" />
@@ -196,17 +196,17 @@ function ResetPassword() {
           <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-emerald-500/20 blur-[120px] rounded-full"></div>
           <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-primary/20 blur-[120px] rounded-full"></div>
         </div>
-        <div className="w-full max-w-md glass-card rounded-3xl p-10 border border-emerald-500/20 shadow-2xl bg-background/40 backdrop-blur-2xl text-center space-y-6 relative z-10 animate-in fade-in zoom-in-95 duration-700">
+        <div className="w-full max-w-md glass-card rounded-2xl p-10 border border-emerald-500/20 shadow-2xl bg-background/40 backdrop-blur-2xl text-center space-y-6 relative z-10 animate-in fade-in zoom-in-95 duration-700">
           <div className="mx-auto h-16 w-16 rounded-2xl bg-emerald-500/10 text-emerald-500 grid place-items-center">
             <CheckCircle2 className="h-8 w-8" />
           </div>
           <div className="space-y-2">
-            <h1 className="text-3xl font-black tracking-tight">Senha alterada!</h1>
+            <h1 className="text-3xl font-extrabold tracking-tight">Senha alterada!</h1>
             <p className="text-muted-foreground text-sm leading-relaxed">
               Sua nova senha foi configurada com sucesso. Agora você já pode fazer login com a nova senha.
             </p>
           </div>
-          <LoginButton label="Ir para o Login" className="premium-button w-full h-14 rounded-2xl font-bold uppercase tracking-widest" />
+          <LoginButton label="Ir para o Login" className="premium-button w-full h-14 rounded-2xl font-bold tracking-tight" />
         </div>
       </div>
     );
@@ -225,11 +225,11 @@ function ResetPassword() {
            <div className="inline-flex mx-auto mb-4 sm:mb-6">
               <Logo size={28} wordmarkClassName="text-2xl sm:text-3xl" />
            </div>
-           <h1 className="text-3xl sm:text-5xl font-black tracking-tighter text-foreground drop-shadow-sm">Nova Senha</h1>
+           <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tighter text-foreground ">Nova Senha</h1>
            <p className="text-muted-foreground text-base sm:text-lg font-medium opacity-80">Defina sua nova senha de acesso.</p>
         </div>
 
-        <div className="glass-card rounded-3xl sm:rounded-[3rem] p-8 sm:p-12 border border-primary/10 shadow-2xl relative bg-background/40 backdrop-blur-2xl mx-4 sm:mx-0">
+        <div className="glass-card rounded-2xl p-8 sm:p-12 border border-border shadow-xl relative bg-white mx-4 sm:mx-0">
           <div className="absolute -top-7 left-1/2 -translate-x-1/2 h-14 w-14 rounded-2xl bg-primary text-primary-foreground border border-primary shadow-xl shadow-primary/20 grid place-items-center">
              <KeyRound className="h-7 w-7" />
           </div>
@@ -237,7 +237,7 @@ function ResetPassword() {
           <form onSubmit={onSubmit} className="space-y-6 mt-4">
             <div className="space-y-5">
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/70 ml-2">Nova Senha</Label>
+                <Label htmlFor="password" className="text-[10px] font-extrabold tracking-wide text-primary/70 ml-2">Nova Senha</Label>
                 <PasswordInput
                   id="password"
                   placeholder="Crie uma senha forte"
@@ -247,7 +247,7 @@ function ResetPassword() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   aria-describedby="password-strength"
-                  inputClassName="bg-muted/20 border-border/40 rounded-2xl h-14 px-4 focus-visible:ring-primary/20 focus-visible:border-primary/30 transition-all font-medium"
+                  inputClassName="bg-white border-border rounded-2xl h-14 px-4 focus-visible:ring-primary/20 focus-visible:border-primary/30 transition-all font-medium"
                 />
                 <div id="password-strength" className="pt-2">
                   <PasswordStrengthMeter password={password} />
@@ -255,7 +255,7 @@ function ResetPassword() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword" className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/70 ml-2">Confirmar Nova Senha</Label>
+                <Label htmlFor="confirmPassword" className="text-[10px] font-extrabold tracking-wide text-primary/70 ml-2">Confirmar Nova Senha</Label>
                 <PasswordInput
                   id="confirmPassword"
                   placeholder="Repita a senha"
@@ -265,7 +265,7 @@ function ResetPassword() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   aria-invalid={confirmPassword.length > 0 && confirmPassword !== password}
-                  inputClassName="bg-muted/20 border-border/40 rounded-2xl h-14 px-4 focus-visible:ring-primary/20 focus-visible:border-primary/30 transition-all font-medium"
+                  inputClassName="bg-white border-border rounded-2xl h-14 px-4 focus-visible:ring-primary/20 focus-visible:border-primary/30 transition-all font-medium"
                 />
                 {confirmPassword.length > 0 && confirmPassword !== password && (
                   <p className="text-xs text-destructive ml-2">As senhas não coincidem.</p>
@@ -280,13 +280,13 @@ function ResetPassword() {
               </div>
             )}
 
-            <Button type="submit" disabled={loading} className="premium-button w-full h-16 rounded-2xl text-lg font-black uppercase tracking-widest shadow-xl shadow-primary/20 hover:shadow-2xl hover:shadow-primary/30 active:scale-[0.98] transition-all">
+            <Button type="submit" disabled={loading} className="premium-button w-full h-16 rounded-2xl text-lg font-extrabold tracking-tight shadow-sm hover:shadow-md transition-all">
               {loading ? "Atualizando..." : "Alterar Senha"}
             </Button>
           </form>
 
           <div className="mt-8 pt-8 border-t border-border/40 text-center">
-            <div className="flex items-center justify-center gap-2 text-[10px] text-muted-foreground uppercase tracking-widest font-bold">
+            <div className="flex items-center justify-center gap-2 text-[10px] text-muted-foreground tracking-tight font-bold">
                <ShieldCheck className="h-3 w-3" /> Segurança NexPonto
             </div>
           </div>
