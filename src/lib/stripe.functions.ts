@@ -14,19 +14,21 @@ type Db = SupabaseClient<Database>;
 type ProfileRow = { tenant_id: string; email: string | null };
 
 async function getAdminTenant(supabase: Db, userId: string): Promise<ProfileRow> {
-  const { data: roles } = await supabase
-    .from("user_roles")
-    .select("role")
-    .eq("user_id", userId);
-  if (!roles?.some((r) => r.role === "admin")) {
-    throw new Error("Apenas o administrador do escritório pode gerenciar a assinatura.");
-  }
   const { data: profile } = await supabase
     .from("profiles")
     .select("tenant_id, email")
     .eq("id", userId)
     .single();
   if (!profile?.tenant_id) throw new Error("Escritório não encontrado.");
+
+  const { data: roles } = await supabase
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", userId)
+    .eq("tenant_id", profile.tenant_id);
+  if (!roles?.some((r) => r.role === "admin")) {
+    throw new Error("Apenas o administrador do escritório pode gerenciar a assinatura.");
+  }
   return profile;
 }
 
