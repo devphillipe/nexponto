@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle2, Clock, LogIn, Coffee, Sunrise, LogOut, MapPin, Smartphone } from "lucide-react";
 import { getCurrentCoords } from "@/lib/geolocation";
 import { registerOwnPunch } from "@/lib/time-entry.functions";
+import { useEmployeeMembership } from "@/lib/employee-membership";
 
 export const Route = createFileRoute("/_func/funcionario/meu-ponto")({
   head: () => ({ meta: [{ title: "Registrar Ponto — NexPonto" }] }),
@@ -49,25 +50,11 @@ function MyClockPage() {
     return () => clearInterval(i);
   }, []);
 
-  const { data: employee } = useQuery({
-    queryKey: ["my-employee"],
-    staleTime: 1000 * 60 * 60, // 1 hour (employee info rarely changes)
-    enabled: !!profile,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("employees")
-        .select("id, tenant_id, active, daily_hours, tenants(timezone, default_daily_hours)")
-        .eq("user_id", profile!.id)
-        .maybeSingle();
-      if (error) throw error;
-      return data;
-    },
-  });
+  const { selected: employee, loading: membershipLoading } = useEmployeeMembership();
 
-  const tenantSettings = (employee as any)?.tenants;
   const effectiveDailyHours =
-    employee?.daily_hours ?? tenantSettings?.default_daily_hours ?? 8;
-  const tenantTimeZone = tenantSettings?.timezone || "America/Sao_Paulo";
+    employee?.daily_hours ?? employee?.tenant_default_daily_hours ?? 8;
+  const tenantTimeZone = employee?.tenant_timezone || "America/Sao_Paulo";
   const currentEntryDate = dateInTimeZone(tenantTimeZone);
 
   const { data: todayEntries } = useQuery({
@@ -104,6 +91,7 @@ function MyClockPage() {
       const coords = await getCurrentCoords();
       const result = await registerPunch({
         data: {
+          tenant_id: employee.tenant_id,
           user_agent: navigator.userAgent,
           ...(coords ? { latitude: coords.latitude, longitude: coords.longitude } : {}),
         },
@@ -117,6 +105,14 @@ function MyClockPage() {
     } finally {
       setPunching(false);
     }
+  }
+
+  if (membershipLoading || !employee) {
+    return (
+      <div className="glass-card rounded-2xl p-10 text-center text-sm text-muted-foreground animate-pulse">
+        Carregando vínculo...
+      </div>
+    );
   }
 
   const totalWorkedMs = computeWorked(todayEntries ?? []);
