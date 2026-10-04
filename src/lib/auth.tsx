@@ -78,7 +78,8 @@ export function useProfile() {
       const { data: roles } = await supabase
         .from("user_roles")
         .select("role")
-        .eq("user_id", user.id);
+        .eq("user_id", user.id)
+        .eq("tenant_id", profile.tenant_id);
       const role =
         roles?.find((r) => r.role === "admin")?.role ??
         roles?.find((r) => r.role === "employee")?.role ??
