@@ -11,10 +11,19 @@ export const Route = createFileRoute("/_func")({
     const { data } = await supabase.auth.getUser();
     if (!data.user) throw redirect({ to: "/funcionario/login" });
 
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("tenant_id")
+      .eq("id", data.user.id)
+      .maybeSingle();
+
+    if (!profile?.tenant_id) throw redirect({ to: "/funcionario/login" });
+
     const { data: roles } = await supabase
       .from("user_roles")
       .select("role")
-      .eq("user_id", data.user.id);
+      .eq("user_id", data.user.id)
+      .eq("tenant_id", profile.tenant_id);
 
     if (!roles?.some((r) => r.role === "employee")) {
       throw redirect({ to: "/funcionario/login" });
