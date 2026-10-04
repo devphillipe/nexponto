@@ -43,8 +43,8 @@ function WorkDaysPicker({
     onChange(value.includes(d) ? value.filter((x) => x !== d) : [...value, d].sort((a, b) => a - b));
 
   return (
-    <fieldset className="space-y-2 rounded-2xl border border-border/40 bg-muted/10 p-4">
-      <legend className="px-1 text-xs font-bold uppercase tracking-widest text-muted-foreground">
+    <fieldset className="space-y-2 rounded-2xl border border-border bg-muted/10 p-4">
+      <legend className="px-1 text-xs font-bold tracking-tight text-muted-foreground">
         Dias de trabalho
       </legend>
       <div className="flex flex-wrap gap-2" role="group" aria-label="Dias de trabalho">
@@ -61,7 +61,7 @@ function WorkDaysPicker({
               className={`h-10 min-w-[3rem] rounded-xl border px-3 text-xs font-bold uppercase tracking-wide transition-all ${
                 on
                   ? "border-primary/40 bg-primary text-primary-foreground shadow-sm"
-                  : "border-border/40 bg-background/60 text-muted-foreground hover:border-primary/30"
+                  : "border-border bg-background/60 text-muted-foreground hover:border-primary/30"
               }`}
             >
               {d.short}
@@ -143,16 +143,16 @@ function EmployeesPage() {
               placeholder="Buscar colaborador..." 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-12 h-12 md:h-14 w-full sm:w-64 md:w-80 bg-muted/10 border-border/40 rounded-xl md:rounded-2xl transition-all hover:border-primary/20 focus:sm:w-80 md:focus:w-96 font-medium"
+              className="pl-12 h-12 md:h-14 w-full sm:w-64 md:w-80 bg-muted/10 border-border rounded-xl md:rounded-2xl transition-all hover:border-primary/20 focus:sm:w-80 md:focus:w-96 font-medium"
             />
           </div>
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-              <Button size="lg" className="rounded-xl md:rounded-2xl shadow-xl shadow-primary/20 font-black uppercase tracking-widest text-[10px] md:text-xs px-6 md:px-8 h-12 md:h-14 w-full sm:w-auto">
+              <Button size="lg" className="rounded-xl md:rounded-2xl shadow-sm shadow-primary/20 font-extrabold tracking-tight text-[10px] md:text-xs px-6 md:px-8 h-12 md:h-14 w-full sm:w-auto">
                 <Plus className="mr-2 h-5 w-5" /> Novo Colaborador
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-2xl p-0 overflow-hidden bg-background border-primary/20 rounded-[2rem]">
+            <DialogContent className="max-w-2xl p-0 overflow-hidden bg-background border-primary/20 rounded-2xl">
               <div className="bg-primary/5 p-8 border-b border-primary/10">
                 <DialogHeader>
                   <DialogTitle className="text-2xl font-display font-bold">Cadastrar Colaborador</DialogTitle>
@@ -167,7 +167,7 @@ function EmployeesPage() {
         </div>
       </div>
 
-      <div className="glass-card overflow-hidden rounded-[2.5rem] border border-border/40 shadow-sm transition-all duration-500 hover:shadow-md">
+      <div className="glass-card overflow-hidden rounded-2xl border border-border shadow-sm transition-all duration-500 hover:shadow-md">
         {isLoading ? (
           <TableSkeleton rows={6} cols={4} />
         ) : !filtered?.length ? (
@@ -182,7 +182,7 @@ function EmployeesPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm min-w-[800px]">
-            <thead className="border-b border-border/40 bg-muted/20 text-left text-[11px] uppercase font-bold tracking-widest text-muted-foreground">
+            <thead className="border-b border-border bg-muted/20 text-left text-[11px] uppercase font-bold tracking-widest text-muted-foreground">
               <tr>
                 <th className="px-8 py-4">Nome & Contato</th>
                 <th className="px-6 py-4">Departamento / Cargo</th>
@@ -451,7 +451,7 @@ function EditEmployeeDialog({ employee, onDone }: { employee: any, onDone: () =>
           <Edit2 className="h-4 w-4" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl p-0 overflow-hidden bg-background border-primary/20 rounded-[2rem]">
+      <DialogContent className="max-w-2xl p-0 overflow-hidden bg-background border-primary/20 rounded-2xl">
         <div className="bg-primary/5 p-8 border-b border-primary/10">
           <DialogHeader>
             <DialogTitle className="text-2xl font-display font-bold">Editar Colaborador</DialogTitle>
@@ -555,7 +555,7 @@ const EmployeeTableRow = memo(({ e, handleToggle, qc }: { e: any, handleToggle: 
             onDone={() => qc.invalidateQueries({ queryKey: ["employees"] })} 
           />
           <div className="h-6 w-[1px] bg-border/40 mx-1"></div>
-          <span className={`text-[10px] font-bold uppercase tracking-widest ${e.active ? "text-success" : "text-muted-foreground"}`}>
+          <span className={`text-[10px] font-bold tracking-tight ${e.active ? "text-success" : "text-muted-foreground"}`}>
             {e.active ? "Ativo" : "Inativo"}
           </span>
           <Switch
