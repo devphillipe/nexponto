@@ -89,6 +89,37 @@ function WorkDaysPicker({
   );
 }
 
+function WorkloadSummary({
+  dailyHours,
+  workDays,
+}: {
+  dailyHours: string | number | null | undefined;
+  workDays: number[];
+}) {
+  const parsed = Number(dailyHours);
+  const hours = Number.isFinite(parsed) && parsed > 0 ? parsed : 8;
+  const weekly = hours * workDays.length;
+  const formatHours = (value: number) =>
+    Number.isInteger(value) ? String(value) : value.toFixed(1).replace(".", ",");
+
+  return (
+    <div className="grid grid-cols-3 gap-2 rounded-xl border border-blue-100 bg-blue-50/60 p-3 text-center">
+      <div>
+        <div className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Por dia</div>
+        <div className="mt-1 text-sm font-extrabold text-[#071A2B]">{formatHours(hours)}h</div>
+      </div>
+      <div>
+        <div className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Dias/semana</div>
+        <div className="mt-1 text-sm font-extrabold text-[#071A2B]">{workDays.length}</div>
+      </div>
+      <div>
+        <div className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Jornada semanal</div>
+        <div className="mt-1 text-sm font-extrabold text-primary">{formatHours(weekly)}h</div>
+      </div>
+    </div>
+  );
+}
+
 export const Route = createFileRoute("/_admin/admin/funcionarios")({
   head: () => ({ meta: [{ title: "Funcionários — NexPonto Admin" }] }),
   component: EmployeesPage,
@@ -186,7 +217,7 @@ function EmployeesPage() {
               <tr>
                 <th className="px-8 py-4">Nome & Contato</th>
                 <th className="px-6 py-4">Departamento / Cargo</th>
-                <th className="px-6 py-4">Jornada Diária</th>
+                <th className="px-6 py-4">Jornada / Escala</th>
                 <th className="px-6 py-4 text-right">Ações</th>
               </tr>
             </thead>
@@ -223,6 +254,10 @@ const newEmployeeSchema = z.object({
   hire_date_br: z.string().optional().refine(
     (v) => !v || isValidDateBr(v),
     "Informe uma data válida (DD/MM/AAAA)."
+  ),
+  daily_hours: z.string().optional().refine(
+    (v) => !v || (Number.isFinite(Number(v)) && Number(v) >= 1 && Number(v) <= 24),
+    "Informe uma jornada diária entre 1 e 24 horas."
   ),
 });
 
@@ -345,10 +380,12 @@ function NewEmployeeForm({ onDone }: { onDone: () => void }) {
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="dh">Jornada diária (h)</Label>
-          <Input id="dh" type="number" inputMode="decimal" step="0.5" min="1" max="24" placeholder="Padrão do escritório" value={form.daily_hours} onChange={(e) => up("daily_hours", e.target.value)} />
+          <Input id="dh" type="number" inputMode="decimal" step="0.5" min="1" max="24" placeholder="Padrão: 8h" value={form.daily_hours} onChange={(e) => up("daily_hours", e.target.value)} {...aria("daily_hours")} />
+          {err("daily_hours")}
         </div>
       </div>
       <WorkDaysPicker idPrefix="new" value={workDays} onChange={setWorkDays} />
+      <WorkloadSummary dailyHours={form.daily_hours} workDays={workDays} />
       <Button type="submit" disabled={loading || workDays.length === 0} className="w-full" aria-busy={loading}>
         {loading ? "Cadastrando..." : "Cadastrar funcionário"}
       </Button>
@@ -370,6 +407,10 @@ const editEmployeeSchema = z.object({
   hire_date_br: z.string().optional().refine(
     (v) => !v || isValidDateBr(v),
     "Informe uma data válida (DD/MM/AAAA)."
+  ),
+  daily_hours: z.string().optional().refine(
+    (v) => !v || (Number.isFinite(Number(v)) && Number(v) >= 1 && Number(v) <= 24),
+    "Informe uma jornada diária entre 1 e 24 horas."
   ),
 });
 
@@ -500,10 +541,12 @@ function EditEmployeeDialog({ employee, onDone }: { employee: any, onDone: () =>
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="edit-dh">Jornada diária (h)</Label>
-                <Input id="edit-dh" type="number" inputMode="decimal" step="0.5" min="1" max="24" placeholder="Padrão do escritório" value={form.daily_hours} onChange={(e) => up("daily_hours", e.target.value)} />
+                <Input id="edit-dh" type="number" inputMode="decimal" step="0.5" min="1" max="24" placeholder="Padrão: 8h" value={form.daily_hours} onChange={(e) => up("daily_hours", e.target.value)} {...aria("daily_hours")} />
+                {err("daily_hours")}
               </div>
             </div>
             <WorkDaysPicker idPrefix={`edit-${employee.id}`} value={workDays} onChange={setWorkDays} />
+            <WorkloadSummary dailyHours={form.daily_hours} workDays={workDays} />
             <Button type="submit" disabled={loading || workDays.length === 0} className="w-full mt-4" aria-busy={loading}>
               {loading ? "Salvando..." : "Salvar Alterações"}
             </Button>
@@ -545,6 +588,9 @@ const EmployeeTableRow = memo(({ e, handleToggle, qc }: { e: any, handleToggle: 
           </span>
           <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
             {formatWorkDays(e.work_days)}
+          </div>
+          <div className="text-[10px] font-bold text-primary">
+            {(e.daily_hours || 8) * normalizeWorkDays(e.work_days).length}h/semana
           </div>
         </div>
     </td>
