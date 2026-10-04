@@ -117,23 +117,23 @@ function MyClockPage() {
     <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
       <div className="text-center md:text-left space-y-1">
         <h1 className="font-display text-2xl font-bold tracking-tight text-foreground">
-          Olá, {profile?.full_name?.split(" ")[0]}!
+          Bom dia, {profile?.full_name?.split(" ")[0]}!
         </h1>
         <p className="text-muted-foreground text-sm font-medium capitalize opacity-80">{dateStr}</p>
       </div>
 
-      <div className="glass-card rounded-[2rem] p-6 text-center relative overflow-hidden group border border-border/40 shadow-xl">
+      <div className="glass-card rounded-2xl p-6 text-center relative overflow-hidden group border border-border shadow-sm">
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-60"></div>
         
         <div className="mb-4 space-y-1">
            <div
-             className="font-mono text-5xl sm:text-6xl font-black tracking-tighter text-primary drop-shadow-sm select-none"
+             className="font-mono text-5xl sm:text-6xl font-extrabold tracking-tighter text-primary drop-shadow-sm select-none"
              aria-live="off"
              aria-label={`Horário atual ${now.toLocaleTimeString("pt-BR")}`}
            >
              {now.toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' })}<span className="text-2xl sm:text-3xl opacity-30">:{now.toLocaleTimeString("pt-BR", { second: '2-digit' })}</span>
            </div>
-           <div className="flex items-center justify-center gap-1.5 text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">
+           <div className="flex items-center justify-center gap-1.5 text-[9px] font-extrabold uppercase tracking-[0.2em] text-muted-foreground/60">
               <MapPin className="h-2.5 w-2.5" aria-hidden="true" /> Escritório Central
            </div>
         </div>
@@ -146,11 +146,11 @@ function MyClockPage() {
           </div>
         ) : nextType ? (
           <div className="max-w-md mx-auto space-y-4">
-            <div className="p-4 rounded-2xl bg-muted/20 border border-border/20 relative" aria-live="polite">
-               <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-background border border-border text-[8px] font-black uppercase tracking-[0.15em] text-primary shadow-sm">
+            <div className="p-4 rounded-2xl bg-slate-50 border border-border relative" aria-live="polite">
+               <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-background border border-border text-[8px] font-extrabold uppercase tracking-[0.15em] text-primary shadow-sm">
                  Próximo Registro
                </span>
-               <div className={`text-xl font-black uppercase tracking-tighter flex items-center justify-center gap-3 ${META[nextType].tone}`}>
+               <div className={`text-xl font-extrabold uppercase tracking-tighter flex items-center justify-center gap-3 ${META[nextType].tone}`}>
                   {(() => {
                     const Icon = META[nextType].icon;
                     return <Icon className="h-5 w-5" aria-hidden="true" />;
@@ -165,7 +165,7 @@ function MyClockPage() {
               disabled={punching}
               aria-busy={punching}
               aria-label={`Registrar ${META[nextType].label} agora`}
-              className="premium-button min-h-14 sm:min-h-16 w-full rounded-2xl text-lg font-black uppercase tracking-widest gap-3 shadow-lg shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
+              className="premium-button min-h-14 sm:min-h-16 w-full rounded-2xl text-lg font-extrabold tracking-tight gap-3 shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
             >
               <Smartphone className="h-5 w-5" aria-hidden="true" />
               {punching ? "Sincronizando..." : `Registrar ${META[nextType].label}`}
@@ -203,11 +203,11 @@ function MyClockPage() {
                   className={`flex items-center justify-between rounded-2xl px-5 py-4 transition-all ${
                     entry 
                       ? `${META[t].bg} border border-border/10` 
-                      : "bg-muted/10 border border-border/5 text-muted-foreground"
+                      : "bg-slate-50 border border-border/5 text-muted-foreground"
                   }`}
                 >
                   <div className="flex items-center gap-4">
-                    <div className={`p-2 rounded-xl ${entry ? "bg-background/40" : "bg-muted/10"}`}>
+                    <div className={`p-2 rounded-xl ${entry ? "bg-background/40" : "bg-slate-50"}`}>
                       <Icon className={`h-5 w-5 ${entry ? META[t].tone : "opacity-30"}`} />
                     </div>
                     <span className={`font-bold text-sm ${entry ? "" : "opacity-50"}`}>{META[t].label}</span>
@@ -226,25 +226,25 @@ function MyClockPage() {
           </div>
         </div>
 
-        <div className="glass-card rounded-2xl p-6 flex flex-col border border-border/40 shadow-sm">
+        <div className="glass-card rounded-2xl p-6 flex flex-col border border-border shadow-sm">
           <h2 className="mb-4 font-display text-lg font-bold tracking-tight text-foreground">Resumo da Jornada</h2>
           
           <div className="space-y-3 flex-1">
-             <div className="flex items-center justify-between p-4 rounded-xl bg-muted/10 border border-border/20 group hover:bg-muted/20 transition-all">
+             <div className="flex items-center justify-between p-4 rounded-xl bg-slate-50 border border-border group hover:bg-slate-50 transition-all">
                 <div>
-                   <div className="text-[8px] uppercase font-black tracking-[0.2em] text-muted-foreground opacity-70 mb-1">Tempo Trabalhado</div>
-                   <div className="font-mono text-2xl font-black text-foreground">{formatDur(totalWorkedMs)}</div>
+                   <div className="text-[8px] uppercase font-extrabold tracking-[0.2em] text-muted-foreground opacity-70 mb-1">Tempo Trabalhado</div>
+                   <div className="font-mono text-2xl font-extrabold text-foreground">{formatDur(totalWorkedMs)}</div>
                 </div>
                 <div className="h-10 w-10 rounded-xl bg-primary/10 grid place-items-center text-primary group-hover:scale-110 transition-transform">
                    <Clock className="h-5 w-5" />
                 </div>
              </div>
 
-             <div className="flex items-center justify-between p-4 rounded-xl bg-muted/10 border border-border/20 group hover:bg-muted/20 transition-all">
+             <div className="flex items-center justify-between p-4 rounded-xl bg-slate-50 border border-border group hover:bg-slate-50 transition-all">
                 <div>
-                   <div className="text-[8px] uppercase font-black tracking-[0.2em] text-muted-foreground opacity-70 mb-1">Saldo do Dia</div>
+                   <div className="text-[8px] uppercase font-extrabold tracking-[0.2em] text-muted-foreground opacity-70 mb-1">Saldo do Dia</div>
                    <div
-                    className={`font-mono text-2xl font-black ${
+                    className={`font-mono text-2xl font-extrabold ${
                       balance >= 0 ? "text-success" : "text-warning"
                     }`}
                    >
