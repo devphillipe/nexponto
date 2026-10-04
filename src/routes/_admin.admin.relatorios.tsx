@@ -59,8 +59,8 @@ function RelatoriosPage() {
         .from("time_entries")
         .select("id, entry_date, entry_at, entry_type, employee_id, notes, is_adjustment, employees(full_name, daily_hours)")
         .eq("tenant_id", profile!.tenant_id)
-        .gte("entry_date", startDate.toISOString().split("T")[0])
-        .lte("entry_date", endDate.toISOString().split("T")[0]);
+        .gte("entry_date", format(startDate, "yyyy-MM-dd"))
+        .lte("entry_date", format(endDate, "yyyy-MM-dd"));
 
       if (employeeId !== "all") {
         query.eq("employee_id", employeeId);
@@ -73,8 +73,8 @@ function RelatoriosPage() {
         .from("absences")
         .select("id, absence_date, reason, employee_id")
         .eq("tenant_id", profile!.tenant_id)
-        .gte("absence_date", startDate.toISOString().split("T")[0])
-        .lte("absence_date", endDate.toISOString().split("T")[0]);
+        .gte("absence_date", format(startDate, "yyyy-MM-dd"))
+        .lte("absence_date", format(endDate, "yyyy-MM-dd"));
 
       const employeesToReport = employeeId === "all"
         ? (employees || []).filter(e => e.active)
