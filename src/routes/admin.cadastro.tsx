@@ -8,6 +8,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PasswordInput } from "@/components/forms/PasswordInput";
+import { PasswordStrengthMeter } from "@/components/forms/PasswordStrengthMeter";
+import { getPasswordStrength } from "@/lib/validators";
 
 export const Route = createFileRoute("/admin/cadastro")({
   head: () => ({ meta: [{ title: "Cadastrar escritório — NexPonto" }] }),
@@ -36,8 +39,9 @@ function AdminSignup() {
       toast.error("As senhas não coincidem.");
       return;
     }
-    if (form.password.length < 8) {
-      toast.error("A senha deve ter pelo menos 8 caracteres.");
+    const strength = getPasswordStrength(form.password);
+    if (!strength.metAll) {
+      toast.error("A senha não atende a todos os requisitos de segurança.");
       return;
     }
     setLoading(true);
@@ -144,26 +148,30 @@ function AdminSignup() {
               <div className="grid md:grid-cols-2 gap-6">
                  <div className="space-y-2">
                     <Label htmlFor="pw" className="text-xs font-bold tracking-tight text-muted-foreground ml-1">Criar Senha</Label>
-                    <Input 
-                      id="pw" 
-                      type="password" 
-                      placeholder="••••••••"
-                      required 
-                      value={form.password} 
+                    <PasswordInput
+                      id="pw"
+                      placeholder="Crie uma senha forte"
+                      autoComplete="new-password"
+                      required
+                      minLength={8}
+                      value={form.password}
                       onChange={(e) => up("password", e.target.value)}
-                      className="bg-white border-border rounded-2xl h-14 px-5 focus-visible:ring-primary/20 transition-all font-medium"
+                      inputClassName="bg-white border border-border rounded-2xl h-14 px-4 focus-visible:ring-primary/20 transition-all font-medium"
                     />
+                    <PasswordStrengthMeter password={form.password} />
                  </div>
                  <div className="space-y-2">
                     <Label htmlFor="pc" className="text-xs font-bold tracking-tight text-muted-foreground ml-1">Confirmar Senha</Label>
-                    <Input 
-                      id="pc" 
-                      type="password" 
-                      placeholder="••••••••"
-                      required 
-                      value={form.confirm} 
+                    <PasswordInput
+                      id="pc"
+                      placeholder="Repita a senha"
+                      autoComplete="new-password"
+                      required
+                      minLength={8}
+                      value={form.confirm}
                       onChange={(e) => up("confirm", e.target.value)}
-                      className="bg-white border-border rounded-2xl h-14 px-5 focus-visible:ring-primary/20 transition-all font-medium"
+                      aria-invalid={form.confirm.length > 0 && form.confirm !== form.password}
+                      inputClassName="bg-white border border-border rounded-2xl h-14 px-4 focus-visible:ring-primary/20 transition-all font-medium"
                     />
                  </div>
               </div>
