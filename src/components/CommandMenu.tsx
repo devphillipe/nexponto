@@ -67,11 +67,11 @@ export function CommandMenu() {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="relative flex items-center gap-3 rounded-xl md:rounded-[1.25rem] bg-muted/20 border border-border/40 px-3 md:px-5 py-2 md:py-3 text-xs md:text-sm text-muted-foreground transition-all duration-300 hover:bg-muted/30 hover:border-primary/20 hover:shadow-sm group w-10 h-10 md:w-full md:max-w-lg md:h-auto"
+        className="relative flex items-center gap-3 rounded-xl bg-slate-50 border border-border px-3 md:px-5 py-2 md:py-3 text-xs md:text-sm text-muted-foreground transition-all duration-200 hover:bg-white hover:border-slate-300 hover:shadow-sm group w-10 h-10 md:w-full md:max-w-lg md:h-auto"
       >
         <Search className="h-5 w-5 group-hover:text-primary transition-colors shrink-0" />
         <span className="font-medium truncate hidden md:inline-block">O que você deseja fazer?</span>
-        <kbd className="pointer-events-none absolute right-4 hidden h-6 select-none items-center gap-1 rounded-lg border border-border/60 bg-muted/40 px-2 font-mono text-[10px] font-black opacity-100 sm:flex">
+        <kbd className="pointer-events-none absolute right-4 hidden h-6 select-none items-center gap-1 rounded-lg border border-border/60 bg-white px-2 font-mono text-[10px] font-bold opacity-100 sm:flex">
           <span className="text-xs">{isMac ? '⌘' : 'Ctrl'}</span> K
         </kbd>
       </button>
