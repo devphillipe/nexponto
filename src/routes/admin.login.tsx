@@ -91,28 +91,23 @@ function AdminLogin() {
   }
 
   return (
-    <div className="min-h-dvh flex items-center justify-center p-6 [padding-top:calc(1.5rem+var(--sat))] [padding-bottom:calc(1.5rem+var(--sab))] [padding-left:calc(1.5rem+var(--sal))] [padding-right:calc(1.5rem+var(--sar))] relative overflow-hidden">
+    <div className="min-h-dvh flex items-center justify-center bg-background p-4 sm:p-6 [padding-top:calc(1rem+var(--sat))] [padding-bottom:calc(1rem+var(--sab))] relative overflow-hidden">
       <NextFlowBackground />
-      <div className="absolute top-0 left-0 w-full h-full -z-10 opacity-30 pointer-events-none">
-        <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-primary/20 blur-[120px] rounded-full"></div>
-        <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-accent/20 blur-[120px] rounded-full"></div>
-      </div>
-
-      <div className="w-full max-w-lg space-y-8 sm:space-y-12 animate-in fade-in zoom-in-95 duration-1000 slide-in-from-bottom-8 relative z-10">
+      <div className="w-full max-w-md space-y-8 sm:space-y-12 animate-in fade-in zoom-in-95 duration-1000 slide-in-from-bottom-8 relative z-10">
         <div className="text-center space-y-3 sm:space-y-4 px-4">
            <Link to="/" className="inline-flex mx-auto mb-4 sm:mb-6 hover:scale-105 transition-transform duration-500">
               <Logo size={28} wordmarkClassName="text-2xl sm:text-3xl" />
            </Link>
-           <h1 className="text-3xl sm:text-5xl font-black tracking-tighter text-foreground drop-shadow-sm">Portal do Escritório</h1>
-           <p className="text-muted-foreground text-base sm:text-lg font-medium opacity-80">Gerencie sua equipe administrativa.</p>
+           <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tighter text-foreground ">Bem-vindo de volta</h1>
+           <p className="text-muted-foreground text-base sm:text-lg font-medium opacity-80">Acesse a gestão do seu escritório.</p>
         </div>
 
-        <div className="glass-card rounded-3xl sm:rounded-[3rem] p-8 sm:p-12 border border-primary/10 shadow-2xl relative bg-background/40 backdrop-blur-2xl mx-4 sm:mx-0">
+        <div className="glass-card rounded-2xl p-8 sm:p-12 border border-border shadow-xl relative bg-white mx-4 sm:mx-0">
           {!showForgot ? (
             <form onSubmit={onSubmit} className="space-y-8">
               <div className="space-y-6">
                 <div className="space-y-3">
-                  <Label htmlFor="email" className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/70 ml-2">E-mail Corporativo</Label>
+                  <Label htmlFor="email" className="text-[10px] font-extrabold tracking-wide text-primary/70 ml-2">E-mail Corporativo</Label>
                   <div className="relative group">
                     <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
                     <Input 
@@ -124,13 +119,13 @@ function AdminLogin() {
                       required 
                       value={email} 
                       onChange={(e) => setEmail(e.target.value)}
-                      className="bg-muted/20 border-border/40 rounded-2xl h-14 pl-12 pr-4 focus-visible:ring-primary/20 focus-visible:border-primary/30 transition-all font-medium"
+                      className="bg-white border-border rounded-2xl h-14 pl-12 pr-4 focus-visible:ring-primary/20 focus-visible:border-primary/30 transition-all font-medium"
                     />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <div className="flex justify-between items-center px-1">
-                    <Label htmlFor="password" className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Senha de Acesso</Label>
+                    <Label htmlFor="password" className="text-xs font-bold tracking-tight text-muted-foreground">Senha de Acesso</Label>
                     <button 
                       type="button"
                       onClick={() => setShowForgot(true)}
@@ -146,13 +141,13 @@ function AdminLogin() {
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    inputClassName="bg-muted/30 border-none rounded-2xl h-12 px-4 focus-visible:ring-primary/40"
+                    inputClassName="bg-white border border-border rounded-2xl h-12 px-4 focus-visible:ring-primary/40"
                   />
                 </div>
               </div>
               
-              <Button type="submit" disabled={loading} className="premium-button w-full h-16 rounded-2xl text-lg font-black uppercase tracking-widest shadow-xl shadow-primary/20 hover:shadow-2xl hover:shadow-primary/30 active:scale-[0.98] transition-all">
-                {loading ? "Autenticando..." : "Acessar Painel"}
+              <Button type="submit" disabled={loading} className="premium-button w-full h-16 rounded-2xl text-lg font-extrabold tracking-tight shadow-sm hover:shadow-md transition-all">
+                {loading ? "Autenticando..." : "Entrar no NexPonto"}
               </Button>
             </form>
           ) : resetSent ? (
@@ -161,7 +156,7 @@ function AdminLogin() {
                 <CheckCircle2 className="h-8 w-8" />
               </div>
               <div className="space-y-2">
-                <h3 className="text-2xl font-black tracking-tight">E-mail enviado!</h3>
+                <h3 className="text-2xl font-extrabold tracking-tight">E-mail enviado!</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">
                   Enviamos um link de recuperação para{" "}
                   <span className="font-bold text-foreground break-all">{resetEmail}</span>.
@@ -175,7 +170,7 @@ function AdminLogin() {
                 <Button
                   type="button"
                   onClick={() => { setResetSent(false); setShowForgot(false); setResetEmail(""); }}
-                  className="premium-button w-full h-14 rounded-2xl font-bold uppercase tracking-widest"
+                  className="premium-button w-full h-14 rounded-2xl font-bold tracking-tight"
                 >
                   Voltar para o Login
                 </Button>
@@ -201,7 +196,7 @@ function AdminLogin() {
                 </div>
                 
                 <div className="space-y-3">
-                  <Label htmlFor="resetEmail" className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/70 ml-2">E-mail de Recuperação</Label>
+                  <Label htmlFor="resetEmail" className="text-[10px] font-extrabold tracking-wide text-primary/70 ml-2">E-mail de Recuperação</Label>
                   <div className="relative group">
                     <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
                     <Input 
@@ -215,7 +210,7 @@ function AdminLogin() {
                       onChange={(e) => { setResetEmail(e.target.value); if (resetError) setResetError(""); }}
                       aria-invalid={!!resetError}
                       aria-describedby={resetError ? "resetEmailError" : undefined}
-                      className="bg-muted/20 border-border/40 rounded-2xl h-14 pl-12 pr-4 focus-visible:ring-primary/20 focus-visible:border-primary/30 transition-all font-medium"
+                      className="bg-white border-border rounded-2xl h-14 pl-12 pr-4 focus-visible:ring-primary/20 focus-visible:border-primary/30 transition-all font-medium"
                     />
                   </div>
                 </div>
@@ -229,7 +224,7 @@ function AdminLogin() {
               </div>
               
               <div className="space-y-4">
-                <Button type="submit" disabled={sendingReset} className="premium-button w-full h-16 rounded-2xl text-lg font-black uppercase tracking-widest">
+                <Button type="submit" disabled={sendingReset} className="premium-button w-full h-16 rounded-2xl text-lg font-extrabold tracking-tight">
                   {sendingReset ? "Enviando..." : "Enviar Link"}
                 </Button>
                 <Button type="button" variant="ghost" onClick={() => { setShowForgot(false); setResetError(""); }} className="w-full font-bold text-sm">
@@ -248,7 +243,7 @@ function AdminLogin() {
                 </Link>
               </p>
             )}
-            <div className="flex items-center justify-center gap-2 text-[10px] text-muted-foreground uppercase tracking-widest font-bold">
+            <div className="flex items-center justify-center gap-2 text-[10px] text-muted-foreground tracking-tight font-bold">
                <ShieldCheck className="h-3 w-3" /> Acesso Seguro NexPonto
             </div>
           </div>
