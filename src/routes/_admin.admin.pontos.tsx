@@ -31,7 +31,7 @@ const TYPE_LABEL: Record<string, string> = {
 function PontosPage() {
   const { data: profile } = useProfile();
   const queryClient = useQueryClient();
-  const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [date, setDate] = useState(() => format(new Date(), "yyyy-MM-dd"));
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isBatchOpen, setIsBatchOpen] = useState(false);
   const [editingEntry, setEditingEntry] = useState<any>(null);
