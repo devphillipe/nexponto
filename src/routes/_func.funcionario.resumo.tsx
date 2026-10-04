@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useProfile } from "@/lib/auth";
+import { useEmployeeMembership } from "@/lib/employee-membership";
 import { normalizeWorkDays, formatWorkDays } from "@/lib/work-days";
 import { getBrazilNationalHoliday } from "@/lib/brazil-national-holidays";
 import {
@@ -64,35 +64,7 @@ function workedForDay(items: Entry[]) {
 }
 
 function SummaryPage() {
-  const { data: profile } = useProfile();
-
-  const { data: employee } = useQuery({
-    queryKey: ["my-employee"],
-    staleTime: 1000 * 60 * 60,
-    enabled: !!profile,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("employees")
-        .select("id, tenant_id, daily_hours, work_days, hire_date")
-        .eq("user_id", profile!.id)
-        .maybeSingle();
-      if (error) throw error;
-      if (!data) return null;
-
-      if (data.daily_hours != null) return { ...data, effective_daily_hours: data.daily_hours };
-
-      const { data: tenant, error: tenantError } = await supabase
-        .from("tenants")
-        .select("default_daily_hours")
-        .eq("id", data.tenant_id)
-        .single();
-      if (tenantError) throw tenantError;
-      return {
-        ...data,
-        effective_daily_hours: tenant?.default_daily_hours ?? 8,
-      };
-    },
-  });
+  const { selected: employee, loading: membershipLoading } = useEmployeeMembership();
 
   const monthStart = useMemo(() => {
     const d = new Date();
@@ -100,7 +72,7 @@ function SummaryPage() {
   }, []);
 
   const { data, isLoading } = useQuery({
-    queryKey: ["my-month-summary", employee?.id, ymd(monthStart)],
+    queryKey: ["my-month-summary", employee?.id, employee?.tenant_id, ymd(monthStart)],
     staleTime: 1000 * 60,
     enabled: !!employee,
     queryFn: async () => {
@@ -129,7 +101,7 @@ function SummaryPage() {
     },
   });
 
-  const daily = (employee?.effective_daily_hours ?? employee?.daily_hours ?? 8) * 3600_000;
+  const daily = (employee?.daily_hours ?? employee?.tenant_default_daily_hours ?? 8) * 3600_000;
 
   const stats = useMemo(() => {
     const entries = data?.entries ?? [];
@@ -208,6 +180,14 @@ function SummaryPage() {
       weekBalance: weekWorked - weekExpected,
     };
   }, [data, daily, monthStart, employee]);
+
+  if (membershipLoading || !employee) {
+    return (
+      <div className="glass-card rounded-3xl p-12 text-center text-sm text-muted-foreground animate-pulse">
+        Carregando vínculo...
+      </div>
+    );
+  }
 
   const monthLabel = monthStart.toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
   const positive = stats.balance >= 0;
@@ -353,7 +333,7 @@ function SummaryPage() {
 
           <p className="text-[11px] text-muted-foreground text-center leading-relaxed px-4">
             Sua escala: <strong>{formatWorkDays((employee as any)?.work_days)}</strong> · Jornada diária
-            prevista: <strong>{employee?.effective_daily_hours ?? employee?.daily_hours ?? 8} horas</strong>. O dia de hoje só entra no
+            prevista: <strong>{employee.daily_hours ?? employee.tenant_default_daily_hours} horas</strong>. O dia de hoje só entra no
             saldo após o fechamento. Divergências? Fale com seu supervisor.
           </p>
         </>
