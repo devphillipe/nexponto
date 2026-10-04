@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { memo } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
@@ -8,6 +9,7 @@ import { useProfile } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, Clock, LogIn, Coffee, Sunrise, LogOut, MapPin, Smartphone } from "lucide-react";
 import { getCurrentCoords } from "@/lib/geolocation";
+import { registerOwnPunch } from "@/lib/time-entry.functions";
 
 export const Route = createFileRoute("/_func/funcionario/meu-ponto")({
   head: () => ({ meta: [{ title: "Registrar Ponto — NexPonto" }] }),
@@ -24,12 +26,20 @@ const META: Record<EntryType, { label: string; icon: typeof LogIn; tone: string;
   saida: { label: "Saída Final", icon: LogOut, tone: "text-destructive", bg: "bg-destructive/10" },
 };
 
-function todayStr() {
-  return new Date().toISOString().slice(0, 10);
+function dateInTimeZone(timeZone: string) {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date());
+  const get = (type: string) => parts.find((p) => p.type === type)?.value ?? "";
+  return `${get("year")}-${get("month")}-${get("day")}`;
 }
 
 function MyClockPage() {
   const qc = useQueryClient();
+  const registerPunch = useServerFn(registerOwnPunch);
   const { data: profile } = useProfile();
   const [now, setNow] = useState(new Date());
   const [punching, setPunching] = useState(false);
@@ -46,7 +56,7 @@ function MyClockPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("employees")
-        .select("id, tenant_id, active, daily_hours")
+        .select("id, tenant_id, active, daily_hours, tenants(timezone, default_daily_hours)")
         .eq("user_id", profile!.id)
         .maybeSingle();
       if (error) throw error;
@@ -54,8 +64,14 @@ function MyClockPage() {
     },
   });
 
+  const tenantSettings = (employee as any)?.tenants;
+  const effectiveDailyHours =
+    employee?.daily_hours ?? tenantSettings?.default_daily_hours ?? 8;
+  const tenantTimeZone = tenantSettings?.timezone || "America/Sao_Paulo";
+  const currentEntryDate = dateInTimeZone(tenantTimeZone);
+
   const { data: todayEntries } = useQuery({
-    queryKey: ["my-today", employee?.id],
+    queryKey: ["my-today", employee?.id, currentEntryDate],
     staleTime: 1000 * 30, // 30 seconds
     enabled: !!employee,
     queryFn: async () => {
@@ -63,7 +79,7 @@ function MyClockPage() {
         .from("time_entries")
         .select("entry_type, entry_at, source")
         .eq("employee_id", employee!.id)
-        .eq("entry_date", todayStr())
+        .eq("entry_date", currentEntryDate)
         .order("entry_at");
       if (error) throw error;
       return data;
@@ -71,7 +87,7 @@ function MyClockPage() {
   });
 
   // Jornadas menores que 8h não têm intervalo de almoço: só entrada e saída.
-  const hasLunch = (employee?.daily_hours ?? 8) >= 8;
+  const hasLunch = effectiveDailyHours >= 8;
   const sequence: readonly EntryType[] = hasLunch
     ? SEQUENCE
     : (["entrada", "saida"] as const);
@@ -82,28 +98,29 @@ function MyClockPage() {
   async function punch() {
     if (!employee || !nextType) return;
     setPunching(true);
-    // Captura a localização sem bloquear a batida: se o GPS for negado
-    // ou der timeout, o ponto é registrado normalmente sem coordenadas.
-    const coords = await getCurrentCoords();
-    const { error } = await supabase.from("time_entries").insert({
-      tenant_id: employee.tenant_id,
-      employee_id: employee.id,
-      entry_type: nextType,
-      source: "automatico",
-      user_agent: navigator.userAgent,
-      ...(coords ? { latitude: coords.latitude, longitude: coords.longitude } : {}),
-    });
-    setPunching(false);
-    if (error) {
-      toast.error(error.message);
-      return;
+    try {
+      // Captura a localização sem bloquear a batida: se o GPS for negado
+      // ou der timeout, o ponto é registrado normalmente sem coordenadas.
+      const coords = await getCurrentCoords();
+      const result = await registerPunch({
+        data: {
+          user_agent: navigator.userAgent,
+          ...(coords ? { latitude: coords.latitude, longitude: coords.longitude } : {}),
+        },
+      });
+      const recordedType = result.entry_type as EntryType;
+      toast.success(`${META[recordedType].label} registrada com sucesso!`);
+      qc.invalidateQueries({ queryKey: ["my-today"] });
+      qc.invalidateQueries({ queryKey: ["my-month-summary"] });
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Não foi possível registrar o ponto.");
+    } finally {
+      setPunching(false);
     }
-    toast.success(`${META[nextType].label} registrada com sucesso!`);
-    qc.invalidateQueries({ queryKey: ["my-today"] });
   }
 
   const totalWorkedMs = computeWorked(todayEntries ?? []);
-  const dailyTarget = (employee?.daily_hours ?? 8) * 3600_000;
+  const dailyTarget = effectiveDailyHours * 3600_000;
   const balance = totalWorkedMs - dailyTarget;
 
   const today = new Date();
@@ -258,7 +275,7 @@ function MyClockPage() {
           </div>
           
           <p className="mt-8 text-[11px] text-muted-foreground text-center leading-relaxed">
-            Sua jornada diária prevista é de <strong>{employee?.daily_hours || 8} horas</strong>. <br />
+            Sua jornada diária prevista é de <strong>{effectiveDailyHours} horas</strong>. <br />
             Qualquer divergência, procure o seu supervisor.
           </p>
         </div>
