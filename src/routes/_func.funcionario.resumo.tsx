@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useProfile } from "@/lib/auth";
 import { normalizeWorkDays, formatWorkDays } from "@/lib/work-days";
+import { getBrazilNationalHoliday } from "@/lib/brazil-national-holidays";
 import {
   TrendingUp,
   TrendingDown,
@@ -72,11 +73,24 @@ function SummaryPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("employees")
-        .select("id, tenant_id, daily_hours, work_days")
+        .select("id, tenant_id, daily_hours, work_days, hire_date")
         .eq("user_id", profile!.id)
         .maybeSingle();
       if (error) throw error;
-      return data;
+      if (!data) return null;
+
+      if (data.daily_hours != null) return { ...data, effective_daily_hours: data.daily_hours };
+
+      const { data: tenant, error: tenantError } = await supabase
+        .from("tenants")
+        .select("default_daily_hours")
+        .eq("id", data.tenant_id)
+        .single();
+      if (tenantError) throw tenantError;
+      return {
+        ...data,
+        effective_daily_hours: tenant?.default_daily_hours ?? 8,
+      };
     },
   });
 
@@ -115,7 +129,7 @@ function SummaryPage() {
     },
   });
 
-  const daily = (employee?.daily_hours ?? 8) * 3600_000;
+  const daily = (employee?.effective_daily_hours ?? employee?.daily_hours ?? 8) * 3600_000;
 
   const stats = useMemo(() => {
     const entries = data?.entries ?? [];
@@ -136,16 +150,31 @@ function SummaryPage() {
       d = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1)
     ) {
       const key = ymd(d);
+      const hiredOnOrBefore =
+        !employee?.hire_date || key >= String(employee.hire_date).slice(0, 10);
+      const nationalHoliday = getBrazilNationalHoliday(key);
       const isOff = !workDays.includes(d.getDay());
       const worked = workedForDay(byDay.get(key) ?? []);
       const isToday = key === ymd(today);
-      const expected = isOff || absent.has(key) || isToday ? 0 : daily;
-      days.push({ date: key, worked, expected, off: isOff });
+      const expected =
+        isOff || !hiredOnOrBefore || absent.has(key) || nationalHoliday || isToday
+          ? 0
+          : daily;
+      days.push({
+        date: key,
+        worked,
+        expected,
+        off: isOff || !hiredOnOrBefore || !!nationalHoliday,
+      });
     }
 
     const worked = days.reduce((s, d) => s + d.worked, 0);
     const expected = days.reduce((s, d) => s + d.expected, 0);
     const daysWorked = days.filter((d) => d.worked > 0).length;
+    const absencesCount = absent.size;
+    const faults = days.filter(
+      (d) => d.expected > 0 && d.worked === 0 && !absent.has(d.date),
+    ).length;
 
     // Semana atual (segunda a domingo)
     const wd = (today.getDay() + 6) % 7;
@@ -172,7 +201,8 @@ function SummaryPage() {
       expected,
       balance: worked - expected,
       daysWorked,
-      absences: absent.size,
+      absences: absencesCount,
+      faults,
       week,
       weekWorked,
       weekBalance: weekWorked - weekExpected,
@@ -269,7 +299,8 @@ function SummaryPage() {
               icon={<CalendarDays className="h-5 w-5" />}
             />
             <Stat label="Dias com registro" value={String(stats.daysWorked)} />
-            <Stat label="Faltas / abonos" value={String(stats.absences)} />
+            <Stat label="Abonos" value={String(stats.absences)} />
+            <Stat label="Faltas apuradas" value={String(stats.faults)} />
           </section>
 
           {/* Resumo semanal */}
@@ -322,7 +353,7 @@ function SummaryPage() {
 
           <p className="text-[11px] text-muted-foreground text-center leading-relaxed px-4">
             Sua escala: <strong>{formatWorkDays((employee as any)?.work_days)}</strong> · Jornada diária
-            prevista: <strong>{employee?.daily_hours ?? 8} horas</strong>. O dia de hoje só entra no
+            prevista: <strong>{employee?.effective_daily_hours ?? employee?.daily_hours ?? 8} horas</strong>. O dia de hoje só entra no
             saldo após o fechamento. Divergências? Fale com seu supervisor.
           </p>
         </>
