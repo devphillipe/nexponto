@@ -4,32 +4,25 @@ import { useProfile } from "@/lib/auth";
 import { Clock, History, LogOut, User, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/Logo";
-import { memo } from "react";
+import { memo, useEffect } from "react";
+import { EmployeeMembershipProvider, clearStoredEmployeeTenant, useEmployeeMembership } from "@/lib/employee-membership";
 
 export const Route = createFileRoute("/_func")({
   beforeLoad: async () => {
     const { data } = await supabase.auth.getUser();
     if (!data.user) throw redirect({ to: "/funcionario/login" });
 
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("tenant_id")
-      .eq("id", data.user.id)
-      .maybeSingle();
-
-    if (!profile?.tenant_id) throw redirect({ to: "/funcionario/login" });
-
     const { data: roles } = await supabase
       .from("user_roles")
       .select("role")
       .eq("user_id", data.user.id)
-      .eq("tenant_id", profile.tenant_id);
+      .eq("role", "employee");
 
-    if (!roles?.some((r) => r.role === "employee")) {
+    if (!roles?.length) {
       throw redirect({ to: "/funcionario/login" });
     }
   },
-  component: memo(FuncLayout),
+  component: memo(FuncLayoutWithMembership),
 });
 
 const nav = [
@@ -39,12 +32,31 @@ const nav = [
   { to: "/funcionario/perfil", label: "Perfil", icon: User },
 ] as const;
 
+function FuncLayoutWithMembership() {
+  return (
+    <EmployeeMembershipProvider>
+      <FuncLayout />
+    </EmployeeMembershipProvider>
+  );
+}
+
 function FuncLayout() {
   const { data: profile } = useProfile();
+  const { memberships, selected, loading: membershipLoading, clearSelection } = useEmployeeMembership();
   const navigate = useNavigate();
   const loc = useLocation();
 
+  useEffect(() => {
+    if (membershipLoading) return;
+    const onSelector = loc.pathname.startsWith("/funcionario/selecionar-empresa");
+    if (memberships.length > 1 && !selected && !onSelector) {
+      navigate({ to: "/funcionario/selecionar-empresa" });
+    }
+  }, [membershipLoading, memberships.length, selected, loc.pathname, navigate]);
+
   async function logout() {
+    clearSelection();
+    clearStoredEmployeeTenant();
     await supabase.auth.signOut();
     navigate({ to: "/" });
   }
@@ -58,7 +70,7 @@ function FuncLayout() {
             <div className="flex min-w-0 items-center gap-3">
               <div className="hidden min-w-0 text-right sm:block">
                 <div className="truncate text-xs font-bold text-[#071A2B]">{profile?.full_name}</div>
-                <div className="truncate text-[10px] font-medium text-muted-foreground">{profile?.tenant_name}</div>
+                <div className="truncate text-[10px] font-medium text-muted-foreground">{selected?.tenant_name ?? (memberships.length > 1 ? "Selecione o escritório" : profile?.tenant_name)}</div>
               </div>
               <div className="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-xl bg-blue-50 text-sm font-extrabold text-primary">
                 {profile?.avatar_url ? (
