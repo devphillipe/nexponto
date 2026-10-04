@@ -134,7 +134,7 @@ function PerfilPage() {
         <p className="text-muted-foreground mt-1 text-sm">Atualize sua foto e altere sua senha.</p>
       </div>
 
-      <Card className="glass-card border-border/40 rounded-2xl overflow-hidden">
+      <Card className="glass-card border-border rounded-2xl overflow-hidden">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-lg">
             <Camera className="h-5 w-5 text-primary" /> Foto de Perfil
@@ -192,7 +192,7 @@ function PerfilPage() {
         </CardContent>
       </Card>
 
-      <Card className="glass-card border-border/40 rounded-2xl overflow-hidden">
+      <Card className="glass-card border-border rounded-2xl overflow-hidden">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-lg">
             <UserIcon className="h-5 w-5 text-primary" /> Dados da Conta
@@ -210,7 +210,7 @@ function PerfilPage() {
         </CardContent>
       </Card>
 
-      <Card className="glass-card border-border/40 rounded-2xl overflow-hidden">
+      <Card className="glass-card border-border rounded-2xl overflow-hidden">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-lg">
             <Lock className="h-5 w-5 text-primary" /> Alterar Senha
