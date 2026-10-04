@@ -3,7 +3,7 @@ import { memo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useProfile } from "@/lib/auth";
+import { useEmployeeMembership } from "@/lib/employee-membership";
 import { Calendar, Clock, ChevronDown, History } from "lucide-react";
 import { LocationDialog } from "@/components/LocationDialog";
 
@@ -27,23 +27,18 @@ const TYPE_COLOR: Record<string, string> = {
 };
 
 function HistoryPage() {
-  const { data: profile } = useProfile();
+  const { selected: employee, loading: membershipLoading } = useEmployeeMembership();
   const [expandedDays, setExpandedDays] = useState<Record<string, boolean>>({});
 
   const { data: entries, isLoading } = useQuery({
-    queryKey: ["my-history", profile?.id],
-    enabled: !!profile,
+    queryKey: ["my-history", employee?.id, employee?.tenant_id],
+    enabled: !!employee,
     queryFn: async () => {
-      const { data: emp } = await supabase
-        .from("employees")
-        .select("id")
-        .eq("user_id", profile!.id)
-        .maybeSingle();
-      if (!emp) return [];
       const { data, error } = await supabase
         .from("time_entries")
         .select("id, entry_date, entry_at, entry_type, source, latitude, longitude")
-        .eq("employee_id", emp.id)
+        .eq("employee_id", employee!.id)
+        .eq("tenant_id", employee!.tenant_id)
         .order("entry_at", { ascending: false })
         .limit(100);
       if (error) throw error;
@@ -65,6 +60,14 @@ function HistoryPage() {
       [date]: !prev[date],
     }));
   };
+
+  if (membershipLoading || !employee) {
+    return (
+      <div className="glass-card rounded-2xl p-10 text-center text-sm text-muted-foreground animate-pulse">
+        Carregando vínculo...
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 sm:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
