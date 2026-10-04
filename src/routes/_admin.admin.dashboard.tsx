@@ -61,7 +61,8 @@ function Dashboard() {
           .from("employees")
           .select("id", { count: "exact", head: true })
           .eq("tenant_id", profile!.tenant_id)
-          .gte("hire_date", monthStart),
+          .gte("hire_date", monthStart)
+          .lte("hire_date", today),
         supabase
           .from("time_entries")
           .select("employee_id")
