@@ -1,10 +1,5 @@
 import React from "react";
 
-/**
- * Lightweight static background.
- * A single, subtle radial glow behind the hero — no animations, no SVG,
- * no particles. Kept as `NextFlowBackground` for import compatibility.
- */
 export const NextFlowBackground: React.FC = React.memo(() => {
   return (
     <div
@@ -12,7 +7,7 @@ export const NextFlowBackground: React.FC = React.memo(() => {
       className="fixed inset-0 -z-20 pointer-events-none bg-background"
       style={{
         backgroundImage:
-          "radial-gradient(ellipse 60% 40% at 50% 30%, rgba(0,229,255,0.07), transparent 70%)",
+          "radial-gradient(circle at 12% 8%, rgba(37,99,235,0.08), transparent 28%), radial-gradient(circle at 88% 16%, rgba(34,211,238,0.08), transparent 24%), linear-gradient(180deg, #ffffff 0%, #f7f9fc 48%, #f7f9fc 100%)",
       }}
     />
   );
