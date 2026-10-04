@@ -29,6 +29,7 @@ function ConfiguracoesPage() {
   const [pw, setPw] = useState("");
   const [pw2, setPw2] = useState("");
   const [pwLoading, setPwLoading] = useState(false);
+  const [cep, setCep] = useState("");
   const [formData, setFormData] = useState({
     name: "",
     document: "",
@@ -337,8 +338,9 @@ function ConfiguracoesPage() {
               <Label htmlFor="cep">CEP (Busca Automática)</Label>
               <CepInput
                 id="cep"
-                value=""
+                value={cep}
                 onValueChange={(v) => {
+                  setCep(v);
                   if (v.length === 8) fetchAddress(formatCep(v));
                 }}
               />
