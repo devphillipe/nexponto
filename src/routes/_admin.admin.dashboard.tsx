@@ -9,6 +9,8 @@ import { useNavigate } from "@tanstack/react-router";
 
 import { useMemo } from "react";
 import { format } from "date-fns";
+import { worksOn } from "@/lib/work-days";
+import { getBrazilNationalHoliday } from "@/lib/brazil-national-holidays";
 import { ptBR } from "date-fns/locale";
 
 const TYPE_LABEL: Record<string, string> = {
@@ -32,26 +34,29 @@ function Dashboard() {
     enabled: !!profile?.tenant_id,
     staleTime: 1000 * 60 * 5, // 5 minutes
     queryFn: async () => {
-      const today = new Date().toISOString().slice(0, 10);
+      const today = format(new Date(), "yyyy-MM-dd");
+      const todayDate = new Date(`${today}T12:00:00`);
       const monthStart = today.slice(0, 8) + "01";
-      const [emps, actives, todayEntries, recentActivities, monthHires, todayEntradas] = await Promise.all([
+      const nationalHoliday = getBrazilNationalHoliday(today);
+
+      const [emps, activeEmployees, todayEntries, recentActivities, monthHires, todayEntradas, todayAbsences] = await Promise.all([
         supabase.from("employees").select("id", { count: "exact", head: true }).eq("tenant_id", profile!.tenant_id),
         supabase
           .from("employees")
-          .select("id", { count: "exact", head: true })
+          .select("id, work_days, hire_date")
           .eq("tenant_id", profile!.tenant_id)
           .eq("active", true),
         supabase
           .from("time_entries")
-          .select("id", { count: "exact", head: true })
+          .select("id, notes, is_adjustment")
           .eq("tenant_id", profile!.tenant_id)
           .eq("entry_date", today),
         supabase
           .from("time_entries")
-          .select("id, entry_at, entry_type, employees(full_name)")
+          .select("id, entry_at, entry_type, notes, is_adjustment, employees(full_name)")
           .eq("tenant_id", profile!.tenant_id)
           .order("entry_at", { ascending: false })
-          .limit(10),
+          .limit(20),
         supabase
           .from("employees")
           .select("id", { count: "exact", head: true })
@@ -63,17 +68,43 @@ function Dashboard() {
           .eq("tenant_id", profile!.tenant_id)
           .eq("entry_date", today)
           .eq("entry_type", "entrada"),
+        supabase
+          .from("absences")
+          .select("employee_id")
+          .eq("tenant_id", profile!.tenant_id)
+          .eq("absence_date", today),
       ]);
-      const activeCount = actives.count ?? 0;
+
+      const activeList = activeEmployees.data ?? [];
+      const activeCount = activeList.length;
+      const absentToday = new Set((todayAbsences.data ?? []).map((a: any) => a.employee_id));
+      const scheduledToday = nationalHoliday
+        ? []
+        : activeList.filter((e: any) => {
+            const hired = !e.hire_date || String(e.hire_date).slice(0, 10) <= today;
+            return hired && worksOn(e.work_days, todayDate) && !absentToday.has(e.id);
+          });
+
       const withEntrada = new Set((todayEntradas.data ?? []).map((e: any) => e.employee_id));
-      const pendencias = Math.max(0, activeCount - withEntrada.size);
+      const presentScheduled = scheduledToday.filter((e: any) => withEntrada.has(e.id)).length;
+      const pendencias = Math.max(0, scheduledToday.length - presentScheduled);
+      const validTodayPunches = (todayEntries.data ?? []).filter(
+        (e: any) => !(e.is_adjustment && e.notes?.startsWith("ABONO:")),
+      ).length;
+      const validRecentActivities = (recentActivities.data ?? [])
+        .filter((e: any) => !(e.is_adjustment && e.notes?.startsWith("ABONO:")))
+        .slice(0, 10);
+
       return {
         total: emps.count ?? 0,
         active: activeCount,
-        todayPunches: todayEntries.count ?? 0,
-        recentActivities: recentActivities.data ?? [],
+        scheduledToday: scheduledToday.length,
+        presentScheduled,
+        todayPunches: validTodayPunches,
+        recentActivities: validRecentActivities,
         monthHires: monthHires.count ?? 0,
         pendencias,
+        nationalHoliday: nationalHoliday?.name ?? null,
       };
     },
   });
@@ -100,27 +131,37 @@ function Dashboard() {
         label: "Pendências",
         value: pend,
         icon: AlertCircle,
-        trend: pend > 0 ? "Sem entrada hoje" : "Tudo em dia",
+        trend: stats?.nationalHoliday
+          ? "Feriado nacional"
+          : pend > 0
+            ? "Sem entrada prevista"
+            : "Tudo em dia",
         color: pend > 0 ? "text-warning" : "text-muted-foreground",
       },
     ];
   }, [stats]);
 
-  const productivity = useMemo(() => {
-    const active = stats?.active ?? 0;
-    const punches = stats?.todayPunches ?? 0;
-    if (!active) {
-      return { label: "Sem dados ainda", icon: Activity, tone: "bg-slate-50 border-border text-muted-foreground shadow-none" };
+  const attendance = useMemo(() => {
+    if (stats?.nationalHoliday) {
+      return {
+        label: `Feriado nacional · ${stats.nationalHoliday}`,
+        icon: CheckCircle2,
+        tone: "bg-primary/10 border-primary/20 text-primary shadow-none",
+      };
     }
-    const expected = active * 4;
-    const rate = expected > 0 ? punches / expected : 0;
-    if (rate >= 0.75) {
-      return { label: "Produtividade em alta", icon: TrendingUp, tone: "bg-success/10 border-success/20 text-success shadow-success/5" };
+    const scheduled = stats?.scheduledToday ?? 0;
+    const present = stats?.presentScheduled ?? 0;
+    if (!scheduled) {
+      return { label: "Sem jornada prevista hoje", icon: Activity, tone: "bg-slate-50 border-border text-muted-foreground shadow-none" };
     }
-    if (rate >= 0.35) {
-      return { label: "Produtividade estável", icon: Activity, tone: "bg-primary/10 border-primary/20 text-primary shadow-primary/5" };
+    const rate = present / scheduled;
+    if (rate >= 1) {
+      return { label: "Equipe prevista em dia", icon: CheckCircle2, tone: "bg-success/10 border-success/20 text-success shadow-success/5" };
     }
-    return { label: "Produtividade baixa", icon: TrendingDown, tone: "bg-warning/10 border-warning/20 text-warning shadow-warning/5" };
+    if (rate >= 0.5) {
+      return { label: `${present}/${scheduled} com entrada registrada`, icon: Activity, tone: "bg-primary/10 border-primary/20 text-primary shadow-primary/5" };
+    }
+    return { label: `${present}/${scheduled} com entrada registrada`, icon: AlertCircle, tone: "bg-warning/10 border-warning/20 text-warning shadow-warning/5" };
   }, [stats]);
 
   return (
@@ -132,9 +173,9 @@ function Dashboard() {
           </h1>
           <p className="text-muted-foreground mt-2 md:mt-3 text-base md:text-xl font-medium">Aqui está o resumo do seu escritório hoje.</p>
         </div>
-        <div className={`flex items-center self-start gap-3 px-5 py-2.5 rounded-2xl border text-sm font-bold shadow-sm ${productivity.tone}`}>
-           <productivity.icon className="h-4 w-4" />
-           {productivity.label}
+        <div className={`flex items-center self-start gap-3 px-5 py-2.5 rounded-2xl border text-sm font-bold shadow-sm ${attendance.tone}`}>
+           <attendance.icon className="h-4 w-4" />
+           {attendance.label}
         </div>
       </div>
 
