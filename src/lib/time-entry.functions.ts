@@ -3,6 +3,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const PunchSchema = z.object({
+  tenant_id: z.string().uuid(),
   latitude: z.number().min(-90).max(90).optional(),
   longitude: z.number().min(-180).max(180).optional(),
   user_agent: z.string().max(500).optional(),
@@ -32,6 +33,7 @@ export const registerOwnPunch = createServerFn({ method: "POST" })
       .from("employees")
       .select("id, tenant_id, active, daily_hours")
       .eq("user_id", userId)
+      .eq("tenant_id", data.tenant_id)
       .maybeSingle();
 
     if (employeeError) throw new Error(employeeError.message);
