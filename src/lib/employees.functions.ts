@@ -48,6 +48,14 @@ export const createEmployee = createServerFn({ method: "POST" })
 
     const tenantId = profile.tenant_id;
 
+    const { data: tenant, error: tenantErr } = await supabase
+      .from("tenants")
+      .select("default_daily_hours")
+      .eq("id", tenantId)
+      .single();
+    if (tenantErr) throw new Error(tenantErr.message);
+    const defaultDailyHours = tenant?.default_daily_hours ?? 8;
+
     // Create auth user with provisional password (email auto-confirmed in config).
     const { data: created, error: createErr } =
       await supabaseAdmin.auth.admin.createUser({
@@ -87,7 +95,7 @@ export const createEmployee = createServerFn({ method: "POST" })
         position: data.position,
         department: data.department,
         hire_date: data.hire_date || null,
-        daily_hours: data.daily_hours ?? null,
+        daily_hours: data.daily_hours ?? defaultDailyHours,
         work_days: data.work_days ?? [1, 2, 3, 4, 5],
         active: true,
       });
