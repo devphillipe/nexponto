@@ -3,7 +3,7 @@ import { memo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useProfile } from "@/lib/auth";
-import { Users, Clock, CheckCircle2, AlertCircle, ArrowUpRight, TrendingUp, TrendingDown, Activity, CheckCircle } from "lucide-react";
+import { Users, Clock, CheckCircle2, AlertCircle, ArrowUpRight, Activity, CheckCircle } from "lucide-react";
 import { CardSkeleton } from "@/components/SkeletonLoader";
 import { useNavigate } from "@tanstack/react-router";
 
@@ -164,6 +164,8 @@ function Dashboard() {
     return { label: `${present}/${scheduled} com entrada registrada`, icon: AlertCircle, tone: "bg-warning/10 border-warning/20 text-warning shadow-warning/5" };
   }, [stats]);
 
+  const AttendanceIcon = attendance.icon;
+
   return (
     <div className="space-y-12 animate-in fade-in slide-in-from-bottom-6 duration-1000">
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
@@ -174,7 +176,7 @@ function Dashboard() {
           <p className="text-muted-foreground mt-2 md:mt-3 text-base md:text-xl font-medium">Aqui está o resumo do seu escritório hoje.</p>
         </div>
         <div className={`flex items-center self-start gap-3 px-5 py-2.5 rounded-2xl border text-sm font-bold shadow-sm ${attendance.tone}`}>
-           <attendance.icon className="h-4 w-4" />
+           <AttendanceIcon className="h-4 w-4" />
            {attendance.label}
         </div>
       </div>
