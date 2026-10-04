@@ -1,7 +1,17 @@
 import { createFileRoute, Link, Outlet, redirect, useNavigate, useLocation } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useProfile } from "@/lib/auth";
-import { LayoutDashboard, Users, Clock, LogOut, Bell, Search, Settings, FileText, Menu, X, CreditCard } from "lucide-react";
+import {
+  LayoutDashboard,
+  Users,
+  Clock,
+  LogOut,
+  Settings,
+  FileText,
+  Menu,
+  CreditCard,
+  ShieldCheck,
+} from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import { CommandMenu } from "@/components/CommandMenu";
@@ -11,13 +21,13 @@ import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/co
 export const Route = createFileRoute("/_admin")({
   beforeLoad: async () => {
     const { data } = await supabase.auth.getUser();
-    if (!data.user) {
-      throw redirect({ to: "/admin/login" });
-    }
+    if (!data.user) throw redirect({ to: "/admin/login" });
+
     const { data: roles } = await supabase
       .from("user_roles")
       .select("role")
       .eq("user_id", data.user.id);
+
     if (!roles?.some((r) => r.role === "admin")) {
       throw redirect({ to: "/admin/login" });
     }
@@ -45,175 +55,140 @@ function AdminLayout() {
     navigate({ to: "/" });
   }
 
+  const navigation = (
+    <>
+      <div className="px-3 pb-2 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">
+        Principal
+      </div>
+      <nav className="flex flex-col gap-1.5">
+        {nav.map((item) => {
+          const active = loc.pathname.startsWith(item.to);
+          return (
+            <Link
+              key={item.to}
+              to={item.to}
+              onClick={() => setIsMobileMenuOpen(false)}
+              className={
+                "group flex min-h-11 items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-semibold transition-colors " +
+                (active
+                  ? "bg-white/10 text-white"
+                  : "text-slate-300 hover:bg-white/[0.06] hover:text-white")
+              }
+            >
+              <item.icon className={"h-5 w-5 " + (active ? "text-cyan-300" : "text-slate-400 group-hover:text-blue-300")} />
+              {item.label}
+            </Link>
+          );
+        })}
+      </nav>
+    </>
+  );
+
   return (
-    <div className="flex min-h-dvh bg-background/50 overflow-x-hidden">
-      {/* Sidebar Desktop */}
-      <aside className="hidden w-72 shrink-0 flex-col border-r border-border/40 bg-background/40 backdrop-blur-2xl p-8 lg:flex sticky top-0 h-dvh transition-all duration-300">
-        <div className="mb-10 flex items-center gap-3 px-1">
-          <Logo size={24} showWordmark={false} />
-          <div className="min-w-0">
-            <div className="truncate font-display text-xl font-bold tracking-tight">
-              Nex<span className="text-primary">Ponto</span>
-            </div>
-            <div className="truncate text-[9px] uppercase font-black tracking-[0.25em] text-primary/80 opacity-80">
-              Admin Console
-            </div>
-          </div>
+    <div className="flex min-h-dvh bg-background">
+      <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col bg-[#071A2B] px-4 py-6 text-white lg:flex">
+        <div className="px-2">
+          <Logo size={28} inverse wordmarkClassName="text-xl" />
+          <p className="mt-2 pl-10 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">
+            Gestão de jornada
+          </p>
         </div>
 
-        <div className="mb-8 p-5 glass-card rounded-2xl bg-gradient-to-br from-primary/10 to-transparent border-primary/10 shadow-sm transition-all hover:shadow-md">
-           <div className="flex items-center gap-3">
-             <div className="min-w-0">
-               <div className="truncate text-[9px] text-primary uppercase font-black tracking-widest mb-0.5">Assinatura Ativa</div>
-               <div className="truncate text-xs font-bold text-foreground">Escritório Central</div>
-             </div>
-           </div>
-        </div>
+        <div className="mt-8 flex-1">{navigation}</div>
 
-        <nav className="flex flex-1 flex-col gap-2">
-          <div className="px-2 mb-2 text-[10px] uppercase font-bold tracking-widest text-muted-foreground/50">
-            Principal
-          </div>
-          {nav.map((item) => {
-            const active = loc.pathname.startsWith(item.to);
-            return (
-              <Link
-                key={item.to}
-                to={item.to}
-                className={`group flex items-center gap-3 rounded-2xl px-5 py-3.5 min-h-[3rem] text-sm font-semibold transition-all duration-300 ${
-                  active
-                    ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-[1.02] border border-primary/20"
-                    : "text-muted-foreground hover:bg-muted/50 hover:text-foreground hover:translate-x-1"
-                }`}
-              >
-                <item.icon className={`h-5 w-5 transition-colors duration-300 ${active ? "text-primary-foreground" : "group-hover:text-primary"}`} />
-                {item.label}
-              </Link>
-            );
-          })}
-        </nav>
-
-        <div className="mt-auto space-y-4 pt-6 border-t border-border/40">
-           <Link 
-             to="/admin/configuracoes"
-             className={`flex w-full items-center gap-3 rounded-2xl px-5 py-3.5 min-h-[3rem] text-sm font-semibold transition-all duration-300 ${
-               loc.pathname.startsWith("/admin/configuracoes")
-                 ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
-                 : "text-muted-foreground hover:bg-muted/50 hover:text-foreground hover:translate-x-1"
-             }`}
-           >
-             <Settings className="h-5 w-5" /> Configurações
-           </Link>
-           <button 
-             onClick={logout}
-             className="flex w-full items-center gap-3 rounded-2xl px-5 py-3.5 min-h-[3rem] text-sm font-semibold text-destructive/80 hover:bg-destructive/10 hover:text-destructive transition-all duration-300 hover:translate-x-1"
-           >
-             <LogOut className="h-5 w-5" /> Sair do Sistema
-           </button>
+        <div className="border-t border-white/10 pt-4">
+          <Link
+            to="/admin/configuracoes"
+            className={
+              "flex min-h-11 items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-semibold transition-colors " +
+              (loc.pathname.startsWith("/admin/configuracoes")
+                ? "bg-white/10 text-white"
+                : "text-slate-300 hover:bg-white/[0.06] hover:text-white")
+            }
+          >
+            <Settings className="h-5 w-5" />
+            Configurações
+          </Link>
+          <button
+            onClick={logout}
+            className="mt-1.5 flex min-h-11 w-full items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-slate-300 transition-colors hover:bg-red-500/10 hover:text-red-300"
+          >
+            <LogOut className="h-5 w-5" />
+            Sair
+          </button>
         </div>
       </aside>
 
-      <div className="flex-1 flex flex-col min-w-0 max-w-full">
-        <header className="h-20 md:h-24 border-b border-border/40 flex items-center justify-between bg-background/60 backdrop-blur-2xl sticky top-0 z-30 transition-all duration-300 box-content [padding-top:var(--sat)] [padding-left:calc(1rem+var(--sal))] [padding-right:calc(1rem+var(--sar))] md:[padding-left:calc(2rem+var(--sal))] md:[padding-right:calc(2rem+var(--sar))] lg:[padding-left:calc(3rem+var(--sal))] lg:[padding-right:calc(3rem+var(--sar))]">
-           <div className="flex items-center gap-3 lg:hidden">
-             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-               <SheetTrigger asChild>
-                 <Button variant="ghost" size="icon" aria-label="Abrir menu" className="h-12 w-12 touch-target rounded-2xl">
-                   <Menu className="h-7 w-7" />
-                 </Button>
-               </SheetTrigger>
-
-               <SheetContent side="left" className="p-0 w-[85vw] max-w-xs border-r border-border/40 bg-background/95 backdrop-blur-2xl">
-                 <div className="flex h-full flex-col p-6 [padding-top:calc(1.5rem+var(--sat))] [padding-bottom:calc(1.5rem+var(--sab))] [padding-left:calc(1.5rem+var(--sal))]">
-                    <SheetHeader className="mb-10 text-left px-2">
-                      <div className="flex items-center gap-3">
-                        <Logo size={24} showWordmark={false} />
-                        <SheetTitle className="text-xl font-bold tracking-tight">NexPonto</SheetTitle>
-                      </div>
+      <div className="flex min-w-0 flex-1 flex-col">
+        <header className="sticky top-0 z-30 border-b border-border bg-white/95 backdrop-blur-xl [padding-top:var(--sat)]">
+          <div className="flex h-18 items-center gap-3 px-4 md:px-6 lg:px-8">
+            <div className="lg:hidden">
+              <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon" aria-label="Abrir menu">
+                    <Menu className="h-5 w-5" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="left" className="w-[86vw] max-w-xs border-r-0 bg-[#071A2B] p-0 text-white">
+                  <div className="flex h-full flex-col px-4 py-6 [padding-top:calc(1.5rem+var(--sat))]">
+                    <SheetHeader className="px-2 text-left">
+                      <SheetTitle className="sr-only">Menu do NexPonto</SheetTitle>
+                      <Logo size={28} inverse wordmarkClassName="text-xl" />
                     </SheetHeader>
-
-                    <nav className="flex flex-1 flex-col gap-2">
-                      {nav.map((item) => {
-                        const active = loc.pathname.startsWith(item.to);
-                        return (
-                          <Link
-                            key={item.to}
-                            to={item.to}
-                            onClick={() => setIsMobileMenuOpen(false)}
-                            className={`group flex items-center gap-3 rounded-2xl px-5 py-3.5 min-h-[3rem] text-sm font-semibold transition-all duration-300 ${
-                              active
-                                ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-[1.02] border border-primary/20"
-                                : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
-                            }`}
-                          >
-                            <item.icon className={`h-5 w-5 transition-colors duration-300 ${active ? "text-primary-foreground" : "group-hover:text-primary"}`} />
-                            {item.label}
-                          </Link>
-                        );
-                      })}
-                    </nav>
-
-                    <div className="mt-auto space-y-4 pt-6 border-t border-border/40">
-                      <Link 
-                        to="/admin/configuracoes"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                        className={`flex w-full items-center gap-3 rounded-2xl px-5 py-3.5 min-h-[3rem] text-sm font-semibold transition-all duration-300 ${
-                          loc.pathname.startsWith("/admin/configuracoes")
-                            ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
-                            : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
-                        }`}
-                      >
-                        <Settings className="h-5 w-5" /> Configurações
-                      </Link>
-                      <button 
-                        onClick={() => { setIsMobileMenuOpen(false); logout(); }}
-                        className="flex w-full items-center gap-3 rounded-2xl px-5 py-3.5 min-h-[3rem] text-sm font-semibold text-destructive/80 hover:bg-destructive/10 hover:text-destructive transition-all duration-300"
-                      >
-                        <LogOut className="h-5 w-5" /> Sair
-                      </button>
-                    </div>
-                 </div>
-               </SheetContent>
-             </Sheet>
-             <div className="md:hidden">
-                <Logo size={20} showWordmark={false} />
-             </div>
-           </div>
-
-           <div className="hidden md:block flex-1 max-w-xl">
-             <CommandMenu />
-           </div>
-           
-            <div className="flex items-center gap-2 md:gap-6 ml-auto">
-              <div className="md:hidden">
-                 <CommandMenu />
-              </div>
-              <div className="h-8 w-[1px] bg-border mx-1 md:mx-2 hidden sm:block"></div>
-              <div className="flex items-center gap-2 md:gap-3">
-                <div className="text-right hidden sm:block min-w-0 max-w-40 md:max-w-52">
-                  <div className="truncate text-[11px] md:text-xs font-semibold text-foreground leading-tight">{profile?.tenant_name}</div>
-                  <div className="truncate text-[9px] md:text-[10px] font-medium text-muted-foreground leading-tight">{profile?.full_name}</div>
-                </div>
-                {profile?.tenant_logo_url ? (
-                  <img
-                    src={profile.tenant_logo_url}
-                    alt={`Logo ${profile.tenant_name}`}
-                    className="h-9 w-9 md:h-10 md:w-10 rounded-xl md:rounded-2xl border border-border/40 object-contain bg-background/60 shadow-sm p-1"
-                  />
-                ) : (
-                  <div className="h-9 w-9 md:h-10 md:w-10 rounded-xl md:rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 flex items-center justify-center font-bold text-primary shadow-sm text-xs md:text-sm">
-                    {profile?.tenant_name?.charAt(0) ?? profile?.full_name?.charAt(0)}
+                    <div className="mt-8 flex-1">{navigation}</div>
+                    <button
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        logout();
+                      }}
+                      className="flex min-h-11 items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-slate-300 hover:bg-red-500/10 hover:text-red-300"
+                    >
+                      <LogOut className="h-5 w-5" />
+                      Sair
+                    </button>
                   </div>
-                )}
-              </div>
+                </SheetContent>
+              </Sheet>
             </div>
+
+            <div className="hidden flex-1 md:block">
+              <CommandMenu />
+            </div>
+
+            <div className="md:hidden">
+              <Logo size={24} showWordmark={false} />
+            </div>
+
+            <div className="ml-auto flex items-center gap-3">
+              <div className="hidden items-center gap-2 rounded-lg border border-border bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-600 xl:flex">
+                <ShieldCheck className="h-4 w-4 text-success" />
+                Ambiente protegido
+              </div>
+
+              <div className="hidden text-right sm:block">
+                <div className="max-w-48 truncate text-xs font-bold text-[#071A2B]">{profile?.tenant_name}</div>
+                <div className="max-w-48 truncate text-[11px] font-medium text-muted-foreground">{profile?.full_name}</div>
+              </div>
+
+              {profile?.tenant_logo_url ? (
+                <img
+                  src={profile.tenant_logo_url}
+                  alt={`Logo ${profile.tenant_name ?? "do escritório"}`}
+                  className="h-10 w-10 rounded-xl border border-border bg-white object-contain p-1 shadow-sm"
+                />
+              ) : (
+                <div className="grid h-10 w-10 place-items-center rounded-xl bg-blue-50 text-sm font-extrabold text-primary">
+                  {profile?.tenant_name?.charAt(0) ?? profile?.full_name?.charAt(0) ?? "N"}
+                </div>
+              )}
+            </div>
+          </div>
         </header>
-        
+
         <main
           id="main-content"
-          className="flex-1 max-w-[1600px] mx-auto w-full animate-in fade-in slide-in-from-bottom-4 duration-700 overflow-x-hidden p-4 md:p-8 lg:p-12 [padding-bottom:calc(1rem+var(--sab))] md:[padding-bottom:calc(2rem+var(--sab))] lg:[padding-bottom:calc(3rem+var(--sab))] [padding-left:calc(1rem+var(--sal))] [padding-right:calc(1rem+var(--sar))] md:[padding-left:calc(2rem+var(--sal))] md:[padding-right:calc(2rem+var(--sar))] lg:[padding-left:calc(3rem+var(--sal))] lg:[padding-right:calc(3rem+var(--sar))]"
+          className="mx-auto w-full max-w-[1600px] flex-1 overflow-x-hidden p-4 [padding-bottom:calc(1rem+var(--sab))] md:p-6 md:[padding-bottom:calc(1.5rem+var(--sab))] lg:p-8 lg:[padding-bottom:calc(2rem+var(--sab))]"
         >
-
           <Outlet />
         </main>
       </div>
