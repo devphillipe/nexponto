@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { PasswordInput } from "@/components/forms/PasswordInput";
 import { translateAuthError } from "@/lib/auth-errors";
+import { clearStoredEmployeeTenant } from "@/lib/employee-membership";
 import { CpfInput } from "@/components/forms/SpecializedInputs";
 import { isValidCpf, formatCpf, onlyDigits } from "@/lib/masks";
 import {
@@ -70,7 +71,14 @@ function FuncLogin() {
         window.localStorage.removeItem("nexponto-remembered-cpf");
       }
 
-      navigate({ to: "/funcionario/meu-ponto" });
+      clearStoredEmployeeTenant();
+      const memberships = session.memberships ?? [];
+      if (memberships.length === 1) {
+        window.localStorage.setItem("nexponto-employee-tenant", memberships[0]!.tenant_id);
+        navigate({ to: "/funcionario/meu-ponto" });
+      } else {
+        navigate({ to: "/funcionario/selecionar-empresa" });
+      }
     } catch (err) {
       setLoading(false);
       toast.error(translateAuthError(err, "CPF ou senha inválidos."));
