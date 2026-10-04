@@ -72,26 +72,22 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
-      { name: "theme-color", content: "#020406" },
+      { name: "theme-color", content: "#071A2B" },
       { name: "mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
 
-      { title: "NexPonto — Controle de Ponto Inteligente" },
+      { title: "NexPonto — Tempo sob controle." },
       {
         name: "description",
-        content:
-          "NexPonto: A solução definitiva para controle de ponto digital. Multitenant, seguro e altamente intuitivo.",
+        content: "Gestão de jornada, ponto e equipe em uma plataforma simples, segura e eficiente.",
       },
-      { property: "og:title", content: "NexPonto — Controle de Ponto Inteligente" },
+      { property: "og:title", content: "NexPonto — Tempo sob controle." },
       {
         property: "og:description",
-        content: "Gestão simplificada para escritórios e facilidade total para colaboradores.",
+        content: "Gestão de jornada, ponto e equipe em uma plataforma simples, segura e eficiente.",
       },
-      { name: "twitter:title", content: "NexPonto — Controle de Ponto Inteligente" },
-      { name: "description", content: "Ponto Digital is a time tracking application for managing employee attendance and work hours." },
-      { property: "og:description", content: "Ponto Digital is a time tracking application for managing employee attendance and work hours." },
-      { name: "twitter:description", content: "Ponto Digital is a time tracking application for managing employee attendance and work hours." },
+      { name: "twitter:title", content: "NexPonto — Tempo sob controle." },
       { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/94a48ac5-0ee0-4fed-9617-69c211480ed0/id-preview-6212d833--1ddd49b7-dd66-45ec-835e-37eb4f3dce9c.lovable.app-1779330822556.png" },
       { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/94a48ac5-0ee0-4fed-9617-69c211480ed0/id-preview-6212d833--1ddd49b7-dd66-45ec-835e-37eb4f3dce9c.lovable.app-1779330822556.png" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -105,7 +101,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "icon", type: "image/png", sizes: "512x512", href: "/icon-512.png" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap&text=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789%20%E2%80%94",
+        href: "https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap",
       },
     ],
   }),
@@ -117,7 +113,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR" className="dark">
+    <html lang="pt-BR">
       <head>
         <HeadContent />
       </head>
