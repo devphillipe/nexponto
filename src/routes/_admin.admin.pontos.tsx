@@ -210,7 +210,7 @@ function PontosPage() {
         </div>
         
         <div className="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
-          <div className="glass-card p-2 md:p-3 rounded-xl md:rounded-2xl flex items-center gap-4 h-12 md:h-14 border border-border/40 shadow-sm transition-all hover:border-primary/30 w-full sm:w-auto">
+          <div className="glass-card p-2 md:p-3 rounded-xl md:rounded-2xl flex items-center gap-4 h-12 md:h-14 border border-border shadow-sm transition-all hover:border-primary/30 w-full sm:w-auto">
             <Calendar className="h-4 md:h-5 w-4 md:w-5 text-primary ml-2 md:ml-3" />
             <Input 
               type="date" 
@@ -222,11 +222,11 @@ function PontosPage() {
 
           <Dialog open={isBatchOpen} onOpenChange={setIsBatchOpen}>
             <DialogTrigger asChild>
-              <Button size="lg" className="rounded-xl md:rounded-2xl shadow-xl shadow-primary/20 font-black uppercase tracking-widest text-[10px] md:text-xs px-6 md:px-8 h-12 md:h-14 w-full sm:w-auto">
+              <Button size="lg" className="rounded-xl md:rounded-2xl shadow-sm shadow-primary/20 font-extrabold tracking-tight text-[10px] md:text-xs px-6 md:px-8 h-12 md:h-14 w-full sm:w-auto">
                 <Plus className="h-5 w-5" /> Novo Registro
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[640px] rounded-[2rem] border-none glass-card p-0 overflow-hidden max-h-[90dvh] overflow-y-auto">
+            <DialogContent className="sm:max-w-[640px] rounded-2xl border-none glass-card p-0 overflow-hidden max-h-[90dvh] overflow-y-auto">
               <BatchPontoForm
                 employees={(employees as any) || []}
                 defaultDate={date}
@@ -241,7 +241,7 @@ function PontosPage() {
             setIsAddOpen(open);
             if (!open) setEditingEntry(null);
           }}>
-            <DialogContent className="sm:max-w-[500px] rounded-[2rem] border-none glass-card p-0 overflow-hidden">
+            <DialogContent className="sm:max-w-[500px] rounded-2xl border-none glass-card p-0 overflow-hidden">
 
               <form onSubmit={(e) => {
                 e.preventDefault();
@@ -272,7 +272,7 @@ function PontosPage() {
                   <div className="space-y-2">
                     <Label htmlFor="employee_id_field">Colaborador *</Label>
                     <Select name="employee_id" defaultValue={editingEntry?.employee_id} required>
-                      <SelectTrigger id="employee_id_field" className="rounded-xl h-11 border-border/40 bg-background/50">
+                      <SelectTrigger id="employee_id_field" className="rounded-xl h-11 border-border bg-background/50">
                         <SelectValue placeholder="Selecione o funcionário" />
                       </SelectTrigger>
                       <SelectContent>
@@ -285,17 +285,17 @@ function PontosPage() {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="entry_date">Data *</Label>
-                      <Input id="entry_date" name="entry_date" type="date" defaultValue={editingEntry?.entry_date || date} required className="rounded-xl h-11 border-border/40 bg-background/50" />
+                      <Input id="entry_date" name="entry_date" type="date" defaultValue={editingEntry?.entry_date || date} required className="rounded-xl h-11 border-border bg-background/50" />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="entry_time">Horário *</Label>
-                      <Input id="entry_time" name="entry_time" type="time" step="1" inputMode="numeric" defaultValue={editingEntry ? format(new Date(editingEntry.entry_at), "HH:mm:ss") : ""} required className="rounded-xl h-11 border-border/40 bg-background/50" />
+                      <Input id="entry_time" name="entry_time" type="time" step="1" inputMode="numeric" defaultValue={editingEntry ? format(new Date(editingEntry.entry_at), "HH:mm:ss") : ""} required className="rounded-xl h-11 border-border bg-background/50" />
                     </div>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="entry_type_field">Tipo de Registro *</Label>
                     <Select name="entry_type" defaultValue={editingEntry?.entry_type || "entrada"} required>
-                      <SelectTrigger id="entry_type_field" className="rounded-xl h-11 border-border/40 bg-background/50">
+                      <SelectTrigger id="entry_type_field" className="rounded-xl h-11 border-border bg-background/50">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -307,11 +307,11 @@ function PontosPage() {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="notes">Justificativa *</Label>
-                    <Input id="notes" name="notes" required minLength={3} maxLength={300} placeholder="Motivo do ajuste manual" defaultValue={editingEntry?.notes || ""} className="rounded-xl h-11 border-border/40 bg-background/50" aria-describedby="notes-hint" />
+                    <Input id="notes" name="notes" required minLength={3} maxLength={300} placeholder="Motivo do ajuste manual" defaultValue={editingEntry?.notes || ""} className="rounded-xl h-11 border-border bg-background/50" aria-describedby="notes-hint" />
                     <p id="notes-hint" className="text-[11px] text-muted-foreground">Obrigatória para registros manuais. Mínimo 3 caracteres.</p>
                   </div>
                 </div>
-                <DialogFooter className="p-8 bg-muted/20 border-t border-border/40">
+                <DialogFooter className="p-8 bg-muted/20 border-t border-border">
                   <Button type="button" variant="ghost" onClick={() => setIsAddOpen(false)} className="rounded-xl">Cancelar</Button>
                   <Button type="submit" disabled={addMutation.isPending} aria-busy={addMutation.isPending} className="rounded-xl px-8 font-bold">
                     {addMutation.isPending ? "Salvando..." : "Salvar Registro"}
@@ -325,9 +325,9 @@ function PontosPage() {
 
       <div className="space-y-6">
         {isLoading ? (
-          <div className="glass-card p-16 text-center text-sm text-muted-foreground animate-pulse rounded-[2rem]">Carregando registros...</div>
+          <div className="glass-card p-16 text-center text-sm text-muted-foreground animate-pulse rounded-2xl">Carregando registros...</div>
         ) : !Object.keys(groupedData).length ? (
-          <div className="glass-card p-20 text-center space-y-4 rounded-[2rem]">
+          <div className="glass-card p-20 text-center space-y-4 rounded-2xl">
              <div className="h-16 w-16 bg-muted/30 rounded-full grid place-items-center mx-auto">
                 <Clock className="h-8 w-8 text-muted-foreground" />
              </div>
@@ -338,7 +338,7 @@ function PontosPage() {
             const isExpanded = expandedEmployees.has(employeeName);
             const totalItems = group.entries.length + group.absences.length;
             return (
-              <div key={employeeName} className="glass-card overflow-hidden rounded-2xl md:rounded-[2.5rem] border border-border/40 bg-background/20 backdrop-blur-xl shadow-sm transition-all duration-500 hover:shadow-md hover:border-primary/10">
+              <div key={employeeName} className="glass-card overflow-hidden rounded-2xl md:rounded-2xl border border-border bg-background/20 backdrop-blur-xl shadow-sm transition-all duration-500 hover:shadow-md hover:border-primary/10">
                 <div 
                   className="px-6 md:px-10 py-5 md:py-7 border-b border-border/20 bg-muted/5 flex items-center justify-between cursor-pointer group"
                   onClick={() => toggleEmployee(employeeName)}
@@ -350,7 +350,7 @@ function PontosPage() {
                     <div>
                       <h3 className="font-display text-lg md:text-2xl font-bold tracking-tight text-foreground">{employeeName}</h3>
                       <div className="flex items-center gap-2 md:gap-3 mt-0.5 md:mt-1">
-                        <span className="text-[9px] md:text-xs font-black uppercase tracking-widest text-muted-foreground opacity-80">{totalItems} registro(s)</span>
+                        <span className="text-[9px] md:text-xs font-extrabold tracking-tight text-muted-foreground opacity-80">{totalItems} registro(s)</span>
                         <div className="h-1 w-1 rounded-full bg-border"></div>
                         <span className="text-[9px] md:text-xs font-bold text-primary">Visualizar</span>
                       </div>
@@ -526,11 +526,11 @@ function BatchPontoForm({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="batch-start">Data inicial *</Label>
-            <Input id="batch-start" type="date" required value={startDate} onChange={(e) => setStartDate(e.target.value)} className="rounded-xl h-11 border-border/40 bg-background/50" />
+            <Input id="batch-start" type="date" required value={startDate} onChange={(e) => setStartDate(e.target.value)} className="rounded-xl h-11 border-border bg-background/50" />
           </div>
           <div className="space-y-2">
             <Label htmlFor="batch-end">Data final (opcional)</Label>
-            <Input id="batch-end" type="date" min={startDate || undefined} value={endDate} onChange={(e) => setEndDate(e.target.value)} className="rounded-xl h-11 border-border/40 bg-background/50" />
+            <Input id="batch-end" type="date" min={startDate || undefined} value={endDate} onChange={(e) => setEndDate(e.target.value)} className="rounded-xl h-11 border-border bg-background/50" />
           </div>
         </div>
 
@@ -539,9 +539,9 @@ function BatchPontoForm({
           <span className="text-sm text-muted-foreground">Seguir a escala de cada colaborador — dias fora da escala não recebem registros</span>
         </label>
 
-        <div className="space-y-3 rounded-2xl border border-border/40 bg-background/40 p-4">
+        <div className="space-y-3 rounded-2xl border border-border bg-background/40 p-4">
           <div className="flex items-center justify-between gap-2">
-            <Label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Horário padrão</Label>
+            <Label className="text-xs font-extrabold tracking-tight text-muted-foreground">Horário padrão</Label>
             <Button type="button" variant="ghost" size="sm" className="h-8 rounded-lg text-xs font-bold" onClick={applyStandardToAll}>
               Aplicar a todos
             </Button>
@@ -554,7 +554,7 @@ function BatchPontoForm({
                   type="time"
                   value={standard[t] || ""}
                   onChange={(e) => setStandard((prev) => ({ ...prev, [t]: e.target.value }))}
-                  className="rounded-xl h-10 border-border/40 bg-background/50"
+                  className="rounded-xl h-10 border-border bg-background/50"
                 />
               </div>
             ))}
@@ -575,9 +575,9 @@ function BatchPontoForm({
             placeholder="Buscar colaborador..."
             value={empSearch}
             onChange={(e) => setEmpSearch(e.target.value)}
-            className="rounded-xl h-11 border-border/40 bg-background/50"
+            className="rounded-xl h-11 border-border bg-background/50"
           />
-          <div className="max-h-72 overflow-y-auto rounded-xl border border-border/40 bg-background/40 divide-y divide-border/20">
+          <div className="max-h-72 overflow-y-auto rounded-xl border border-border bg-background/40 divide-y divide-border/20">
             {filtered.length === 0 ? (
               <p className="p-4 text-sm text-muted-foreground">Nenhum colaborador encontrado.</p>
             ) : (
@@ -609,7 +609,7 @@ function BatchPontoForm({
                                   [emp.id]: { ...(prev[emp.id] || {}), [t]: e.target.value },
                                 }))
                               }
-                              className="rounded-lg h-10 border-border/40 bg-background/50 text-sm"
+                              className="rounded-lg h-10 border-border bg-background/50 text-sm"
                             />
                           </div>
                         ))}
@@ -633,7 +633,7 @@ function BatchPontoForm({
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder="Ex: Ajuste de ponto por falha no aplicativo"
-            className="rounded-xl border-border/40 bg-background/50"
+            className="rounded-xl border-border bg-background/50"
           />
         </div>
 
@@ -644,7 +644,7 @@ function BatchPontoForm({
         )}
       </div>
 
-      <DialogFooter className="p-6 md:p-8 bg-muted/20 border-t border-border/40">
+      <DialogFooter className="p-6 md:p-8 bg-muted/20 border-t border-border">
         <Button type="button" variant="ghost" onClick={onCancel} className="rounded-xl">Cancelar</Button>
         <Button type="submit" disabled={isPending || total === 0} className="rounded-xl px-8 font-bold">
           {isPending ? "Salvando..." : total > 1 ? `Salvar ${total} batidas` : "Salvar Registro"}
