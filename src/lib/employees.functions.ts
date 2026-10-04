@@ -115,11 +115,38 @@ export const toggleEmployeeActive = createServerFn({ method: "POST" })
     z.object({ employee_id: z.string().uuid(), active: z.boolean() }).parse(data),
   )
   .handler(async ({ data, context }) => {
-    const { supabase } = context;
+    const { supabase, userId } = context;
+
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("tenant_id")
+      .eq("id", userId)
+      .single();
+    if (profileError || !profile?.tenant_id) throw new Error("Perfil não encontrado.");
+
+    const { data: roles, error: roleError } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId)
+      .eq("tenant_id", profile.tenant_id);
+    if (roleError) throw new Error(roleError.message);
+    if (!roles?.some((r) => r.role === "admin")) {
+      throw new Error("Apenas administradores podem alterar o status do funcionário.");
+    }
+
+    const { data: employee, error: employeeError } = await supabase
+      .from("employees")
+      .select("tenant_id")
+      .eq("id", data.employee_id)
+      .single();
+    if (employeeError || !employee) throw new Error("Funcionário não encontrado.");
+    if (employee.tenant_id !== profile.tenant_id) throw new Error("Acesso negado.");
+
     const { error } = await supabase
       .from("employees")
       .update({ active: data.active })
-      .eq("id", data.employee_id);
+      .eq("id", data.employee_id)
+      .eq("tenant_id", profile.tenant_id);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
