@@ -350,7 +350,7 @@ function NewEmployeeForm({ onDone }: { onDone: () => void }) {
     }
     setLoading(true);
     try {
-      await createFn({
+      const result = await createFn({
         data: {
           full_name: form.full_name.trim(),
           email: form.email.trim().toLowerCase(),
@@ -364,7 +364,11 @@ function NewEmployeeForm({ onDone }: { onDone: () => void }) {
           work_days: workDays,
         },
       });
-      toast.success("Funcionário cadastrado! Compartilhe e-mail e senha com ele.");
+      if ((result as any).linked_existing_identity) {
+        toast.success("Vínculo criado! Este funcionário já tinha acesso ao NexPonto e continuará usando a senha atual.");
+      } else {
+        toast.success("Funcionário cadastrado! Compartilhe e-mail e senha com ele.");
+      }
       onDone();
     } catch (e) {
       toast.error((e as Error).message);
