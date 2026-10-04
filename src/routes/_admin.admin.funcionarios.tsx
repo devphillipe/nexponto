@@ -4,6 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useProfile } from "@/lib/auth";
 import { createEmployee, toggleEmployeeActive, updateEmployee } from "@/lib/employees.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -179,17 +180,20 @@ export const Route = createFileRoute("/_admin/admin/funcionarios")({
 });
 
 function EmployeesPage() {
+  const { data: profile } = useProfile();
   const qc = useQueryClient();
   const toggleFn = useServerFn(toggleEmployeeActive);
   const [open, setOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
   const { data: employees, isLoading } = useQuery({
-    queryKey: ["employees"],
+    queryKey: ["employees", profile?.tenant_id],
+    enabled: !!profile?.tenant_id,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("employees")
         .select("id, full_name, email, cpf, phone, position, department, active, daily_hours, work_days, hire_date")
+        .eq("tenant_id", profile!.tenant_id)
         .order("full_name");
       if (error) throw error;
       return data;
