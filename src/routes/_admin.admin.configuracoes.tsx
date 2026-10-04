@@ -186,7 +186,7 @@ function ConfiguracoesPage() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <Card className="glass-card border-border/40 shadow-sm rounded-2xl md:rounded-[2.5rem] overflow-hidden transition-all hover:shadow-md">
+        <Card className="glass-card border-border shadow-sm rounded-2xl md:rounded-2xl overflow-hidden transition-all hover:shadow-md">
           <CardHeader className="p-8 pb-4">
             <CardTitle className="text-xl flex items-center gap-2 text-primary">
               <ImageIcon className="h-5 w-5" />
@@ -244,7 +244,7 @@ function ConfiguracoesPage() {
           </CardContent>
         </Card>
 
-        <Card className="glass-card border-border/40 shadow-sm rounded-2xl md:rounded-[2.5rem] overflow-hidden transition-all hover:shadow-md">
+        <Card className="glass-card border-border shadow-sm rounded-2xl md:rounded-2xl overflow-hidden transition-all hover:shadow-md">
           <CardHeader className="p-8 pb-4">
             <CardTitle className="text-xl flex items-center gap-2 text-primary">
               <Building2 className="h-5 w-5" />
@@ -321,7 +321,7 @@ function ConfiguracoesPage() {
           </CardContent>
         </Card>
 
-        <Card className="glass-card border-border/40 shadow-sm rounded-2xl md:rounded-[2.5rem] overflow-hidden transition-all hover:shadow-md">
+        <Card className="glass-card border-border shadow-sm rounded-2xl md:rounded-2xl overflow-hidden transition-all hover:shadow-md">
           <CardHeader className="p-8 pb-4">
             <CardTitle className="text-xl flex items-center gap-2 text-primary">
               <Clock className="h-5 w-5" />
@@ -359,13 +359,13 @@ function ConfiguracoesPage() {
         </Card>
 
         <div className="flex justify-end gap-4">
-          <Button type="submit" size="lg" disabled={updateMutation.isPending} className="rounded-xl md:rounded-[1.5rem] px-8 md:px-16 h-14 md:h-16 text-base md:text-lg font-black uppercase tracking-widest shadow-xl shadow-primary/20 w-full sm:w-auto">
+          <Button type="submit" size="lg" disabled={updateMutation.isPending} className="rounded-xl md:rounded-[1.5rem] px-8 md:px-16 h-14 md:h-16 text-base md:text-lg font-extrabold tracking-tight shadow-sm shadow-primary/20 w-full sm:w-auto">
             {updateMutation.isPending ? "Salvando..." : "Salvar Alterações"}
           </Button>
         </div>
       </form>
 
-      <Card className="glass-card border-border/40 shadow-sm rounded-2xl md:rounded-[2.5rem] overflow-hidden transition-all hover:shadow-md">
+      <Card className="glass-card border-border shadow-sm rounded-2xl md:rounded-2xl overflow-hidden transition-all hover:shadow-md">
         <CardHeader className="p-8 pb-4">
           <CardTitle className="text-xl flex items-center gap-2 text-primary">
             <Lock className="h-5 w-5" />
