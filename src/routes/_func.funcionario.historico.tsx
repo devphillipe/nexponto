@@ -74,11 +74,11 @@ function HistoryPage() {
       </div>
 
       {isLoading ? (
-        <div className="glass-card rounded-[1.5rem] sm:rounded-[2rem] p-12 sm:p-20 text-center text-sm text-muted-foreground animate-pulse">
+        <div className="glass-card rounded-[1.5rem] sm:rounded-2xl p-12 sm:p-20 text-center text-sm text-muted-foreground animate-pulse">
           Carregando histórico...
         </div>
       ) : !entries?.length ? (
-        <div className="glass-card rounded-[1.5rem] sm:rounded-[2rem] p-12 sm:p-20 text-center space-y-4">
+        <div className="glass-card rounded-[1.5rem] sm:rounded-2xl p-12 sm:p-20 text-center space-y-4">
            <div className="h-12 w-12 sm:h-16 sm:w-16 bg-muted/30 rounded-full grid place-items-center mx-auto">
               <History className="h-6 w-6 sm:h-8 sm:w-8 text-muted-foreground" />
            </div>
@@ -90,7 +90,7 @@ function HistoryPage() {
             const isExpanded = expandedDays[date] !== false; // Default expanded for now, or true? User said "permitir expandir e recolher", implying they might be closed by default or open. Let's do open by default but toggleable.
             
             return (
-              <div key={date} className="glass-card rounded-[1.5rem] sm:rounded-[2rem] border border-border/40 overflow-hidden relative transition-all duration-300">
+              <div key={date} className="glass-card rounded-[1.5rem] sm:rounded-2xl border border-border overflow-hidden relative transition-all duration-300">
                 <div className="absolute top-0 left-0 w-1 sm:w-1.5 h-full bg-primary/20"></div>
                 
                 <button 
