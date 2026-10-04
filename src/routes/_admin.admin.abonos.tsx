@@ -67,8 +67,6 @@ function AbonosPage() {
   const addMutation = useMutation({
     mutationFn: async (payload: { employees: { id: string; dates: string[] }[]; reason: string; description: string }) => {
       const { employees: selectedEmployees, reason, description } = payload;
-      const reasonLabel = REASONS.find((r) => r.value === reason)?.label || reason;
-
       const absenceRows = selectedEmployees.flatMap(({ id: employee_id, dates }) =>
         dates.map((absence_date) => ({
           employee_id,
@@ -82,21 +80,6 @@ function AbonosPage() {
 
       const { error: absenceError } = await supabase.from("absences").insert(absenceRows);
       if (absenceError) throw absenceError;
-
-      const entryRows = absenceRows.map((a) => ({
-        employee_id: a.employee_id,
-        tenant_id: profile!.tenant_id,
-        entry_date: a.absence_date,
-        entry_at: `${a.absence_date}T00:00:00Z`,
-        entry_type: "entrada" as any,
-        notes: `ABONO: ${reasonLabel}. ${description || ""}`,
-        source: "manual_admin" as any,
-        is_adjustment: true,
-        created_by: profile!.id,
-      }));
-
-      const { error: entryError } = await supabase.from("time_entries").insert(entryRows);
-      if (entryError) console.error("Erro ao criar entradas de ponto para abono:", entryError);
 
       return absenceRows.length;
     },
