@@ -48,9 +48,10 @@ function RelatoriosPage() {
   const generateReport = async (reportFormat: "xlsx" | "pdf") => {
     setLoading(true);
     try {
+      const monthlyRef = new Date(`${month}-01T12:00:00`);
       const ref = new Date(referenceDate + "T12:00:00");
-      const startDate = periodType === "mensal" ? startOfMonth(ref) : periodType === "semanal" ? startOfWeek(ref, { weekStartsOn: 1 }) : ref;
-      const endDate = periodType === "mensal" ? endOfMonth(startDate) : periodType === "semanal" ? endOfWeek(ref, { weekStartsOn: 1 }) : ref;
+      const startDate = periodType === "mensal" ? startOfMonth(monthlyRef) : periodType === "semanal" ? startOfWeek(ref, { weekStartsOn: 1 }) : ref;
+      const endDate = periodType === "mensal" ? endOfMonth(monthlyRef) : periodType === "semanal" ? endOfWeek(ref, { weekStartsOn: 1 }) : ref;
       const periodLabel = periodType === "mensal" ? month : periodType === "semanal" ? `Semana_${format(startDate, "dd-MM")}_a_${format(endDate, "dd-MM-yyyy")}` : format(referenceDate, "dd-MM-yyyy");
 
       
@@ -87,6 +88,7 @@ function RelatoriosPage() {
         
         let totalWorkedMinutes = 0;
         let totalExpectedMinutes = 0;
+        let expectedWorkDays = 0;
 
         const dailyReports = days.map(day => {
           const dateStr = format(day, "yyyy-MM-dd");
@@ -107,6 +109,7 @@ function RelatoriosPage() {
           const empWorkDays = normalizeWorkDays((emp as any).work_days);
           const isWorkDay = worksOn(empWorkDays, day);
           const expectedMinutes = (!isWorkDay || absence) ? 0 : (emp.daily_hours || 8) * 60;
+          if (expectedMinutes > 0) expectedWorkDays += 1;
           
           totalWorkedMinutes += workedMinutes;
           totalExpectedMinutes += expectedMinutes;
@@ -138,6 +141,10 @@ function RelatoriosPage() {
           totalWorked: Math.floor(totalWorkedMinutes / 60) + ":" + String(Math.floor(totalWorkedMinutes % 60)).padStart(2, "0"),
           totalExpected: Math.floor(totalExpectedMinutes / 60) + ":" + String(Math.floor(totalExpectedMinutes % 60)).padStart(2, "0"),
           balance: (diff >= 0 ? "+" : "-") + Math.floor(Math.abs(diff) / 60) + ":" + String(Math.floor(Math.abs(diff) % 60)).padStart(2, "0"),
+          dailyHours: emp.daily_hours || 8,
+          weeklyHours: (emp.daily_hours || 8) * normalizeWorkDays((emp as any).work_days).length,
+          expectedWorkDays,
+          workDaysLabel: formatWorkDays((emp as any).work_days),
           dailyReports
         };
       });
@@ -159,7 +166,11 @@ function RelatoriosPage() {
           
           XLSX.utils.sheet_add_aoa(ws, [
             [],
-            ["Resumo Mensal"],
+            ["Resumo do Período"],
+            ["Escala", rd.workDaysLabel],
+            ["Carga Diária", `${rd.dailyHours}h`],
+            ["Jornada Semanal", `${rd.weeklyHours}h`],
+            ["Dias Previstos", rd.expectedWorkDays],
             ["Total Trabalhado", rd.totalWorked],
             ["Total Esperado", rd.totalExpected],
             ["Saldo", rd.balance]
@@ -247,24 +258,31 @@ function RelatoriosPage() {
           doc.text(`Período: ${periodLabel}`, 14, 70);
 
           doc.setFillColor(245, 247, 250);
-          doc.roundedRect(14, 76, 182, 25, 3, 3, "F");
-          
-          doc.setFontSize(10);
-          doc.text("Total Trabalhado", 20, 86);
-          doc.setFontSize(12);
-          doc.text(rd.totalWorked, 20, 94);
+          doc.roundedRect(14, 76, 182, 38, 3, 3, "F");
+
+          doc.setTextColor(90, 90, 90);
+          doc.setFontSize(9);
+          doc.text(`Escala: ${rd.workDaysLabel}`, 20, 84);
+          doc.text(`Carga diária: ${rd.dailyHours}h`, 80, 84);
+          doc.text(`Jornada semanal: ${rd.weeklyHours}h`, 140, 84);
+          doc.text(`Dias previstos: ${rd.expectedWorkDays}`, 20, 92);
 
           doc.setFontSize(10);
-          doc.text("Total Esperado", 80, 86);
+          doc.text("Total Trabalhado", 20, 101);
           doc.setFontSize(12);
-          doc.text(rd.totalExpected, 80, 94);
+          doc.text(rd.totalWorked, 20, 109);
 
           doc.setFontSize(10);
-          doc.text("Saldo de Horas", 140, 86);
+          doc.text("Total Esperado", 80, 101);
+          doc.setFontSize(12);
+          doc.text(rd.totalExpected, 80, 109);
+
+          doc.setFontSize(10);
+          doc.text("Saldo de Horas", 140, 101);
           doc.setFontSize(14);
           const isNegative = rd.balance.startsWith("-");
           doc.setTextColor(isNegative ? 244 : 76, isNegative ? 67 : 175, isNegative ? 54 : 80);
-          doc.text(rd.balance, 140, 94);
+          doc.text(rd.balance, 140, 109);
 
           const tableBody = rd.dailyReports.map(d => [
             d.date, 
@@ -277,7 +295,7 @@ function RelatoriosPage() {
           ]);
 
           autoTable(doc, {
-            startY: 108,
+            startY: 121,
             head: [["Data", "Entrada", "Almoço (S)", "Almoço (R)", "Saída", "Total", "Status"]],
             body: tableBody,
             theme: "grid",
