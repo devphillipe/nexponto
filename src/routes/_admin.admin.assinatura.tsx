@@ -67,7 +67,7 @@ function AssinaturaPage() {
   useEffect(() => {
     if (checkoutStatus === "sucesso") {
       queryClient.invalidateQueries({ queryKey: ["billing-info"] });
-      toast.success("Pagamento confirmado! Sua assinatura está ativa.");
+      toast.success("Pagamento concluído. Estamos atualizando o status da sua assinatura.");
     } else if (checkoutStatus === "cancelado") {
       toast.info("Pagamento cancelado — nenhuma cobrança foi feita.");
     }
@@ -109,11 +109,17 @@ function AssinaturaPage() {
       <PageHeader />
 
       {checkoutStatus === "sucesso" && (
-        <Card className="border-green-200 bg-green-50">
+        <Card className={isActive ? "border-green-200 bg-green-50" : "border-blue-200 bg-blue-50"}>
           <CardContent className="flex items-center gap-3 p-4">
-            <Check className="h-5 w-5 text-green-500 shrink-0" />
+            {isActive ? (
+              <Check className="h-5 w-5 text-green-500 shrink-0" />
+            ) : (
+              <Loader2 className="h-5 w-5 animate-spin text-primary shrink-0" />
+            )}
             <p className="text-sm font-semibold text-foreground">
-              Pagamento confirmado! Sua assinatura foi ativada.
+              {isActive
+                ? "Pagamento processado e assinatura ativa."
+                : "Pagamento concluído. Aguardando a confirmação automática do Stripe."}
             </p>
           </CardContent>
         </Card>
