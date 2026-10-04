@@ -89,6 +89,59 @@ function WorkDaysPicker({
   );
 }
 
+function DailyHoursField({
+  id,
+  value,
+  onChange,
+  error,
+  ariaProps,
+}: {
+  id: string;
+  value: string;
+  onChange: (value: string) => void;
+  error?: React.ReactNode;
+  ariaProps?: Record<string, any>;
+}) {
+  return (
+    <div className="space-y-2">
+      <Label htmlFor={id}>Jornada diária (h)</Label>
+      <div className="grid grid-cols-3 gap-2">
+        {[4, 6, 8].map((hours) => {
+          const active = Number(value || 8) === hours;
+          return (
+            <Button
+              key={hours}
+              type="button"
+              variant={active ? "default" : "outline"}
+              size="sm"
+              onClick={() => onChange(String(hours))}
+              className="h-9"
+            >
+              {hours}h
+            </Button>
+          );
+        })}
+      </div>
+      <Input
+        id={id}
+        type="number"
+        inputMode="decimal"
+        step="0.5"
+        min="1"
+        max="24"
+        placeholder="Outra carga horária"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        {...ariaProps}
+      />
+      <p className="text-[11px] leading-4 text-muted-foreground">
+        Padrões rápidos: 4h, 6h e 8h. Você também pode informar outra jornada.
+      </p>
+      {error}
+    </div>
+  );
+}
+
 function WorkloadSummary({
   dailyHours,
   workDays,
@@ -378,11 +431,13 @@ function NewEmployeeForm({ onDone }: { onDone: () => void }) {
           <DateBrInput id="hd" value={form.hire_date_br} onValueChange={(v) => up("hire_date_br", v)} {...aria("hire_date_br")} />
           {err("hire_date_br")}
         </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="dh">Jornada diária (h)</Label>
-          <Input id="dh" type="number" inputMode="decimal" step="0.5" min="1" max="24" placeholder="Padrão: 8h" value={form.daily_hours} onChange={(e) => up("daily_hours", e.target.value)} {...aria("daily_hours")} />
-          {err("daily_hours")}
-        </div>
+        <DailyHoursField
+          id="dh"
+          value={form.daily_hours}
+          onChange={(value) => up("daily_hours", value)}
+          error={err("daily_hours")}
+          ariaProps={aria("daily_hours")}
+        />
       </div>
       <WorkDaysPicker idPrefix="new" value={workDays} onChange={setWorkDays} />
       <WorkloadSummary dailyHours={form.daily_hours} workDays={workDays} />
@@ -539,11 +594,13 @@ function EditEmployeeDialog({ employee, onDone }: { employee: any, onDone: () =>
                 <DateBrInput id="edit-hd" value={form.hire_date_br} onValueChange={(v) => up("hire_date_br", v)} {...aria("hire_date_br")} />
                 {err("hire_date_br")}
               </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="edit-dh">Jornada diária (h)</Label>
-                <Input id="edit-dh" type="number" inputMode="decimal" step="0.5" min="1" max="24" placeholder="Padrão: 8h" value={form.daily_hours} onChange={(e) => up("daily_hours", e.target.value)} {...aria("daily_hours")} />
-                {err("daily_hours")}
-              </div>
+              <DailyHoursField
+                id="edit-dh"
+                value={form.daily_hours}
+                onChange={(value) => up("daily_hours", value)}
+                error={err("daily_hours")}
+                ariaProps={aria("daily_hours")}
+              />
             </div>
             <WorkDaysPicker idPrefix={`edit-${employee.id}`} value={workDays} onChange={setWorkDays} />
             <WorkloadSummary dailyHours={form.daily_hours} workDays={workDays} />
