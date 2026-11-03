@@ -55,7 +55,7 @@ function RelatoriosPage() {
       const ref = new Date(ry, (rm || 1) - 1, rdd || 1, 12);
       const startDate = periodType === "mensal" ? startOfMonth(monthlyRef) : periodType === "semanal" ? startOfWeek(ref, { weekStartsOn: 1 }) : ref;
       const endDate = periodType === "mensal" ? endOfMonth(monthlyRef) : periodType === "semanal" ? endOfWeek(ref, { weekStartsOn: 1 }) : ref;
-      const periodLabel = periodType === "mensal" ? month : periodType === "semanal" ? `Semana_${format(startDate, "dd-MM")}_a_${format(endDate, "dd-MM-yyyy")}` : format(referenceDate, "dd-MM-yyyy");
+      const periodLabel = periodType === "mensal" ? month : periodType === "semanal" ? `Semana_${format(startDate, "dd-MM")}_a_${format(endDate, "dd-MM-yyyy")}` : format(ref, "dd-MM-yyyy");
 
       
       const query = supabase
