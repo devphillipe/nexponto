@@ -76,7 +76,8 @@ export const registerOwnPunch = createServerFn({ method: "POST" })
       entry_at: now.toISOString(),
       entry_date: entryDate,
       source: "automatico",
-      created_by: userId,
+      // A regra de segurança exige created_by nulo em batidas automáticas do funcionário.
+      created_by: null,
       user_agent: data.user_agent ?? null,
       latitude: data.latitude ?? null,
       longitude: data.longitude ?? null,
