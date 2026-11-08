@@ -15,9 +15,18 @@ import { useState, useMemo, memo } from "react";
 import { format } from "date-fns";
 import { worksOn, formatWorkDays } from "@/lib/work-days";
 import { LocationDialog } from "@/components/LocationDialog";
+import { insertMissingManualPunches } from "@/lib/manual-punches";
+import type { TablesInsert } from "@/integrations/supabase/types";
 
 export const Route = createFileRoute("/_admin/admin/pontos")({
-  head: () => ({ meta: [{ title: "Pontos — NexPonto Admin" }] }),
+  head: () => ({ meta: [
+    { title: "Pontos — NexPonto Admin" },
+    { name: "description", content: "Consulte registros e complete ou ajuste as batidas da equipe no NexPonto." },
+    { property: "og:title", content: "Pontos — NexPonto Admin" },
+    { property: "og:description", content: "Gestão e ajustes dos registros de ponto da equipe." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: PontosPage,
 });
 
@@ -112,19 +121,21 @@ function PontosPage() {
 
   const addMutation = useMutation({
     mutationFn: async (newData: any) => {
+      if (!profile) throw new Error("Sua sessão expirou. Entre novamente.");
       const timePart = newData.entry_time.split(':').length === 2 ? `${newData.entry_time}:00` : newData.entry_time;
       const entry_at = `${newData.entry_date}T${timePart}`;
       
-      const payload = {
+      const payload: TablesInsert<"time_entries"> = {
         employee_id: newData.employee_id,
-        tenant_id: profile!.tenant_id,
+        tenant_id: profile.tenant_id,
         entry_date: newData.entry_date,
         entry_at: new Date(entry_at).toISOString(),
         entry_type: newData.entry_type,
         notes: newData.notes,
         source: "manual_admin",
-        is_adjustment: !!editingEntry,
-        created_by: profile!.id,
+        is_adjustment: true,
+        created_by: profile.id,
+        ...(editingEntry ? { original_entry_at: editingEntry.original_entry_at ?? editingEntry.entry_at } : {}),
       };
 
       if (editingEntry) {
@@ -134,10 +145,8 @@ function PontosPage() {
           .eq("id", editingEntry.id);
         if (error) throw error;
       } else {
-        const { error } = await supabase
-          .from("time_entries")
-          .insert([payload as any]);
-        if (error) throw error;
+        const result = await insertMissingManualPunches(supabase, [payload]);
+        if (!result.created) throw new Error("Essa batida já existe. Use Ajustar Ponto para alterar seu horário.");
       }
     },
     onSuccess: () => {
@@ -153,7 +162,8 @@ function PontosPage() {
 
   const batchMutation = useMutation({
     mutationFn: async (payload: BatchPontoPayload) => {
-      const rows: any[] = [];
+      if (!profile) throw new Error("Sua sessão expirou. Entre novamente.");
+      const rows: TablesInsert<"time_entries">[] = [];
       for (const emp of payload.employees) {
         for (const d of emp.dates) {
           for (const [type, time] of Object.entries(emp.times)) {
@@ -161,27 +171,26 @@ function PontosPage() {
             const timePart = time.length === 5 ? `${time}:00` : time;
             rows.push({
               employee_id: emp.id,
-              tenant_id: profile!.tenant_id,
+              tenant_id: profile.tenant_id,
               entry_date: d,
               entry_at: new Date(`${d}T${timePart}`).toISOString(),
-              entry_type: type,
+              entry_type: type as TablesInsert<"time_entries">["entry_type"],
               notes: payload.notes,
               source: "manual_admin",
               is_adjustment: true,
-              created_by: profile!.id,
+              created_by: profile.id,
             });
           }
         }
       }
       if (!rows.length) throw new Error("Nenhum registro para salvar.");
-      const { error } = await supabase.from("time_entries").insert(rows);
-      if (error) throw error;
-      return rows.length;
+      return insertMissingManualPunches(supabase, rows);
     },
-    onSuccess: (count) => {
+    onSuccess: ({ created, requested }) => {
       queryClient.invalidateQueries({ queryKey: ["time-entries"] });
       setIsBatchOpen(false);
-      toast.success(count === 1 ? "Ponto registrado!" : `${count} registros criados!`);
+      if (!created) toast.info("Todas as batidas informadas já existem. Nenhum registro foi alterado.");
+      else toast.success(`${created} registro(s) criado(s)!${requested > created ? ` ${requested - created} batida(s) existente(s) preservada(s).` : ""}`);
     },
     onError: (error: any) => toast.error("Erro ao registrar: " + error.message),
   });
@@ -521,6 +530,7 @@ function BatchPontoForm({
         </DialogTitle>
         <DialogDescription>
           Registre um ou vários dias para um ou vários colaboradores, com horários individuais.
+          {" "}Batidas já existentes são preservadas; apenas as faltantes serão adicionadas.
         </DialogDescription>
       </DialogHeader>
 
